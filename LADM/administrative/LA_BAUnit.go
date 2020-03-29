@@ -6,7 +6,7 @@ import "github.com/cdrlis/cdrLIS/LADM/shared"
 type LABaunit struct {
 	shared.VersionedObject
 
-	Name string
+	Name *string
 	Type LABAUnitType
 	UID  shared.Oid
 }

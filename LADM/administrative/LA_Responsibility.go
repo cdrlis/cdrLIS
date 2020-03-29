@@ -3,6 +3,7 @@ package administrative
 // LAResponsibility Responsibility
 type LAResponsibility struct {
 	LARRR
+
 	Type LAResponsibilityType
 }
 

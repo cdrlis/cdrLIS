@@ -3,6 +3,7 @@ package administrative
 // LARestriction Restriction
 type LARestriction struct {
 	LARRR
+
 	PartyRequired *bool
 	Type          LARestrictionType
 }

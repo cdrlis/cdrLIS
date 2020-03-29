@@ -3,6 +3,7 @@ package administrative
 // LARight Right
 type LARight struct {
 	LARRR
+
 	Type LARightType
 }
 

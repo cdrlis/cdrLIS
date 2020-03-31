@@ -8,7 +8,7 @@ type LAGroupParty struct {
 
 	GroupID shared.Oid
 	Type    LAGroupPartyType
-	Members *LAPartyMember
+	Parties []LAPartyMember
 }
 
 // LAGroupPartyType Group party type

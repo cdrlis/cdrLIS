@@ -6,7 +6,7 @@ import "github.com/cdrlis/cdrLIS/LADM/shared"
 type LAPartyMember struct {
 	shared.VersionedObject
 
-	Share   *shared.Fraction
-	Parties []LAPartyMember
-	Groups  []LAGroupParty
+	Share *shared.Fraction
+	Party *LAParty
+	Group *LAGroupParty
 }

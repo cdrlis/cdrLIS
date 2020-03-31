@@ -7,13 +7,16 @@ type LAParty struct {
 	shared.VersionedObject
 
 	// LA_Party
-	ExtPid  *shared.Oid
-	Name    *string
-	Pid     shared.Oid
-	Role    *LAPartyRoleType
-	Type    LAPartyType
-	Members *LAPartyMember
+	ExtPid *shared.Oid
+	Name   NullableString
+	Pid    shared.Oid
+	Role   *LAPartyRoleType
+	Type   LAPartyType
+	Groups []LAPartyMember
 }
+
+// NullableString Nullable string
+type NullableString *string
 
 // LAPartyType Party type
 type LAPartyType int

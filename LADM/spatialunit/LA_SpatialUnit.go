@@ -4,14 +4,14 @@ import "github.com/cdrlis/cdrLIS/LADM/shared"
 
 // LASpatialUnit Spatil unit
 type LASpatialUnit struct {
-	ExtAddressID    shared.Oid
-	Area            LAAreaValue
-	Dimension       LADimensionType
-	Label           string
-	ReferencePoint  GMPoint
+	ExtAddressID    *shared.Oid
+	Area            *LAAreaValue
+	Dimension       *LADimensionType
+	Label           *string
+	ReferencePoint  *GMPoint
 	SuID            shared.Oid
-	SurfaceRelation LASurfaceRelationType
-	Volume          LAVolumeValue
+	SurfaceRelation *LASurfaceRelationType
+	Volume          *LAVolumeValue
 }
 
 func (su LASpatialUnit) areaClosed() bool {

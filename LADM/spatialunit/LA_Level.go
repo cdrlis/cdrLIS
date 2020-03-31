@@ -5,10 +5,10 @@ import "github.com/cdrlis/cdrLIS/LADM/shared"
 // LALevel Level
 type LALevel struct {
 	LID          shared.Oid
-	Name         string
-	RegisterType LARegisterType
-	Structure    LAStructureType
-	Type         LALevelContentType
+	Name         *string
+	RegisterType *LARegisterType
+	Structure    *LAStructureType
+	Type         *LALevelContentType
 }
 
 // LARegisterType Register type

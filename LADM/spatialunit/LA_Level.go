@@ -1,10 +1,10 @@
 package spatialunit
 
-import "github.com/cdrlis/cdrLIS/LADM/shared"
+import "github.com/cdrlis/cdrLIS/LADM/common"
 
 // LALevel Level
 type LALevel struct {
-	LID          shared.Oid
+	LID          common.Oid
 	Name         *string
 	RegisterType *LARegisterType
 	Structure    *LAStructureType

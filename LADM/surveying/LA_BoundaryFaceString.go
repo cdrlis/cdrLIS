@@ -1,12 +1,12 @@
 package surveying
 
-import "github.com/cdrlis/cdrLIS/LADM/shared"
+import "github.com/cdrlis/cdrLIS/LADM/common"
 
 // LABoundaryFaceString Boundary face string
 type LABoundaryFaceString struct {
-	shared.VersionedObject
+	common.VersionedObject
 
-	BfsID          shared.Oid
+	BfsID          common.Oid
 	Geometry       *GMMultiCurve
 	LocationByText *string
 }

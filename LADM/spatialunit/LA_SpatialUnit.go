@@ -1,15 +1,15 @@
 package spatialunit
 
-import "github.com/cdrlis/cdrLIS/LADM/shared"
+import "github.com/cdrlis/cdrLIS/LADM/common"
 
 // LASpatialUnit Spatil unit
 type LASpatialUnit struct {
-	ExtAddressID    *shared.Oid
+	ExtAddressID    *common.Oid
 	Area            *LAAreaValue
 	Dimension       *LADimensionType
 	Label           *string
 	ReferencePoint  *GMPoint
-	SuID            shared.Oid
+	SuID            common.Oid
 	SurfaceRelation *LASurfaceRelationType
 	Volume          *LAVolumeValue
 }

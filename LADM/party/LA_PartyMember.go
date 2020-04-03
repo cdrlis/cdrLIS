@@ -1,12 +1,12 @@
 package party
 
-import "github.com/cdrlis/cdrLIS/LADM/shared"
+import "github.com/cdrlis/cdrLIS/LADM/common"
 
 // LAPartyMember Party member
 type LAPartyMember struct {
-	shared.VersionedObject
+	common.VersionedObject
 
-	Share *shared.Fraction
+	Share *common.Fraction
 	Party *LAParty
 	Group *LAGroupParty
 }

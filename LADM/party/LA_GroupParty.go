@@ -1,12 +1,12 @@
 package party
 
-import "github.com/cdrlis/cdrLIS/LADM/shared"
+import "github.com/cdrlis/cdrLIS/LADM/common"
 
 // LAGroupParty Group party
 type LAGroupParty struct {
 	LAParty
 
-	GroupID shared.Oid
+	GroupID common.Oid
 	Type    LAGroupPartyType
 	Parties []LAPartyMember
 }

@@ -1,14 +1,14 @@
 package administrative
 
-import "github.com/cdrlis/cdrLIS/LADM/shared"
+import "github.com/cdrlis/cdrLIS/LADM/common"
 
 // LABaunit Basic administrative unit
 type LABaunit struct {
-	shared.VersionedObject
+	common.VersionedObject
 
 	Name *string
 	Type LABAUnitType
-	UID  shared.Oid
+	UID  common.Oid
 }
 
 // LABAUnitType BA unit type

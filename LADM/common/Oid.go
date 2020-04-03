@@ -1,4 +1,4 @@
-package shared
+package common
 
 // Oid Object identifier
 type Oid struct {

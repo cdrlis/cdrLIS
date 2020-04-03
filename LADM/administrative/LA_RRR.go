@@ -1,14 +1,14 @@
 package administrative
 
-import "github.com/cdrlis/cdrLIS/LADM/shared"
+import "github.com/cdrlis/cdrLIS/LADM/common"
 
 // LARRR right, restriction, responsibility
 type LARRR struct {
-	shared.VersionedObject
+	common.VersionedObject
 
 	Description *string
-	RID         shared.Oid
-	Share       *shared.Fraction
+	RID         common.Oid
+	Share       *common.Fraction
 	ShareCheck  *bool
 	TimeSpec    *string // TODO ISO8601_ISO14825_Type
 }

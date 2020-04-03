@@ -1,6 +1,6 @@
 package spatialunit
 
-import "github.com/cdrlis/cdrLIS/LADM/shared"
+import "github.com/cdrlis/cdrLIS/LADM/common"
 
 // LASpatialUnitGroup Spatial unit group
 type LASpatialUnitGroup struct {
@@ -8,5 +8,5 @@ type LASpatialUnitGroup struct {
 	Label          *string
 	Name           *string
 	ReferencePoint *GMPoint
-	SugID          shared.Oid
+	SugID          common.Oid
 }

@@ -1,15 +1,15 @@
 package surveying
 
-import "github.com/cdrlis/cdrLIS/LADM/shared"
+import "github.com/cdrlis/cdrLIS/LADM/common"
 
 // LAPoint Point
 type LAPoint struct {
-	shared.VersionedObject
+	common.VersionedObject
 
 	InterpolationRole LAInterpolationType
 	Monumentation     *LAMonumentationType
 	OriginalLocation  GMPoint
-	PID               shared.Oid
+	PID               common.Oid
 	PointType         LAPointType
 	ProductionMethod  *LILinage
 	TransAndResult    *LATransformation

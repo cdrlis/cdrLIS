@@ -1,9 +1,13 @@
 package administrative
 
-// LAResponsibility Responsibility
+//
+// Administrative::LA_Responsibility
+//
+// An instance of class LA_Responsibility is a responsibility. LA_Responsibility is a subclass of class LA_RRR.
+// See Figure 10.
+
 type LAResponsibility struct {
 	LARRR
-
 	Type LAResponsibilityType
 }
 
@@ -12,5 +16,7 @@ type LAResponsibilityType int
 
 const (
 	// DefaultResponsibility Default responsibility type
-	DefaultResponsibility LAResponsibilityType = 0
+	DefaultResponsibility LAResponsibilityType = iota
+	MonumentMaintenance
+	WaterwayMaintenance
 )

@@ -7,6 +7,7 @@ import (
 
 //
 // Administrative::LA_RRR
+//
 // LA_RRR is an abstract class with three specialization classes:
 // 1) LA_Right, with rights as instances. Rights are primarily in the domain of private or customary law.
 //    Ownership rights are generally based on (national) legislation, and code lists in the LADM are in

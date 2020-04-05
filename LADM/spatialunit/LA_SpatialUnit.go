@@ -71,7 +71,12 @@ type LAAreaValue struct {
 // Area Area
 type Area int64
 
-// LAAreaType Area type
+//
+// LA_AreaType: the LA_AreaType code list includes all the various area types, such as official or
+// calculated, used in a specific land administration profile implementation. The LA_AreaType code list is
+// required to implement the LA_AreaValue data type. The code list shall provide a complete list of all codes
+// with a name and description.
+//
 type LAAreaType int
 
 const (
@@ -83,7 +88,12 @@ const (
 	SurveyedArea
 )
 
-// LADimensionType Dimension type
+//
+// LA_DimensionType: the LA_DimensionType code list includes all the various dimension types, such as
+// 2D or 3D, used in a specific land administration profile implementation. The LA_DimensionType code list
+// is required only if the attribute dimension in LA_SpatialUnit class is implemented. The code list shall
+// provide a complete list of all codes with a name and description.
+//
 type LADimensionType int
 
 const (

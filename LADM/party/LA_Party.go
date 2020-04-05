@@ -1,7 +1,13 @@
 package party
 
-import "github.com/cdrlis/cdrLIS/LADM/common"
+import (
+	"github.com/cdrlis/cdrLIS/LADM/administrative"
+	"github.com/cdrlis/cdrLIS/LADM/common"
+)
 
+//
+// Party::LA_Party
+//
 // An instance of class LA_Party is a party. A party is associated to zero or more [0..*] instances of a subclass of
 // LA_RRR. LA_Party is also associated to LA_BAUnit, to cater for the fact that a basic administrative unit can
 // be a party (e.g. a basic administrative unit holding an easement on another basic administrative unit). A party
@@ -18,6 +24,9 @@ type LAParty struct {
 	Role   *LAPartyRoleType
 	Type   LAPartyType
 	Groups []LAPartyMember
+
+	Unit []administrative.LABAunit // baunitAsParty
+	RRR  []administrative.LARRR    // rrrParty
 }
 
 // LAPartyType Party type

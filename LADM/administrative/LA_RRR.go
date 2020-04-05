@@ -1,8 +1,10 @@
 package administrative
 
 import (
-	"github.com/cdrlis/cdrLIS/LADM/common"
 	"time"
+
+	"github.com/cdrlis/cdrLIS/LADM/common"
+	"github.com/cdrlis/cdrLIS/LADM/party"
 )
 
 //
@@ -21,9 +23,13 @@ import (
 
 type LARRR struct {
 	common.VersionedObject
+
 	Description *string
 	RID         common.Oid
 	Share       *common.Fraction
 	ShareCheck  *bool
 	TimeSpec    *time.Time // TODO ISO8601_ISO14825_Type
+
+	Party *party.LAParty // rrrParty
+	Unit  *LABAunit      // unitRrr
 }

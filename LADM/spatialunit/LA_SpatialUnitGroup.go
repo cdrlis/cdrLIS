@@ -16,9 +16,12 @@ import (
 
 type LASpatialUnitGroup struct {
 	common.VersionedObject
+
 	HierarchyLevel int
 	Label          *string
 	Name           *string
 	ReferencePoint *geometry.GMPoint
 	SugID          common.Oid
+
+	SpatialUnits []LASpatialUnit // suSuGroup
 }

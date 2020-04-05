@@ -1,6 +1,10 @@
 package administrative
 
-import "github.com/cdrlis/cdrLIS/LADM/common"
+import (
+	"github.com/cdrlis/cdrLIS/LADM/common"
+	"github.com/cdrlis/cdrLIS/LADM/party"
+	"github.com/cdrlis/cdrLIS/LADM/spatialunit"
+)
 
 //
 // Administrative::LA_BAUnit
@@ -20,11 +24,16 @@ import "github.com/cdrlis/cdrLIS/LADM/common"
 // spatial sources (i.e. the extent – part of – of a basic administrative unit can be described on a spatial source).
 // See Figure 10.
 
-type LABaunit struct {
+type LABAunit struct {
 	common.VersionedObject
+
 	Name *string
 	Type LABAUnitType
 	UID  common.Oid
+
+	Party        []party.LAParty             // baunitAsParty
+	RRRs         *LARRR                      // unitRrr
+	SpatialUnits []spatialunit.LASpatialUnit // suBaunit
 }
 
 // LABAUnitType BA unit type

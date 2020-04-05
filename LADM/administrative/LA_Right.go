@@ -8,7 +8,10 @@ package administrative
 // may also be specifically associated to the right which is the object of the mortgage); see Figure 10.
 type LARight struct {
 	LARRR
+
 	Type LARightType
+
+	Mortages []LAMortgage // mortageRight
 }
 
 // LARightType Right type

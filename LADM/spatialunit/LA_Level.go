@@ -5,11 +5,15 @@ import "github.com/cdrlis/cdrLIS/LADM/common"
 // Set of spatial units (4.1.23), with a geometric, and/or topological, and/or thematic coherence
 
 type LALevel struct {
+	common.VersionedObject
+
 	LID          common.Oid
 	Name         *string
 	RegisterType *LARegisterType
 	Structure    *LAStructureType
 	Type         *LALevelContentType
+
+	SpatialUnits []LASpatialUnit // suLevel
 }
 
 //

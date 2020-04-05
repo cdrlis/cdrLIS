@@ -8,6 +8,7 @@ package administrative
 
 type LARestriction struct {
 	LARRR
+
 	PartyRequired *bool
 	Type          LARestrictionType
 }

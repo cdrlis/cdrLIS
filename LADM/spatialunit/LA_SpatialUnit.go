@@ -1,6 +1,7 @@
 package spatialunit
 
 import (
+	"github.com/cdrlis/cdrLIS/LADM/administrative"
 	"github.com/cdrlis/cdrLIS/LADM/common"
 	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
 	"github.com/cdrlis/cdrLIS/LADM/external"
@@ -32,6 +33,12 @@ type LASpatialUnit struct {
 	ReferencePoint  *geometry.GMPoint
 	SuID            common.Oid
 	SurfaceRelation *LASurfaceRelationType
+
+	BAUnits              []administrative.LABAunit           // suBaunit
+	SpatialUnitHierarchy []LASpatialUnit                     // suHierarchy
+	SpatialUnitRelation  []LARequiredRelationshipSpatialUnit // relationSu
+	Level                *LALevel                            // suLevel
+	SpatialUnitGroups    []LASpatialUnitGroup                // suSuGroup
 }
 
 // Should they be defined in the interface LASpatialUniter ?!

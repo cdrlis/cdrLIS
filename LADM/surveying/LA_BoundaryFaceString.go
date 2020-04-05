@@ -21,6 +21,7 @@ import (
 
 type LABoundaryFaceString struct {
 	common.VersionedObject
+
 	BfsID          common.Oid
 	Geometry       *geometry.GMMultiCurve
 	LocationByText *string

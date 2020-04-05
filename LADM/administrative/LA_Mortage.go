@@ -11,10 +11,13 @@ package administrative
 
 type LAMortgage struct {
 	LARestriction
+
 	Amount       *Currency
 	InterestRate *float32
 	Ranking      *int
 	Type         *LAMortgageType
+
+	Rights []LARight // mortageRight
 }
 
 type Currency struct {

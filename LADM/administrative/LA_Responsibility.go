@@ -8,6 +8,7 @@ package administrative
 
 type LAResponsibility struct {
 	LARRR
+
 	Type LAResponsibilityType
 }
 

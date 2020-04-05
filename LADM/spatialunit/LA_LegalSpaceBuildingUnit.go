@@ -1,20 +1,25 @@
 package spatialunit
 
+import "github.com/cdrlis/cdrLIS/LADM/external"
+
 // LALegalSpaceBuildingUnit Legal space building unit
 type LALegalSpaceBuildingUnit struct {
 	LASpatialUnit
-
-	ExtPhysicalBuildingUnitID ExtPhysicalBuildingUnit
-	Type                      LABuildingUnitType
+	ExtPhysicalBuildingUnitID *external.ExtPhysicalBuildingUnit
+	Type                      *LABuildingUnitType
 }
 
-// ExtPhysicalBuildingUnit External physical building unit
-type ExtPhysicalBuildingUnit string
+//
+// LA_BuildingUnitType: the LA_BuildingUnitType code list includes all the various building unit types, such
+// as private or commercial, used in a specific land administration profile implementation. The
+// LA_BuildingUnitType code list is required only if the attribute type in LA_LegalSpaceBuildingUnit class is
+// implemented. The code list shall provide a complete list of all codes with a name and description.
 
-// LABuildingUnitType Building unit type
 type LABuildingUnitType int
 
 const (
 	// DefaultBuilding Default building type
-	DefaultBuilding LABuildingUnitType = 0
+	DefaultBuilding LABuildingUnitType = iota
+	Individual
+	Shared
 )

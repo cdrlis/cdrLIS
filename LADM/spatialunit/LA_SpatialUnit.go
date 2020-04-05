@@ -113,7 +113,7 @@ const (
 type LASurfaceRelationType int
 
 const (
-	Mixed LASurfaceRelationType = iota
+	MixedSRT LASurfaceRelationType = iota // Due to conflict with LALevelContentType, Mixed can't be used.
 	Below
 	Above
 	OnSurface

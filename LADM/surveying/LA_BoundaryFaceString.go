@@ -1,6 +1,9 @@
 package surveying
 
-import "github.com/cdrlis/cdrLIS/LADM/common"
+import (
+	"github.com/cdrlis/cdrLIS/LADM/common"
+	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
+)
 
 //
 // Surveying and Representation::LA_BoundaryFaceString
@@ -19,9 +22,6 @@ import "github.com/cdrlis/cdrLIS/LADM/common"
 type LABoundaryFaceString struct {
 	common.VersionedObject
 	BfsID          common.Oid
-	Geometry       *GMMultiCurve
+	Geometry       *geometry.GMMultiCurve
 	LocationByText *string
 }
-
-// GMMultiCurve Multi curve
-type GMMultiCurve string // TODO external package

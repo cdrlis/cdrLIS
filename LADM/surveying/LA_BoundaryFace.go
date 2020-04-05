@@ -1,15 +1,15 @@
 package surveying
 
-import "github.com/cdrlis/cdrLIS/LADM/common"
+import (
+	"github.com/cdrlis/cdrLIS/LADM/common"
+	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
+)
 
 // LABoundaryFace Boundary face string
 type LABoundaryFace struct {
 	common.VersionedObject
 
 	BfID           common.Oid
-	Geometry       *GMMultiSurface
+	Geometry       *geometry.GMMultiSurface
 	LocationByText *string
 }
-
-// GMMultiSurface Multi surface
-type GMMultiSurface string // TODO external package

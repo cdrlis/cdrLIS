@@ -1,9 +1,11 @@
 package surveying
 
+import "github.com/cdrlis/cdrLIS/LADM/common/geometry"
+
 // LATransformation Transformation
 type LATransformation struct {
 	Transformation      CCOperationMethod
-	TransformedLocation GMPoint
+	TransformedLocation *geometry.GMPoint
 }
 
 // CCOperationMethod Operation method

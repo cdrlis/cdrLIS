@@ -1,6 +1,9 @@
 package spatialunit
 
-import "github.com/cdrlis/cdrLIS/LADM/common"
+import (
+	"github.com/cdrlis/cdrLIS/LADM/common"
+	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
+)
 
 //
 // Spatial Unit::LA_SpatialUnitGroup
@@ -16,6 +19,6 @@ type LASpatialUnitGroup struct {
 	HierarchyLevel int
 	Label          *string
 	Name           *string
-	ReferencePoint *GMPoint
+	ReferencePoint *geometry.GMPoint
 	SugID          common.Oid
 }

@@ -1,6 +1,9 @@
 package surveying
 
-import "github.com/cdrlis/cdrLIS/LADM/common"
+import (
+	"github.com/cdrlis/cdrLIS/LADM/common"
+	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
+)
 
 // LAPoint Point
 type LAPoint struct {
@@ -8,15 +11,12 @@ type LAPoint struct {
 
 	InterpolationRole LAInterpolationType
 	Monumentation     *LAMonumentationType
-	OriginalLocation  GMPoint
+	OriginalLocation  *geometry.GMPoint
 	PID               common.Oid
 	PointType         LAPointType
 	ProductionMethod  *LILinage
 	TransAndResult    *LATransformation
 }
-
-// GMPoint Point
-type GMPoint string // TODO external package
 
 // LILinage Linage
 type LILinage string // TODO external package

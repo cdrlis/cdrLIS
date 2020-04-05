@@ -2,6 +2,7 @@ package spatialunit
 
 import (
 	"github.com/cdrlis/cdrLIS/LADM/common"
+	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
 	"github.com/cdrlis/cdrLIS/LADM/external"
 )
 
@@ -28,7 +29,7 @@ type LASpatialUnit struct {
 	Area            *LAAreaValue
 	Dimension       *LADimensionType
 	Label           *string
-	ReferencePoint  *GMPoint // TODO
+	ReferencePoint  *geometry.GMPoint
 	SuID            common.Oid
 	SurfaceRelation *LASurfaceRelationType
 }
@@ -58,9 +59,6 @@ func (su LASpatialUnit) createArea() string {
 func (su LASpatialUnit) createVolume() string {
 	return ""
 }
-
-// GMPoint Point
-type GMPoint string // TODO external package
 
 // LAAreaValue Area value
 type LAAreaValue struct {

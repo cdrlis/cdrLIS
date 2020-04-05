@@ -1,9 +1,6 @@
 package spatialunit
 
-import (
-	"github.com/cdrlis/cdrLIS/LADM/common"
-	"github.com/paulsmith/gogeos/geos"
-)
+import "github.com/cdrlis/cdrLIS/LADM/common"
 
 //
 // Spatial Unit::LA_SpatialUnitGroup

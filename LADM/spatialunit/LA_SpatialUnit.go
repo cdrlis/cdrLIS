@@ -1,6 +1,9 @@
 package spatialunit
 
-import "github.com/cdrlis/cdrLIS/LADM/common"
+import (
+	"github.com/cdrlis/cdrLIS/LADM/common"
+	"github.com/cdrlis/cdrLIS/LADM/external"
+)
 
 //
 // Spatial Unit::LA_SpatialUnit - single area (or multiple areas) of land (4.1.9) and/or water, or a single volume
@@ -21,14 +24,16 @@ import "github.com/cdrlis/cdrLIS/LADM/common"
 
 type LASpatialUnit struct {
 	common.VersionedObject
-	ExtAddressID    *common.Oid
+	ExtAddressID    *external.ExtAddress
 	Area            *LAAreaValue
 	Dimension       *LADimensionType
 	Label           *string
-	ReferencePoint  *GMPoint
+	ReferencePoint  *GMPoint // TODO
 	SuID            common.Oid
 	SurfaceRelation *LASurfaceRelationType
 }
+
+// Should they be defined in the interface LASpatialUniter ?!
 
 func (su LASpatialUnit) areaClosed() bool {
 	return true
@@ -57,18 +62,49 @@ func (su LASpatialUnit) createVolume() string {
 // GMPoint Point
 type GMPoint string // TODO external package
 
+// LAAreaValue Area value
+type LAAreaValue struct {
+	AreaSize Area
+	Type     LAAreaType
+}
+
+// Area Area
+type Area int64
+
+// LAAreaType Area type
+type LAAreaType int
+
+const (
+	// DefaultArea Default Area type
+	DefaultArea LAAreaType = iota
+	OfficialArea
+	NonOfficialArea
+	CalculatedArea
+	SurveyedArea
+)
+
 // LADimensionType Dimension type
 type LADimensionType int
 
 const (
-	// DefaultDimension Default dimension type
-	DefaultDimension LADimensionType = 0
+	D0 LADimensionType = iota
+	D1
+	D2
+	D3
+	Liminal
 )
 
-// LASurfaceRelationType Surface relation type
+//
+// LA_SurfaceRelationType: the LA_SurfaceRelationType code list includes all the various surface relation
+// types, such as above or below surface, used in a specific land administration profile implementation. The
+// LA_SurfaceRelationType code list is required only if the attribute surfaceRelation in LA_SpatialUnit class
+// is implemented. The code list shall provide a complete list of all codes with a name and description.
+//
 type LASurfaceRelationType int
 
 const (
-	// DefaultSurfaceRealtion Default surface realtion type
-	DefaultSurfaceRealtion LASurfaceRelationType = 0
+	Mixed LASurfaceRelationType = iota
+	Below
+	Above
+	OnSurface
 )

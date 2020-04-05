@@ -2,7 +2,7 @@ package external
 
 import (
 	"github.com/cdrlis/cdrLIS/LADM/common"
-	"github.com/cdrlis/cdrLIS/LADM/surveying"
+	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
 )
 
 //
@@ -13,7 +13,7 @@ import (
 type ExtAddress struct {
 	common.VersionedObject
 	AddressAreaName   *string
-	AddressCoordinate *surveying.GMPoint // TODO
+	AddressCoordinate *geometry.GMPoint
 	AddressID         common.Oid
 	BuildingName      *string
 	BuildingNumber    *string

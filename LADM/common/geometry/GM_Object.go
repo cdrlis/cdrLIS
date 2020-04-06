@@ -7,6 +7,9 @@ import (
 	"github.com/paulsmith/gogeos/geos"
 )
 
+//
+const SRID = "3765" // Croatian SRID
+
 // GMObject Point geometry type
 type GMObject geos.Geometry
 
@@ -24,7 +27,7 @@ func (g *GMObject) Value() (driver.Value, error) {
 		return nil, err
 	}
 
-	return "SRID=4326;" + str, nil
+	return "SRID=" + SRID + ";" + str, nil
 }
 
 // Scan converts the hexadecimal representation of geometry into the given GMObject

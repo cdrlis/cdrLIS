@@ -5,6 +5,7 @@ import (
 	"github.com/cdrlis/cdrLIS/LADM/common"
 	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
 	"github.com/cdrlis/cdrLIS/LADM/external"
+	"github.com/cdrlis/cdrLIS/LADM/surveying"
 )
 
 //
@@ -39,6 +40,8 @@ type LASpatialUnit struct {
 	SpatialUnitRelation  []LARequiredRelationshipSpatialUnit // relationSu
 	Level                *LALevel                            // suLevel
 	SpatialUnitGroups    []LASpatialUnitGroup                // suSuGroup
+
+	bfs []surveying.LABoundaryFace
 }
 
 // Should they be defined in the interface LASpatialUniter ?!
@@ -47,23 +50,11 @@ func (su LASpatialUnit) areaClosed() bool {
 	return true
 }
 
-func (su LASpatialUnit) volumeClosed() bool {
-	return true
-}
-
 func (su LASpatialUnit) computeArea() string {
 	return ""
 }
 
-func (su LASpatialUnit) computeVolume() string {
-	return ""
-}
-
 func (su LASpatialUnit) createArea() string {
-	return ""
-}
-
-func (su LASpatialUnit) createVolume() string {
 	return ""
 }
 

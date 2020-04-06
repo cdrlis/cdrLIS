@@ -41,7 +41,7 @@ type LASpatialUnit struct {
 	Level                *LALevel                            // suLevel
 	SpatialUnitGroups    []LASpatialUnitGroup                // suSuGroup
 
-	bfs []surveying.LABoundaryFace
+	bfs []surveying.LABoundaryFaceString
 }
 
 // Should they be defined in the interface LASpatialUniter ?!

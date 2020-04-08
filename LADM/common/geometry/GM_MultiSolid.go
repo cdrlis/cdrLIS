@@ -2,6 +2,8 @@ package geometry
 
 import (
 	"database/sql/driver"
+
+	"github.com/paulsmith/gogeos/geos"
 )
 
 // GMMultiSolid Point geometry type
@@ -17,4 +19,9 @@ func (g *GMMultiSolid) Value() (driver.Value, error) {
 // struct. Implements Scanner interface for use with database operations.
 func (g *GMMultiSolid) Scan(value interface{}) error {
 	return (*GMObject)(g).Scan(value)
+}
+
+// AsGeometry Returns underlying geometry type
+func (g *GMMultiSolid) AsGeometry() *geos.Geometry {
+	return ((*GMObject)(g)).AsGeometry()
 }

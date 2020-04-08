@@ -56,3 +56,8 @@ func (g *GMObject) Scan(value interface{}) error {
 
 	return nil
 }
+
+// AsGeometry Returns underlying geometry type
+func (g *GMObject) AsGeometry() *geos.Geometry {
+	return (*geos.Geometry)(g)
+}

@@ -31,7 +31,7 @@ type LABAunit struct {
 	Type LABAUnitType
 	UID  common.Oid
 
-	Party []party.LAParty             // rrrParty
+	Party []party.LAParty             // baunitAsParty
 	RRR   []LARRR                     // unitRrr
 	SU    []spatialunit.LASpatialUnit // suBaunit
 }

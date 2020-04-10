@@ -13,11 +13,9 @@ type LAResponsibility struct {
 }
 
 // LAResponsibilityType Responsibility type
-type LAResponsibilityType int
+type LAResponsibilityType string
 
 const (
-	// DefaultResponsibility Default responsibility type
-	DefaultResponsibility LAResponsibilityType = iota
-	MonumentMaintenance
-	WaterwayMaintenance
+	MonumentMaintenance LAResponsibilityType = "monumentMaintenance"
+	WaterwayMaintenance                      = "waterwayMaintenance"
 )

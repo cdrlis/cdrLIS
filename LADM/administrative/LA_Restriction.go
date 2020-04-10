@@ -14,15 +14,13 @@ type LARestriction struct {
 }
 
 // LARestrictionType Restriction type
-type LARestrictionType int
+type LARestrictionType string
 
 const (
-	// DefaultRestriction Default Restriction type
-	DefaultRestriction LARestrictionType = iota
-	AdminPublicServitude
-	Monument
-	MonumentPartly
-	NoBuilding
-	Servitude
-	ServitudePartly
+	AdminPublicServitude LARestrictionType = "adminPublicServitude"
+	Monument                               = "monument"
+	MonumentPartly                         = "monumentPartly"
+	NoBuilding                             = "noBuilding"
+	Servitude                              = "servitude"
+	ServitudePartly                        = "servitudePartly"
 )

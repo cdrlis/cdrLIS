@@ -1,4 +1,4 @@
-package surveying
+package ladm
 
 import (
 	"github.com/cdrlis/cdrLIS/LADM/common"

@@ -1,15 +1,30 @@
 package main
 
 import (
-	"fmt"
-	"github.com/paulsmith/gogeos/geos"
+	"github.com/cdrlis/cdrLIS/logic"
+	"github.com/cdrlis/cdrLIS/repositories"
+
+	"net/http"
+
+	"github.com/cdrlis/cdrLIS/handlers"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
 
 func main() {
-	var (
-		a = geos.Must(geos.FromWKT("POLYGON ((0 3, 2 3, 3 1, 1 0, 0 1.5, 0 3))"))
-		b = geos.Must(geos.FromWKT("POLYGON ((1 2, 1.5 4, 3.5 4, 4.5 2.5, 1 2))"))
-	)
-	c := geos.Must(a.Intersection(b))
-	fmt.Println(c)
+	db, err := gorm.Open("postgres", "host=localhost port=5432 user=postgres dbname=ladm password=123456vV sslmode=disable")
+	defer db.Close()
+	if err != nil {
+		panic(err)
+	}
+	db.LogMode(true)
+
+	ladmRepository := repositories.LadmRepository{DB: db}
+	service := logic.LAPartyService{Context: ladmRepository}
+	partyHandler := handlers.PartyHandler{Service: service}
+
+	http.HandleFunc("/party", partyHandler.GetParty)
+	http.HandleFunc("/party/list", partyHandler.GetParties)
+	http.HandleFunc("/party/update", partyHandler.UpdateParty)
+	http.ListenAndServe(":3000", nil)
 }

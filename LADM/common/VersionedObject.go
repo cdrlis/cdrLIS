@@ -10,8 +10,10 @@ import (
 // database can be reconstructed, as they were at any historical moment. For more on history and dynamic
 // aspects of LA systems, see Annex N.
 type VersionedObject struct {
-	BeginLifespanVersion time.Time
-	EndLifespanVersion   *time.Time
+	BeginLifespanVersion time.Time 	`gorm:"column:beginlifespanversion"`
+	EndLifespanVersion   *time.Time	`gorm:"column:endlifespanversion"`
 	Quality              *metadata.DQ_Element
 	Source               *metadata.CI_ResponsibleParty
 }
+
+type TimeObject time.Time

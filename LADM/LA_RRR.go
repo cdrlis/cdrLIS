@@ -1,10 +1,9 @@
-package administrative
+package ladm
 
 import (
 	"time"
 
 	"github.com/cdrlis/cdrLIS/LADM/common"
-	"github.com/cdrlis/cdrLIS/LADM/party"
 )
 
 //
@@ -30,6 +29,6 @@ type LARRR struct {
 	ShareCheck  *bool
 	TimeSpec    *time.Time
 
-	Party *party.LAParty // rrrParty
-	Unit  *LABAunit      // unitRrr
+	Party *LAParty  // rrrParty
+	Unit  *LABAunit // unitRrr
 }

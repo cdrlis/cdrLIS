@@ -1,9 +1,7 @@
-package administrative
+package ladm
 
 import (
 	"github.com/cdrlis/cdrLIS/LADM/common"
-	"github.com/cdrlis/cdrLIS/LADM/party"
-	"github.com/cdrlis/cdrLIS/LADM/spatialunit"
 )
 
 //
@@ -31,9 +29,9 @@ type LABAunit struct {
 	Type LABAUnitType
 	UID  common.Oid
 
-	Party []party.LAParty             // baunitAsParty
-	RRR   []LARRR                     // unitRrr
-	SU    []spatialunit.LASpatialUnit // suBaunit
+	Party []LAParty       // baunitAsParty
+	RRR   []LARRR         // unitRrr
+	SU    []LASpatialUnit // suBaunit
 }
 
 // LABAUnitType BA unit type

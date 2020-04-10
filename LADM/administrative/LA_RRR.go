@@ -28,7 +28,7 @@ type LARRR struct {
 	RID         common.Oid
 	Share       *common.Fraction
 	ShareCheck  *bool
-	TimeSpec    *time.Time // TODO ISO8601_ISO14825_Type
+	TimeSpec    *time.Time
 
 	Party *party.LAParty // rrrParty
 	Unit  *LABAunit      // unitRrr

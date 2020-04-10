@@ -26,26 +26,23 @@ type Currency struct {
 }
 
 // Currency based on ISO 4217
-type iso4217 int
+type iso4217 string
 
 const (
-	// DefaultISO4217 Default currency type
-	DefaultISO4217 iso4217 = iota
-	AED
+	AED iso4217 = "AED"
 	// ...
-	EUR
+	EUR = "EUR"
 	// ...
-	USD
-	// ..
+	USD = "USD"
+	// ...
+	ZWL = "ZWL"
 )
 
 // LAMortageType Mortage type
-type LAMortgageType int
+type LAMortgageType string
 
 const (
-	// DefaultMortage Default mortage type
-	DefaultMortgage LAMortgageType = iota
-	LevelPayment
-	Linear
-	Microcredit
+	LevelPayment LAMortgageType = "levelPayment"
+	Linear                      = "linear"
+	Microcredit                 = "microcredit"
 )

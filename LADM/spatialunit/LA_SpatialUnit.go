@@ -27,6 +27,7 @@ import (
 
 type LASpatialUnit struct {
 	common.VersionedObject
+
 	ExtAddressID    *external.ExtAddress
 	Area            *LAAreaValue
 	Dimension       *LADimensionType
@@ -35,27 +36,39 @@ type LASpatialUnit struct {
 	SuID            common.Oid
 	SurfaceRelation *LASurfaceRelationType
 
-	BAUnits              []administrative.LABAunit           // suBaunit
-	SpatialUnitHierarchy []LASpatialUnit                     // suHierarchy
-	SpatialUnitRelation  []LARequiredRelationshipSpatialUnit // relationSu
-	Level                *LALevel                            // suLevel
-	SpatialUnitGroups    []LASpatialUnitGroup                // suSuGroup
+	Baunit      []administrative.LABAunit           // suBaunit
+	SuHierarchy []LASpatialUnit                     // suHierarchy
+	RelationSu  []LARequiredRelationshipSpatialUnit // relationSu
+	Level       *LALevel                            // suLevel
+	whole       []LASpatialUnitGroup                // suSuGroup
 
-	bfs []surveying.LABoundaryFaceString
+	MinusBfs []surveying.LABoundaryFaceString // minus
+	PlusBfs  []surveying.LABoundaryFaceString // plus
 }
 
-// Should they be defined in the interface LASpatialUniter ?!
+// Should they be defined in the interface LASpatialUniter ?!f
 
-func (su LASpatialUnit) areaClosed() bool {
-	return true
+type LASpatialUniter interface {
+	AreaClosed() bool
+	ComputeArea() LAAreaValue
+	CreateArea() geometry.GMMultiSurface
 }
 
-func (su LASpatialUnit) computeArea() string {
-	return ""
+func (su LASpatialUnit) AreaClosed() bool {
+	closed, _ := su.CreateArea().AsGeometry().IsClosed()
+	return closed
 }
 
-func (su LASpatialUnit) createArea() string {
-	return ""
+func (su LASpatialUnit) ComputeArea() LAAreaValue {
+	var av LAAreaValue
+	area, _ := su.CreateArea().AsGeometry().Area()
+	av.AreaSize, av.Type = Area(area), CalculatedArea
+	return av
+}
+
+func (su LASpatialUnit) CreateArea() geometry.GMMultiSurface {
+	var ms geometry.GMMultiSurface
+	return ms
 }
 
 // LAAreaValue Area value
@@ -65,7 +78,7 @@ type LAAreaValue struct {
 }
 
 // Area Area
-type Area int64
+type Area float64
 
 //
 // LA_AreaType: the LA_AreaType code list includes all the various area types, such as official or
@@ -73,15 +86,13 @@ type Area int64
 // required to implement the LA_AreaValue data type. The code list shall provide a complete list of all codes
 // with a name and description.
 //
-type LAAreaType int
+type LAAreaType string
 
 const (
-	// DefaultArea Default Area type
-	DefaultArea LAAreaType = iota
-	OfficialArea
-	NonOfficialArea
-	CalculatedArea
-	SurveyedArea
+	OfficialArea    LAAreaType = "officialArea"
+	NonOfficialArea            = "nonOfficialArea"
+	CalculatedArea             = "calculatedArea"
+	SurveyedArea               = "surveyedArea"
 )
 
 //
@@ -90,14 +101,14 @@ const (
 // is required only if the attribute dimension in LA_SpatialUnit class is implemented. The code list shall
 // provide a complete list of all codes with a name and description.
 //
-type LADimensionType int
+type LADimensionType string
 
 const (
-	D0 LADimensionType = iota
-	D1
-	D2
-	D3
-	Liminal
+	D0      LADimensionType = "0D"
+	D1                      = "1D"
+	D2                      = "2D"
+	D3                      = "3D"
+	Liminal                 = "laminal"
 )
 
 //
@@ -106,11 +117,11 @@ const (
 // LA_SurfaceRelationType code list is required only if the attribute surfaceRelation in LA_SpatialUnit class
 // is implemented. The code list shall provide a complete list of all codes with a name and description.
 //
-type LASurfaceRelationType int
+type LASurfaceRelationType string
 
 const (
-	MixedSRT LASurfaceRelationType = iota // Due to conflict with LALevelContentType, Mixed can't be used.
-	Below
-	Above
-	OnSurface
+	MixedSRT  LASurfaceRelationType = "mixed" // Due to conflict with LALevelContentType, Mixed can't be used.
+	Below                           = "below"
+	Above                           = "above"
+	OnSurface                       = "onSurface"
 )

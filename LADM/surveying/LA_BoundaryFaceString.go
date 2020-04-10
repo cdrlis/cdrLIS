@@ -25,4 +25,6 @@ type LABoundaryFaceString struct {
 	BfsID          common.Oid
 	Geometry       *geometry.GMMultiCurve
 	LocationByText *string
+
+	point []LAPoint // pointBfs
 }

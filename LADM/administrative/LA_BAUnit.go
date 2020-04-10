@@ -31,18 +31,16 @@ type LABAunit struct {
 	Type LABAUnitType
 	UID  common.Oid
 
-	Party        []party.LAParty             // baunitAsParty
-	RRRs         *LARRR                      // unitRrr
-	SpatialUnits []spatialunit.LASpatialUnit // suBaunit
+	Party []party.LAParty             // rrrParty
+	RRR   []LARRR                     // unitRrr
+	SU    []spatialunit.LASpatialUnit // suBaunit
 }
 
 // LABAUnitType BA unit type
-type LABAUnitType int
+type LABAUnitType string
 
 const (
-	// DefaultBAUnit Default BA unit type
-	DefaultBAUnit LABAUnitType = iota
-	BasicPropertyUnit
-	LeasedUnit
-	RightOfUseUnit
+	BasicPropertyUnit LABAUnitType = "basicPropertyUnit"
+	LeasedUnit                     = "leasedUnit"
+	RightOfUseUnit                 = "rightOfUseUnit"
 )

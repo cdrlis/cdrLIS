@@ -11,43 +11,41 @@ type LARight struct {
 
 	Type LARightType
 
-	Mortages []LAMortgage // mortageRight
+	mortgage []LAMortgage // mortgageRight
 }
 
 // LARightType Right type
-type LARightType int
+type LARightType string
 
 const (
-	// DefaultRight Default right type
-	DefaultRight LARightType = iota
-	AgriActivity
-	BelowTheDepth
-	BoatHarbour
-	CommonwealthAcquisition
-	Covenant
-	Easement
-	ExcludedArea
-	Forest
-	Freeholding
-	Grazing
-	HousingLand
-	IndustrialState
-	LandsLease
-	Lease
-	MainRoad
-	MarinePark
-	MineTenure
-	NationalPark
-	Occupation
-	Ownership
-	PortAuthority
-	ProfitPrendre
-	Railway
-	Reserve
-	StateForest
-	StateLand
-	TimberReserve
-	TransferredProperty
-	WaterResource
-	WaterRights
+	AgriActivity            LARightType = "agriActivity"
+	BelowTheDepth                       = "belowTheDepth"
+	BoatHarbour                         = "boatHarbour"
+	CommonwealthAcquisition             = "commonwealthAcquisition"
+	Covenant                            = "covenant"
+	Easement                            = "easement"
+	ExcludedArea                        = "excludedArea"
+	Forest                              = "forest"
+	Freeholding                         = "freeholding"
+	Grazing                             = "Grazing"
+	HousingLand                         = "housingLand"
+	IndustrialState                     = "industrialState"
+	LandsLease                          = "landsLease"
+	Lease                               = "lease"
+	MainRoad                            = "mainRoad"
+	MarinePark                          = "marinePark"
+	MineTenure                          = "mineTenure"
+	NationalPark                        = "nationalPark"
+	Occupation                          = "occupation"
+	Ownership                           = "ownership"
+	PortAuthority                       = "portAuthority"
+	ProfitPrendre                       = "profitPrendre"
+	Railway                             = "railway"
+	Reserve                             = "reserve"
+	StateForest                         = "stateForest"
+	StateLand                           = "stateLand"
+	TimberReserve                       = "timberReserve"
+	TransferredProperty                 = "transferredProperty"
+	WaterResource                       = "waterResource"
+	WaterRights                         = "WaterRights"
 )

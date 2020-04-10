@@ -1,9 +1,8 @@
 package metadata
 
-import (
-	"time"
-)
+import "time"
 
+// DQ_Element from ISO 19111
 type DQ_Element struct {
 	NameOfMeasure               string
 	MeasureIdentification       MD_Identifier
@@ -20,14 +19,14 @@ type MD_Identifier struct {
 	code      string
 }
 
-type DQ_EvaluationMethodTypeCode int
+type DQ_EvaluationMethodTypeCode string
 
 const (
-	DirectInternal DQ_EvaluationMethodTypeCode = iota
-	DirectExternal
-	Indirect
+	DirectExternal DQ_EvaluationMethodTypeCode = "directExternal"
+	Indirect                                   = "indirect"
 )
 
+// DQ_Result from ISO 19111
 type DQ_Result struct {
 	Specification int
 	Explanation   string

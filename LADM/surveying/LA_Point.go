@@ -5,7 +5,16 @@ import (
 	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
 )
 
-// LAPoint Point
+//
+// Surveying and Representation::LA_Point
+//
+// An instance of class LA_Point is a point. A point may be associated to zero or one [0..1] spatial units (i.e. the
+// point may be used as the reference point to describe the position of a spatial unit). A point may be associated
+// to zero or more [0..*] boundary faces (i.e. a point may be used to define a vertex of the side of a 3D parcel). A
+// point may be associated to zero or more [0..*] boundary face strings (i.e. a point can be used to define the
+// start, end or vertex of a boundary). A point should be associated to zero or more [0..*] spatial sources. See
+// Figure 12.
+//
 type LAPoint struct {
 	common.VersionedObject
 
@@ -16,6 +25,8 @@ type LAPoint struct {
 	PointType         LAPointType
 	ProductionMethod  *LILineage
 	TransAndResult    *LATransformation
+
+	Bfs []LABoundaryFaceString // pointBfs
 }
 
 // LILinage Linage

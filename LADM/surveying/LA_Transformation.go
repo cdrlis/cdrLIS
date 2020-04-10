@@ -1,6 +1,9 @@
 package surveying
 
-import "github.com/cdrlis/cdrLIS/LADM/common/geometry"
+import (
+	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
+	"github.com/cdrlis/cdrLIS/LADM/common/metadata"
+)
 
 // LATransformation Transformation
 type LATransformation struct {
@@ -8,5 +11,15 @@ type LATransformation struct {
 	TransformedLocation *geometry.GMPoint
 }
 
-// CCOperationMethod Operation method
-type CCOperationMethod string // TODO external package
+// CCOperationMethod from ISO 19111
+type CCOperationMethod struct {
+	FormulaReference CCFormula
+	SourceDimension  int
+	TargetDimension  int
+}
+
+// CC Formula from ISO 19111
+type CCFormula struct {
+	Formula         string
+	FormulaCitation metadata.CI_Citation
+}

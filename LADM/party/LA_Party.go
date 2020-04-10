@@ -17,7 +17,7 @@ import (
 // a source); see Figure 9.
 type LAParty struct {
 	common.VersionedObject
-	// LA_Party
+
 	ExtPid *common.Oid
 	Name   *string
 	Pid    common.Oid

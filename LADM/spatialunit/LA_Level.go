@@ -13,7 +13,7 @@ type LALevel struct {
 	Structure    *LAStructureType
 	Type         *LALevelContentType
 
-	SpatialUnits []LASpatialUnit // suLevel
+	Su []LASpatialUnit // suLevel
 }
 
 //
@@ -22,17 +22,15 @@ type LALevel struct {
 // required only if the attribute registerType in LA_Level class is implemented. The code list shall provide a
 // complete list of all codes with a name and description.
 
-type LARegisterType int
+type LARegisterType string
 
 const (
-	// DefaultRegister Default register type
-	DefaultRegister LARegisterType = 0
-	Urban
-	Rural
-	Mining
-	PublicSpace
-	Forest
-	All
+	Urban       LARegisterType = "urban"
+	Rural                      = "rural"
+	Mining                     = "mining"
+	PublicSpace                = "publicSpace"
+	Forest                     = "forest"
+	All                        = "all"
 )
 
 //
@@ -42,17 +40,15 @@ const (
 // provide a complete list of all codes with a name and description.
 //
 
-type LAStructureType int
+type LAStructureType string
 
 const (
-	// DefaultStructure Default structure type
-	DefaultStructure LAStructureType = 0
-	Point
-	Polygon
-	Text
-	Topological
-	UnstructuredLine
-	Sketch
+	Point            LAStructureType = "point"
+	Polygon                          = "polygon"
+	Text                             = "text"
+	Topological                      = "topological"
+	UnstructuredLine                 = "unstructuredLine"
+	Sketch                           = "sketch"
 )
 
 //
@@ -62,17 +58,15 @@ const (
 // code list shall provide a complete list of all codes with a name and description.
 //
 
-type LALevelContentType int
+type LALevelContentType string
 
 const (
-	// DefaultLevel Default level type
-	DefaultLevel LALevelContentType = 0
-	Building
-	Customary
-	MixedLCT // Due to conflict with LASurfaceRelationType, Mixed can't be used.
-	Network
-	PrimaryRight
-	Responsibility
-	Restriction
-	Informal
+	Building       LALevelContentType = "building"
+	Customary                         = "customary"
+	MixedLCT                          = "mixed" // Due to conflict with LASurfaceRelationType, Mixed can't be used.
+	Network                           = "network"
+	PrimaryRight                      = "primaryRight"
+	Responsibility                    = "responsibility"
+	Restriction                       = "restriction"
+	Informal                          = "informal"
 )

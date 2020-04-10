@@ -15,11 +15,9 @@ type LALegalSpaceBuildingUnit struct {
 // LA_BuildingUnitType code list is required only if the attribute type in LA_LegalSpaceBuildingUnit class is
 // implemented. The code list shall provide a complete list of all codes with a name and description.
 
-type LABuildingUnitType int
+type LABuildingUnitType string
 
 const (
-	// DefaultBuilding Default building type
-	DefaultBuilding LABuildingUnitType = iota
-	Individual
-	Shared
+	Individual LABuildingUnitType = "individual"
+	Shared                        = "shared"
 )

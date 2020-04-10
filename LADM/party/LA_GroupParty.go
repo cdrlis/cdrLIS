@@ -19,13 +19,11 @@ type LAGroupParty struct {
 }
 
 // LAGroupPartyType Group party type
-type LAGroupPartyType int
+type LAGroupPartyType string
 
 const (
-	// DefaultGroupParty Default Group party type
-	DefaultGroupParty LAGroupPartyType = iota
-	Association
-	BAUnitGroup
-	Family
-	Tribe
+	Association LAGroupPartyType = "association"
+	BAUnitGroup                  = "baunitGroup"
+	Family                       = "family"
+	Tribe                        = "tribe"
 )

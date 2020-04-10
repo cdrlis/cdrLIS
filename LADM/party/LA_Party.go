@@ -30,31 +30,28 @@ type LAParty struct {
 }
 
 // LAPartyType Party type
-type LAPartyType int
+type LAPartyType string
 
 const (
-	DefaultPartyType LAPartyType = iota
-	BAUnit
-	Group
-	NaturalPerson
-	NonNaturalPerson
+	BAUnit           LAPartyType = "baunit"
+	Group                        = "group"
+	NaturalPerson                = "naturalPerson"
+	NonNaturalPerson             = "nonNaturalPerson"
 )
 
 // LAPartyRoleType Party role type
-type LAPartyRoleType int
+type LAPartyRoleType string
 
 const (
-	// DefaultPartyRole Default Party role type
-	DefaultPartyRole LAPartyRoleType = iota
-	Bank
-	CertifiedSurveyor
-	Citizen
-	Conveyancer
-	Employee
-	Farmer
-	MoneyProvider
-	Notary
-	StateAdministrator
-	Surveyor
-	Writer
+	Bank               LAPartyRoleType = "bank"
+	CertifiedSurveyor                  = "certifiedSurveyor"
+	Citizen                            = "citizen"
+	Conveyancer                        = "conveyancer"
+	Employee                           = "employee"
+	Farmer                             = "farmer"
+	MoneyProvider                      = "moneyProvider"
+	Notary                             = "notary"
+	StateAdministrator                 = "stateAdministrator"
+	Surveyor                           = "surveyor"
+	Writer                             = "writer"
 )

@@ -16,15 +16,15 @@ type LARequiredRelationshipSpatialUnit struct {
 	relationship iso19125Type
 }
 
-type iso19125Type int
+type iso19125Type string
 
 const (
-	ST_Equals iso19125Type = iota
-	ST_Disjoint
-	ST_Intersects
-	ST_Touches
-	ST_Crosses
-	ST_Within
-	ST_Contains
-	ST_Overlaps
+	ST_Equals     iso19125Type = "ST_Equals"
+	ST_Disjoint                = "ST_Disjoint"
+	ST_Intersects              = "ST_Intersects"
+	ST_Touches                 = "ST_Touches"
+	ST_Crosses                 = "ST_Crosses"
+	ST_Within                  = "ST_Within"
+	ST_Contains                = "ST_Contains"
+	ST_Overlaps                = "ST_Overlaps"
 )

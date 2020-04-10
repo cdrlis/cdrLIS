@@ -27,12 +27,12 @@ type CI_Date struct {
 	DateType CI_DateTypeCode
 }
 
-type CI_DateTypeCode int
+type CI_DateTypeCode string
 
 const (
-	Creation CI_DateTypeCode = iota
-	Publication
-	Revision
+	Creation    CI_DateTypeCode = "creation"
+	Publication                 = "publication"
+	Revision                    = "revision"
 )
 
 type CI_ResponsibleParty struct {
@@ -90,32 +90,32 @@ type CI_OnLineResource struct {
 	Function           CI_OnLineFunctionCode
 }
 
-type CI_OnLineFunctionCode int
+type CI_OnLineFunctionCode string
 
 const (
-	Download CI_OnLineFunctionCode = iota
-	Information
-	OffLineAccess
-	Order
-	Search
+	Download      CI_OnLineFunctionCode = "download"
+	Information                         = "information"
+	OffLineAccess                       = "offLineAccess"
+	Order                               = "order"
+	Search                              = "search"
 )
 
-type CI_PresentationFormCode int
+type CI_PresentationFormCode string
 
 const (
-	DocumentDigital CI_PresentationFormCode = iota
-	DocumentHardcopy
-	ImageDigital
-	ImageHardcopy
-	MapDigital
-	Maphardcopy
-	ModelDigital
-	ModelHardcopy
-	ProfileDigital
-	TableDigital
-	TableHardcopy
-	VideoDigital
-	VideoHardcopy
+	DocumentDigital  CI_PresentationFormCode = "documentDigital"
+	DocumentHardcopy                         = "documentHardcopy"
+	ImageDigital                             = "imageDigital"
+	ImageHardcopy                            = "imageHardcopy"
+	MapDigital                               = "mapDigital"
+	MapHardcopy                              = "mapHardcopy"
+	ModelDigital                             = "modelDigital"
+	ModelHardcopy                            = "modelHardcopy"
+	ProfileDigital                           = "profileDigital"
+	TableDigital                             = "tableDigital"
+	TableHardcopy                            = "tableHardcopy"
+	VideoDigital                             = "videoDigital"
+	VideoHardcopy                            = "videoHardcopy"
 )
 
 type CI_Series struct {

@@ -14,33 +14,38 @@ type LAPoint struct {
 	OriginalLocation  *geometry.GMPoint
 	PID               common.Oid
 	PointType         LAPointType
-	ProductionMethod  *LILinage
+	ProductionMethod  *LILineage
 	TransAndResult    *LATransformation
 }
 
 // LILinage Linage
-type LILinage string // TODO external package
+type LILineage string // TODO external package
 
 // LAInterpolationType Interpolation role type
-type LAInterpolationType int
+type LAInterpolationType string
 
 const (
-	// DefaultInterpolation Default Interpolation type
-	DefaultInterpolation LAInterpolationType = 0
+	End      LAInterpolationType = "end"
+	Isolated                     = "isolated"
+	Mid                          = "mid"
+	MidArc                       = "midarc"
+	Start                        = "start"
 )
 
 // LAMonumentationType Monumentation type
-type LAMonumentationType int
+type LAMonumentationType string
 
 const (
-	// DefaultMonumentation Default Monumentation type
-	DefaultMonumentation LAMonumentationType = 0
+	Beacon       LAMonumentationType = "beacon"
+	Cornserstone                     = "cornserstone"
+	Marker                           = "marker"
+	NotMarked                        = "notMarked"
 )
 
 // LAPointType Point type
-type LAPointType int
+type LAPointType string
 
 const (
-	// DefaultPoint Default point type
-	DefaultPoint LAPointType = 0
+	Control  LAPointType = "control"
+	NoSource             = "noSource"
 )

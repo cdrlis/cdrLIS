@@ -3,6 +3,7 @@ package surveying
 import (
 	"github.com/cdrlis/cdrLIS/LADM/common"
 	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
+	"github.com/cdrlis/cdrLIS/LADM/spatialunit"
 )
 
 //
@@ -26,5 +27,7 @@ type LABoundaryFaceString struct {
 	Geometry       *geometry.GMMultiCurve
 	LocationByText *string
 
-	point []LAPoint // pointBfs
+	point   []LAPoint                   // pointBfs
+	MinusSu []spatialunit.LASpatialUnit // minus
+	PlusSu  []spatialunit.LASpatialUnit // plus
 }

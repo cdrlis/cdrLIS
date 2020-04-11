@@ -1,11 +1,9 @@
-package spatialunit
+package ladm
 
 import (
-	"github.com/cdrlis/cdrLIS/LADM/administrative"
 	"github.com/cdrlis/cdrLIS/LADM/common"
 	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
 	"github.com/cdrlis/cdrLIS/LADM/external"
-	"github.com/cdrlis/cdrLIS/LADM/surveying"
 )
 
 //
@@ -36,14 +34,14 @@ type LASpatialUnit struct {
 	SuID            common.Oid
 	SurfaceRelation *LASurfaceRelationType
 
-	Baunit      []administrative.LABAunit           // suBaunit
+	Baunit      []LABAunit                          // suBaunit
 	SuHierarchy []LASpatialUnit                     // suHierarchy
 	RelationSu  []LARequiredRelationshipSpatialUnit // relationSu
 	Level       *LALevel                            // suLevel
 	whole       []LASpatialUnitGroup                // suSuGroup
 
-	MinusBfs []surveying.LABoundaryFaceString // minus
-	PlusBfs  []surveying.LABoundaryFaceString // plus
+	MinusBfs []LABoundaryFaceString // minus
+	PlusBfs  []LABoundaryFaceString // plus
 }
 
 // Should they be defined in the interface LASpatialUniter ?!f
@@ -55,13 +53,15 @@ type LASpatialUniter interface {
 }
 
 func (su LASpatialUnit) AreaClosed() bool {
-	closed, _ := su.CreateArea().AsGeometry().IsClosed()
+	multiSurface := su.CreateArea()
+	closed, _ := multiSurface.AsGeometry().IsClosed()
 	return closed
 }
 
 func (su LASpatialUnit) ComputeArea() LAAreaValue {
 	var av LAAreaValue
-	area, _ := su.CreateArea().AsGeometry().Area()
+	multiSurface := su.CreateArea()
+	area, _ := multiSurface.AsGeometry().Area()
 	av.AreaSize, av.Type = Area(area), CalculatedArea
 	return av
 }

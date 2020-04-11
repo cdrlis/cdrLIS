@@ -1,4 +1,4 @@
-package administrative
+package ladm
 
 //
 // Administrative::LA_Responsibility

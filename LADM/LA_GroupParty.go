@@ -1,4 +1,4 @@
-package party
+package ladm
 
 import "github.com/cdrlis/cdrLIS/LADM/common"
 

@@ -20,8 +20,8 @@ func main() {
 	}
 	db.LogMode(true)
 
-	ladmRepository := repositories.LadmRepository{DB: db}
-	service := logic.LAPartyService{Context: ladmRepository}
+	ladmDB := repositories.LadmDatabase{DB: db}
+	service := logic.LAPartyService{Context: ladmDB}
 	partyHandler := handler.PartyHandler{Service: service}
 
 	router := httprouter.New()

@@ -5,16 +5,16 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type LadmRepository struct {
+type LadmDatabase struct {
 	DB *gorm.DB
 }
 
-func (ctx LadmRepository) Create(value interface{}) error {
+func (ctx LadmDatabase) Create(value interface{}) error {
 	ctx.DB.Create(value)
 	return nil // TODO error handling
 }
 
-func (ctx LadmRepository) Get(out interface{}, where ...interface{}) error {
+func (ctx LadmDatabase) Get(out interface{}, where ...interface{}) error {
 	if where != nil {
 		if ctx.DB.First(out, where).RowsAffected == 0 {
 			return errors.New("Entity not found")
@@ -25,17 +25,17 @@ func (ctx LadmRepository) Get(out interface{}, where ...interface{}) error {
 	return nil // TODO error handling
 }
 
-func (ctx LadmRepository) GetAll(out interface{}, where ...interface{}) error {
+func (ctx LadmDatabase) GetAll(out interface{}, where ...interface{}) error {
 	ctx.DB.Find(out)
 	return nil // TODO error handling
 }
 
-func (ctx LadmRepository) Update(value interface{}, where ...interface{}) error {
+func (ctx LadmDatabase) Update(value interface{}, where ...interface{}) error {
 	ctx.DB.Save(value)
 	return nil // TODO error handling
 }
 
-func (ctx LadmRepository) Delete(value interface{}, where ...interface{}) error {
+func (ctx LadmDatabase) Delete(value interface{}, where ...interface{}) error {
 	ctx.DB.Delete(value)
 	return nil // TODO error handling
 }

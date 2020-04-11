@@ -38,7 +38,7 @@ type LASpatialUnit struct {
 	SuHierarchy []LASpatialUnit                     // suHierarchy
 	RelationSu  []LARequiredRelationshipSpatialUnit // relationSu
 	Level       *LALevel                            // suLevel
-	whole       []LASpatialUnitGroup                // suSuGroup
+	Whole       []LASpatialUnitGroup                // suSuGroup
 
 	MinusBfs []LABoundaryFaceString // minus
 	PlusBfs  []LABoundaryFaceString // plus

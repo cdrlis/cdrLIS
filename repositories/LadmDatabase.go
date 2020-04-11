@@ -14,7 +14,7 @@ func (ctx LadmDatabase) Create(value interface{}) error {
 	return nil // TODO error handling
 }
 
-func (ctx LadmDatabase) Get(out interface{}, where ...interface{}) error {
+func (ctx LadmDatabase) Read(out interface{}, where ...interface{}) error {
 	if where != nil {
 		if ctx.DB.First(out, where).RowsAffected == 0 {
 			return errors.New("Entity not found")
@@ -25,7 +25,7 @@ func (ctx LadmDatabase) Get(out interface{}, where ...interface{}) error {
 	return nil // TODO error handling
 }
 
-func (ctx LadmDatabase) GetAll(out interface{}, where ...interface{}) error {
+func (ctx LadmDatabase) ReadAll(out interface{}, where ...interface{}) error {
 	ctx.DB.Find(out)
 	return nil // TODO error handling
 }

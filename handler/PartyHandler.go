@@ -1,7 +1,10 @@
 package handler
 
 import (
+	"encoding/json"
+	ladm "github.com/cdrlis/cdrLIS/LADM"
 	"github.com/cdrlis/cdrLIS/logic"
+	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
 
@@ -9,28 +12,19 @@ type PartyHandler struct {
 	Service logic.LAPartyService
 }
 
-func (handler *PartyHandler) GetParty(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		respondError(w, 405,"Method not supported.")
-		http.Error(w, http.StatusText(405), 405)
-		return
-	}
-	party, err := handler.Service.GetParty()
+func (handler *PartyHandler) GetParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	party, err := handler.Service.GetParty(p.ByName("id"))
 	if err != nil {
-		http.Error(w, http.StatusText(500), 500)
+		respondError(w, 404, err.Error())
 		return
 	}
-	respondJSON(w,200,party)
+	respondJSON(w, 200, party)
 }
 
-func (handler *PartyHandler) GetParties(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, http.StatusText(405), 405)
-		return
-	}
+func (handler *PartyHandler) GetParties(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	parties, err := handler.Service.GetPartyList()
 	if err != nil {
-		http.Error(w, http.StatusText(500), 500)
+		respondError(w, 500, err.Error())
 		return
 	}
 	var partyList []string
@@ -41,21 +35,39 @@ func (handler *PartyHandler) GetParties(w http.ResponseWriter, r *http.Request) 
 		}
 		partyList = append(partyList, name)
 	}
-	respondJSON(w,200,parties)
+	respondJSON(w, 200, parties)
 }
 
-func (handler *PartyHandler) UpdateParty(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
-		http.Error(w, http.StatusText(405), 405)
+func (handler *PartyHandler) CreateParty(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	decoder := json.NewDecoder(r.Body)
+	var party ladm.LAParty
+	err := decoder.Decode(&party)
+	if err != nil {
+		respondError(w, 404, err.Error())
 		return
 	}
-	party, err := handler.Service.GetParty()
+	handler.Service.CreateParty(party)
+	respondJSON(w, 201, party)
+}
+
+func (handler *PartyHandler) UpdateParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	party, err := handler.Service.GetParty(p.ByName("id"))
 	if err != nil {
-		http.Error(w, http.StatusText(500), 500)
+		respondError(w, 404, err.Error())
 		return
 	}
 	newName := *party.Name + "1"
 	party.Name = &newName
 	handler.Service.UpdateParty(*party)
-	respondJSON(w,200,party)
+	respondJSON(w, 200, party)
+}
+
+func (handler *PartyHandler) DeleteParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	party, err := handler.Service.GetParty(p.ByName("id"))
+	if err != nil {
+		respondError(w, 404, err.Error())
+		return
+	}
+	handler.Service.DeleteParty(*party)
+	respondJSON(w, 200, party)
 }

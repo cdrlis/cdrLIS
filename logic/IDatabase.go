@@ -1,10 +1,10 @@
 package logic
 
-// Interface IDatabase CRUD
-type IDatabase interface {
+// IRepository CRUD
+type IRepository interface {
 	Create(value interface{}) error
-	Read(out interface{}) error
-	ReadAll(out interface{}) error
-	Update(value interface{}) error
-	Delete(value interface{}) error
+	Get(out interface{}, where ...interface{}) error
+	GetAll(out interface{}, where ...interface{}) error
+	Update(value interface{}, where ...interface{}) error
+	Delete(value interface{}, where ...interface{}) error
 }

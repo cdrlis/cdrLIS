@@ -9,6 +9,7 @@ import (
 	"github.com/cdrlis/cdrLIS/handler"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/julienschmidt/httprouter"
 )
 
 func main() {
@@ -23,8 +24,13 @@ func main() {
 	service := logic.LAPartyService{Context: ladmRepository}
 	partyHandler := handler.PartyHandler{Service: service}
 
-	http.HandleFunc("/party", partyHandler.GetParty)
-	http.HandleFunc("/party/list", partyHandler.GetParties)
-	http.HandleFunc("/party/update", partyHandler.UpdateParty)
-	http.ListenAndServe(":3000", nil)
+	router := httprouter.New()
+
+	router.GET("/party", partyHandler.GetParties)
+	router.POST("/party", partyHandler.CreateParty)
+	router.GET("/party/:id", partyHandler.GetParty)
+	router.PUT("/party/:id", partyHandler.UpdateParty)
+	router.DELETE("/party/:id", partyHandler.DeleteParty)
+
+	http.ListenAndServe(":3000", router)
 }

@@ -8,9 +8,9 @@ type LAPartyService struct {
 	Context IRepository
 }
 
-func (service LAPartyService) GetParty() (*ladm.LAParty, error) {
+func (service LAPartyService) GetParty(id string) (*ladm.LAParty, error) {
 	var party ladm.LAParty
-	err := service.Context.Get(&party)
+	err := service.Context.Get(&party,id)
 	if err != nil {
 		return nil, err
 	}

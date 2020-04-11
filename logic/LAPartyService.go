@@ -5,21 +5,21 @@ import (
 )
 
 type LAPartyService struct {
-	Context IRepository
+	Context IDatabase
 }
 
-func (service LAPartyService) GetParty() (*ladm.LAParty, error) {
+func (service LAPartyService) ReadParty() (*ladm.LAParty, error) {
 	var party ladm.LAParty
-	err := service.Context.Get(&party)
+	err := service.Context.Read(&party)
 	if err != nil {
 		return nil, err
 	}
 	return &party, nil
 }
 
-func (service LAPartyService) GetPartyList() (*[]ladm.LAParty, error) {
+func (service LAPartyService) ReadPartyList() (*[]ladm.LAParty, error) {
 	var parties []ladm.LAParty
-	err := service.Context.GetAll(&parties)
+	err := service.Context.ReadAll(&parties)
 	if err != nil {
 		return nil, err
 	}
@@ -27,6 +27,9 @@ func (service LAPartyService) GetPartyList() (*[]ladm.LAParty, error) {
 }
 
 func (service LAPartyService) UpdateParty(party ladm.LAParty) error {
-	service.Context.Update(&party)
+	err := service.Context.Update(&party)
+	if err != nil {
+		return err
+	}
 	return nil
 }

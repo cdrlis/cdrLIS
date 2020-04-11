@@ -1,7 +1,7 @@
 package logic
 
-// IRepository CRUD
-type IRepository interface {
+// Interface IDatabase CRUD
+type IDatabase interface {
 	Create(value interface{}) error
 	Read(out interface{}) error
 	ReadAll(out interface{}) error

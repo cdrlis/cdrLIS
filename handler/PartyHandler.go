@@ -1,11 +1,8 @@
-package handlers
+package handler
 
 import (
-	"fmt"
-	"net/http"
-	"strings"
-
 	"github.com/cdrlis/cdrLIS/logic"
+	"net/http"
 )
 
 type PartyHandler struct {
@@ -14,6 +11,7 @@ type PartyHandler struct {
 
 func (handler *PartyHandler) GetParty(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "GET" {
+		respondError(w, 405,"Method not supported.")
 		http.Error(w, http.StatusText(405), 405)
 		return
 	}
@@ -22,7 +20,7 @@ func (handler *PartyHandler) GetParty(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(500), 500)
 		return
 	}
-	fmt.Fprintf(w, "Party(%s), ExtPid(%s.%s)", *party.Name, party.ExtPid.Namespace, party.ExtPid.LocalID)
+	respondJSON(w,200,party)
 }
 
 func (handler *PartyHandler) GetParties(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +41,7 @@ func (handler *PartyHandler) GetParties(w http.ResponseWriter, r *http.Request) 
 		}
 		partyList = append(partyList, name)
 	}
-	fmt.Fprintf(w, "Party list ( count %d ):\n%s", len(*parties), strings.Join(partyList, "\n"))
+	respondJSON(w,200,parties)
 }
 
 func (handler *PartyHandler) UpdateParty(w http.ResponseWriter, r *http.Request) {
@@ -59,5 +57,5 @@ func (handler *PartyHandler) UpdateParty(w http.ResponseWriter, r *http.Request)
 	newName := *party.Name + "1"
 	party.Name = &newName
 	handler.Service.UpdateParty(*party)
-	fmt.Fprintf(w, "Updated \"%s\"", *party.Name)
+	respondJSON(w,200,party)
 }

@@ -6,7 +6,7 @@ import (
 
 	"net/http"
 
-	"github.com/cdrlis/cdrLIS/handlers"
+	"github.com/cdrlis/cdrLIS/handler"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 )
@@ -21,7 +21,7 @@ func main() {
 
 	ladmRepository := repositories.LadmRepository{DB: db}
 	service := logic.LAPartyService{Context: ladmRepository}
-	partyHandler := handlers.PartyHandler{Service: service}
+	partyHandler := handler.PartyHandler{Service: service}
 
 	http.HandleFunc("/party", partyHandler.GetParty)
 	http.HandleFunc("/party/list", partyHandler.GetParties)

@@ -53,13 +53,15 @@ type LASpatialUniter interface {
 }
 
 func (su LASpatialUnit) AreaClosed() bool {
-	closed, _ := (su.CreateArea()).AsGeometry().IsClosed()
+	multiSurface := su.CreateArea()
+	closed, _ := multiSurface.AsGeometry().IsClosed()
 	return closed
 }
 
 func (su LASpatialUnit) ComputeArea() LAAreaValue {
 	var av LAAreaValue
-	area, _ := su.CreateArea().AsGeometry().Area()
+	multiSurface := su.CreateArea()
+	area, _ := multiSurface.AsGeometry().Area()
 	av.AreaSize, av.Type = Area(area), CalculatedArea
 	return av
 }

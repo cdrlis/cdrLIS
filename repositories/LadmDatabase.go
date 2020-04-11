@@ -11,12 +11,12 @@ func (ctx LadmRepository) Create(value interface{}) error {
 	return nil // TODO error handling
 }
 
-func (ctx LadmRepository) Get(out interface{}) error {
+func (ctx LadmRepository) Read(out interface{}) error {
 	ctx.DB.First(out)
 	return nil // TODO error handling
 }
 
-func (ctx LadmRepository) GetAll(out interface{}) error {
+func (ctx LadmRepository) ReadAll(out interface{}) error {
 	ctx.DB.Find(out)
 	return nil // TODO error handling
 }

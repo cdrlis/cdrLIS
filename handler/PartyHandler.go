@@ -43,7 +43,7 @@ func (handler *PartyHandler) CreateParty(w http.ResponseWriter, r *http.Request,
 	var party ladm.LAParty
 	err := decoder.Decode(&party)
 	if err != nil {
-		respondError(w, 404, err.Error())
+		respondError(w, 400, err.Error())
 		return
 	}
 	handler.Service.CreateParty(party)
@@ -51,13 +51,18 @@ func (handler *PartyHandler) CreateParty(w http.ResponseWriter, r *http.Request,
 }
 
 func (handler *PartyHandler) UpdateParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	decoder := json.NewDecoder(r.Body)
 	party, err := handler.Service.GetParty(p.ByName("id"))
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
 	}
-	newName := *party.Name + "1"
-	party.Name = &newName
+	err = decoder.Decode(&party)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	party.ID = p.ByName("id")
 	handler.Service.UpdateParty(*party)
 	respondJSON(w, 200, party)
 }
@@ -69,5 +74,5 @@ func (handler *PartyHandler) DeleteParty(w http.ResponseWriter, r *http.Request,
 		return
 	}
 	handler.Service.DeleteParty(*party)
-	respondJSON(w, 200, party)
+	respondEmpty(w, 204)
 }

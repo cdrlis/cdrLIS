@@ -15,12 +15,8 @@ type GMObject geos.Geometry
 
 // Value converts the given GMObject struct into WKT such that it can be stored in a
 // database. Implements Valuer interface for use with database operations.
-func (g *GMObject) Value() (driver.Value, error) {
-	if g == nil {
-		return nil, nil
-	}
-
-	geometry := geos.Geometry(*g)
+func (g GMObject) Value() (driver.Value, error) {
+	geometry := geos.Geometry(g)
 
 	str, err := geometry.ToWKT()
 	if err != nil {

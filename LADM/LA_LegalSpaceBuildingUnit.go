@@ -1,12 +1,35 @@
 package ladm
 
-import "github.com/cdrlis/cdrLIS/LADM/external"
+import (
+	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
+	"github.com/cdrlis/cdrLIS/LADM/external"
+)
 
 // LALegalSpaceBuildingUnit Legal space building unit
 type LALegalSpaceBuildingUnit struct {
 	LASpatialUnit
+	//	LASpatialUniter
 	ExtPhysicalBuildingUnitID *external.ExtPhysicalBuildingUnit
 	Type                      *LABuildingUnitType
+}
+
+func (lsbu LALegalSpaceBuildingUnit) AreaClosed() bool {
+	multiSurface := lsbu.CreateArea()
+	closed, _ := multiSurface.AsGeometry().IsClosed()
+	return closed
+}
+
+func (lsbu LALegalSpaceBuildingUnit) ComputeArea() LAAreaValue {
+	var av LAAreaValue
+	multiSurface := lsbu.CreateArea()
+	area, _ := multiSurface.AsGeometry().Area()
+	av.AreaSize, av.Type = Area(area), CalculatedArea
+	return av
+}
+
+func (lsbu LALegalSpaceBuildingUnit) CreateArea() geometry.GMMultiSurface {
+	var ms geometry.GMMultiSurface
+	return ms
 }
 
 //

@@ -5,6 +5,10 @@ import (
 	"net/http"
 )
 
+func respondEmpty(w http.ResponseWriter, status int) {
+	w.WriteHeader(status)
+}
+
 // respondJSON makes the response with payload as json format
 func respondJSON(w http.ResponseWriter, status int, payload interface{}) {
 	response, err := json.Marshal(payload)

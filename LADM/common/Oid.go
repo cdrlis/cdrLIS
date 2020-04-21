@@ -13,8 +13,8 @@ type Oid struct {
 }
 
 // Value Returs Oid value
-func (id *Oid) Value() (driver.Value, error) {
-	return "(" + id.LocalID + ", " + id.Namespace + ")", nil
+func (id Oid) Value() (driver.Value, error) {
+	return "(" + id.LocalID + "," + id.Namespace + ")", nil
 }
 
 // Scan Reads Oid

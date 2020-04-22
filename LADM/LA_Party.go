@@ -17,14 +17,14 @@ import (
 // a source); see Figure 9.
 type LAParty struct {
 	common.VersionedObject
-	ID     string         `gorm:"column:id;primary_key"`
-	ExtPid *common.Oid    `gorm:"column:extpid"`
-	Name   *string        `gorm:"column:name"`
-	Pid    common.Oid     `gorm:"column:pid"`
-	Role   pq.StringArray `gorm:"type:varchar(100)[]"`
-	Type   string         `gorm:"column:type"`
-	Groups []LAPartyMember
+	ID     string         `gorm:"column:id;primary_key" json:"-"`
+	ExtPid *common.Oid    `gorm:"column:extpid" json:"extPID"`
+	Name   *string        `gorm:"column:name" json:"name"`
+	Pid    common.Oid     `gorm:"column:pid;type:Oid" json:"pID"`
+	Role   pq.StringArray `gorm:"type:varchar(100)[]" json:"role"`
+	Type   string         `gorm:"column:type" json:"type"`
 
+	Groups []LAPartyMember
 	Unit []LABAunit // baunitAsParty
 	RRR  []LARRR    // rrrParty
 }

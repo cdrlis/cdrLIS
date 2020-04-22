@@ -1,4 +1,4 @@
-package repositories
+package database
 
 import (
 	"errors"
@@ -16,7 +16,7 @@ func (ctx LadmDatabase) Create(value interface{}) error {
 
 func (ctx LadmDatabase) Read(out interface{}, where ...interface{}) error {
 	if where != nil {
-		if ctx.DB.First(out, where).RowsAffected == 0 {
+		if ctx.DB.Where(where[0], where[1:]).First(out).RowsAffected == 0 {
 			return errors.New("Entity not found")
 		}
 		return nil
@@ -26,6 +26,12 @@ func (ctx LadmDatabase) Read(out interface{}, where ...interface{}) error {
 }
 
 func (ctx LadmDatabase) ReadAll(out interface{}, where ...interface{}) error {
+	if where != nil {
+		if ctx.DB.Where(where[0], where[1:]).Find(out).RowsAffected == 0 {
+			return errors.New("Entity not found")
+		}
+		return nil
+	}
 	ctx.DB.Find(out)
 	return nil // TODO error handling
 }

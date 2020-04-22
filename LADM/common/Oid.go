@@ -8,11 +8,11 @@ import (
 
 // Oid Object identifier
 type Oid struct {
-	LocalID   string
-	Namespace string
+	LocalID   string `json:"localId"`
+	Namespace string `json:"namespace"`
 }
 
-// Value Returs Oid value
+// Value Returns Oid value
 func (id Oid) Value() (driver.Value, error) {
 	return "(" + id.LocalID + "," + id.Namespace + ")", nil
 }
@@ -21,7 +21,6 @@ func (id Oid) Value() (driver.Value, error) {
 func (id *Oid) Scan(value interface{}) error {
 
 	if value == nil {
-		id = nil
 		return nil
 	}
 

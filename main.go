@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/cdrlis/cdrLIS/logic"
-	"github.com/cdrlis/cdrLIS/repositories"
+	"github.com/cdrlis/cdrLIS/database"
 
 	"net/http"
 
@@ -23,7 +23,7 @@ func main() {
 	}
 	db.LogMode(true)
 
-	ladmDB := repositories.LadmDatabase{DB: db}
+	ladmDB := database.LadmDatabase{DB: db}
 	service := logic.LAPartyService{Context: ladmDB}
 	partyHandler := handler.PartyHandler{Service: service}
 
@@ -31,9 +31,9 @@ func main() {
 
 	router.GET("/party", partyHandler.GetParties)
 	router.POST("/party", partyHandler.CreateParty)
-	router.GET("/party/:id", partyHandler.GetParty)
-	router.PUT("/party/:id", partyHandler.UpdateParty)
-	router.DELETE("/party/:id", partyHandler.DeleteParty)
+	router.GET("/party/:namespace/:localId", partyHandler.GetParty)
+	router.PUT("/party/:namespace/:localId", partyHandler.UpdateParty)
+	router.DELETE("/party/:namespace/:localId", partyHandler.DeleteParty)
 
 	http.ListenAndServe(":3000", router)
 

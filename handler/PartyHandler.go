@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	ladm "github.com/cdrlis/cdrLIS/LADM"
+	"github.com/cdrlis/cdrLIS/LADM/common"
 	"github.com/cdrlis/cdrLIS/logic"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
@@ -13,7 +14,8 @@ type PartyHandler struct {
 }
 
 func (handler *PartyHandler) GetParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	party, err := handler.Service.GetParty(p.ByName("id"))
+	pid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
+	party, err := handler.Service.GetParty(pid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
@@ -46,13 +48,18 @@ func (handler *PartyHandler) CreateParty(w http.ResponseWriter, r *http.Request,
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.Service.CreateParty(party)
-	respondJSON(w, 201, party)
+	createdParty, err := handler.Service.CreateParty(party)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 201, createdParty)
 }
 
 func (handler *PartyHandler) UpdateParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	pid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
 	decoder := json.NewDecoder(r.Body)
-	party, err := handler.Service.GetParty(p.ByName("id"))
+	party, err := handler.Service.GetParty(pid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
@@ -62,13 +69,13 @@ func (handler *PartyHandler) UpdateParty(w http.ResponseWriter, r *http.Request,
 		respondError(w, 400, err.Error())
 		return
 	}
-	party.ID = p.ByName("id")
 	handler.Service.UpdateParty(*party)
 	respondJSON(w, 200, party)
 }
 
 func (handler *PartyHandler) DeleteParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	party, err := handler.Service.GetParty(p.ByName("id"))
+	pid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
+	party, err := handler.Service.GetParty(pid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return

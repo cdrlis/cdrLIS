@@ -1,6 +1,7 @@
 package ladm
 
 import (
+	"database/sql/driver"
 	"github.com/cdrlis/cdrLIS/LADM/common"
 	"github.com/lib/pq"
 )
@@ -21,8 +22,8 @@ type LAParty struct {
 	ExtPid *common.Oid    `gorm:"column:extpid" json:"extPID"`
 	Name   *string        `gorm:"column:name" json:"name"`
 	Pid    common.Oid     `gorm:"column:pid;type:Oid" json:"pID"`
-	Role   pq.StringArray `gorm:"type:varchar(100)[]" json:"role"`
-	Type   string         `gorm:"column:type" json:"type"`
+	Role   LAPartyRoleTypeArray `gorm:"type:varchar(100)[]" json:"role"`
+	Type   LAPartyType         `gorm:"column:type" json:"type"`
 
 	Groups []LAPartyMember
 	Unit []LABAunit // baunitAsParty
@@ -34,7 +35,7 @@ func (LAParty) TableName() string {
 }
 
 // LAPartyType Party type
-type LAPartyType string // TODO Temporary not used (GORM debuging)
+type LAPartyType string
 
 const (
 	BAUnit           LAPartyType = "baunit"
@@ -42,6 +43,16 @@ const (
 	NaturalPerson                = "naturalPerson"
 	NonNaturalPerson             = "nonNaturalPerson"
 )
+
+type LAPartyRoleTypeArray pq.StringArray
+
+func (a *LAPartyRoleTypeArray) Scan(src interface{}) error {
+	return (*pq.StringArray)(a).Scan(src)
+}
+
+func (a LAPartyRoleTypeArray) Value() (driver.Value, error) {
+	return (pq.StringArray)(a).Value()
+}
 
 // LAPartyRoleType Party role type
 type LAPartyRoleType string // TODO Temporary not used (GORM debuging)

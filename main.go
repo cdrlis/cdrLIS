@@ -34,6 +34,11 @@ func main() {
 	router.GET("/party/:namespace/:localId", partyHandler.GetParty)
 	router.PUT("/party/:namespace/:localId", partyHandler.UpdateParty)
 	router.DELETE("/party/:namespace/:localId", partyHandler.DeleteParty)
+	
+	router.GET("/type/party", partyHandler.GetPartyTypes)
+	router.GET("/role/party", partyHandler.GetPartyRoles)
+
+	router.GET("/groupParty", partyHandler.GetGroupParties)
 
 	http.ListenAndServe(":3000", router)
 

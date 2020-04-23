@@ -68,3 +68,35 @@ func (service LAPartyService) DeleteParty(party ladm.LAParty) error {
 	service.Context.Update(&oldParty)
 	return nil
 }
+
+func (service LAPartyService) GetPartyTypeList() (*[]ladm.LAPartyType, error) {
+	types := []ladm.LAPartyType{ladm.BAUnit, ladm.Group, ladm.NaturalPerson, ladm.NonNaturalPerson}
+	return &types, nil
+}
+
+func (service LAPartyService) GetPartyRoleList() (*[]ladm.LAPartyRoleType, error) {
+	types := []ladm.LAPartyRoleType{ladm.Bank, ladm.CertifiedSurveyor, ladm.Citizen, ladm.Conveyancer, ladm.Employee, ladm.Farmer, ladm.MoneyProvider, ladm.Notary, ladm.StateAdministrator, ladm.Surveyor, ladm.Writer}
+	return &types, nil
+}
+
+// Group party
+func (service LAPartyService) CreateGroupParty(party ladm.LAGroupParty) (*ladm.LAGroupParty, error) {
+	currentTime := time.Now()
+	party.ID = uuid.New().String()
+	party.BeginLifespanVersion = currentTime
+	party.EndLifespanVersion = nil
+	err := service.Context.Create(&party)
+	if err != nil {
+		return nil, err
+	}
+	return &party, nil
+}
+
+func (service LAPartyService) GetGroupPartyList() (*[]ladm.LAGroupParty, error) {
+	var parties []ladm.LAGroupParty
+	err := service.Context.ReadAll(&parties, "endlifespanversion IS NULL")
+	if err != nil {
+		return nil, err
+	}
+	return &parties, nil
+}

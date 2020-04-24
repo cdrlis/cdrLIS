@@ -25,7 +25,7 @@ type LAParty struct {
 	Role   LAPartyRoleTypeArray `gorm:"type:varchar(100)[]" json:"role"`
 	Type   LAPartyType          `gorm:"column:type" json:"type"`
 
-	Groups []LAPartyMember
+	Groups []LAPartyMember 		`gorm:"foreignkey:PartyID;association_foreignkey:ID" json:"groups"`
 
 	Unit []LABAunit // baunitAsParty
 

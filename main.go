@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/cdrlis/cdrLIS/logic"
-	"github.com/cdrlis/cdrLIS/database"
+	"github.com/cdrlis/cdrLIS/dbcontext"
 
 	"net/http"
 
@@ -23,7 +23,7 @@ func main() {
 	}
 	db.LogMode(true)
 
-	ladmDB := database.LadmDatabase{DB: db}
+	ladmDB := dbcontext.CRUDContext{DB: db}
 	service := logic.LAPartyService{Context: ladmDB}
 	partyHandler := handler.PartyHandler{Service: service}
 

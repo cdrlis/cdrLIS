@@ -1,7 +1,7 @@
 package logic
 
 // IRepository CRUD
-type IDatabase interface {
+type CRUDer interface {
 	Create(value interface{}) error
 	Read(out interface{}, where ...interface{}) error
 	ReadAll(out interface{}, where ...interface{}) error

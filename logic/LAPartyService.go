@@ -8,7 +8,7 @@ import (
 )
 
 type LAPartyService struct {
-	Context IDatabase
+	Context CRUDer
 }
 
 func (service LAPartyService) GetParty(id common.Oid) (*ladm.LAParty, error) {

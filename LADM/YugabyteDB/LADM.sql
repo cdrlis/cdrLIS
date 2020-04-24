@@ -30,13 +30,14 @@ DROP TYPE IF EXISTS "CC_Formula";
 DROP TABLE IF EXISTS "LA_LegalSpaceBuildingUnit";
 DROP TABLE IF EXISTS "LA_RequiredRelationshipSpatialUnit";
 
+DROP TABLE IF EXISTS "suBaunit";
+DROP TABLE IF EXISTS "suSuGroup";
 DROP TABLE IF EXISTS "LA_SpatialUnit";
 DROP TABLE IF EXISTS "LA_SpatialUnitGroup";
 DROP TABLE IF EXISTS "LA_Level";
 
 DROP TABLE IF EXISTS "LA_RequiredRelationshipBAUnit";
 DROP TABLE IF EXISTS "LA_BAUnit";
-DROP TABLE IF EXISTS "suBaunit";
 DROP TYPE IF EXISTS "LA_BAUnitType";
 DROP TABLE IF EXISTS "mortgageRight";
 DROP TABLE IF EXISTS "LA_Mortgage";
@@ -184,7 +185,8 @@ CREATE TABLE "LA_Party" (
                             endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element",								-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",						-- Omitted for simplicity
-                            CONSTRAINT party_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                            PRIMARY KEY(id),
+                            UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
@@ -210,7 +212,8 @@ CREATE TABLE "LA_GroupParty" (
                                  endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element",								-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",						-- Omitted for simplicity
-                                 CONSTRAINT groupparty_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                 PRIMARY KEY(id),
+                                 UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
@@ -220,21 +223,21 @@ CREATE TABLE "LA_GroupParty" (
 -- An instance of class LA_PartyMember is a party member. Class LA_PartyMember is an optional association
 -- class between LA_Party and LA_GroupParty, see Figure 9.
 CREATE TABLE "LA_PartyMember" (
-                                  id						VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
-                                  parties					VARCHAR NOT NULL,			-- LA_Party.id
-                                  groups					VARCHAR NOT NULL,			-- LA_GroupParty.id
+                                  id						VARCHAR NOT NULL,					-- rID.namespace || '-' || rID.localId
                                   fraction				"Fraction",
+--	quality					"DQ_Element",						-- Omitted for simplicity
+--	source 					"CI_ResponsibleParty",				-- Omitted for simplicity
+--	parties														"parties" REFERENCES "LA_Party", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
+--	groups														"groups" REFERENCES "LA_GroupParty", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
+    -- Therefore:
+                                  parties					VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
+                                  groups					VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
                                   beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                   endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
---	quality					"DQ_Element",								-- Omitted for simplicity
---	source 					"CI_ResponsibleParty",						-- Omitted for simplicity
-
---	parties														"Oid" REFERENCES "LA_Party", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
---	groups														"Oid" REFERENCES "LA_GroupParty", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
-    -- Therefore:
+                                  PRIMARY KEY(id),
+                                  UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
                                   FOREIGN KEY (parties, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                  FOREIGN KEY (groups, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_GroupParty"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                  CONSTRAINT partyMember_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                  FOREIGN KEY (groups, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_GroupParty"(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
@@ -281,19 +284,20 @@ CREATE TYPE "LA_RightType" AS ENUM (
 CREATE TABLE "LA_Right" (
                             id						VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
                             description				VARCHAR,
-                            rID						"Oid" NOT NULL, 				-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YigabyteDB
+                            rID						"Oid" NOT NULL, 				-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
                             share					"Fraction",
                             shareCheck				BOOLEAN DEFAULT TRUE,
                             timeSpec				INTERVAL[],
                             type					"LA_RightType" NOT NULL DEFAULT 'ownership',
-                            beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element", 					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
-                            CONSTRAINT right_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion),
+                            party					VARCHAR NOT NULL,				--  pID.namespace || '-' || pID.localId
+                            beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                            PRIMARY KEY(id),
+                            UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
                             CONSTRAINT right_share_chk CHECK ((share).numerator > 0 AND (share).denominator > 0 AND (share).numerator <= (share).denominator),
-                            FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                            FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_GroupParty"(id, beginLifeSpanVersion, endLifeSpanVersion)
+                            FOREIGN KEY (party, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("LA_RRR"); -- INHERITS not supported yet
 
@@ -309,14 +313,15 @@ CREATE TABLE "LA_Restriction" (
                                   timeSpec				INTERVAL[],
                                   partyRequired			BOOLEAN DEFAULT TRUE,
                                   type					"LA_RestrictionType" NOT NULL,
-                                  beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                  endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element", 					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
-                                  CONSTRAINT restriction_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion),
+                                  party					VARCHAR NOT NULL,				--  pID.namespace || '-' || pID.localId
+                                  beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                  endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                  PRIMARY KEY(id),
+                                  UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
                                   CONSTRAINT restriction_share_chk CHECK ((share).numerator > 0 AND (share).denominator > 0 AND (share).numerator <= (share).denominator),
-                                  FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                  FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_GroupParty"(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                  FOREIGN KEY (party, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("LA_RRR"); -- INHERITS not supported yet
 
@@ -331,14 +336,15 @@ CREATE TABLE "LA_Responsibility" (
                                      shareCheck				BOOLEAN DEFAULT TRUE,
                                      timeSpec				INTERVAL[],
                                      type					"LA_ResponsibilityType" NOT NULL,
-                                     beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                     endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element", 					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
-                                     CONSTRAINT responsibility_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion),
+                                     party					VARCHAR NOT NULL,				--  pID.namespace || '-' || pID.localId
+                                     beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                     endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                     PRIMARY KEY(id),
+                                     UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
                                      CONSTRAINT responsibility_share_chk CHECK ((share).numerator > 0 AND (share).denominator > 0 AND (share).numerator <= (share).denominator),
-                                     FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                     FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_GroupParty"(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                     FOREIGN KEY (party, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("LA_RRR"); -- INHERITS not supported yet
 
@@ -363,12 +369,15 @@ CREATE TABLE "LA_Mortgage" (
                                timeSpec				INTERVAL[],
                                partyRequired			BOOLEAN DEFAULT TRUE,
                                restrictionType			"LA_RestrictionType" NOT NULL,
-                               beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                               endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element", 					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
-                               CONSTRAINT mortgage_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion),
-                               CONSTRAINT mortgage_share_chk CHECK ((share).numerator > 0 AND (share).denominator > 0 AND (share).numerator <= (share).denominator)
+                               party					VARCHAR NOT NULL,				--  pID.namespace || '-' || pID.localId
+                               beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                               endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                               PRIMARY KEY(id),
+                               UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
+                               CONSTRAINT mortgage_share_chk CHECK ((share).numerator > 0 AND (share).denominator > 0 AND (share).numerator <= (share).denominator),
+                               FOREIGN KEY (party, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("LA_Restriction"); -- INHERITS not supported yet
 
@@ -378,13 +387,14 @@ CREATE TABLE "mortgageRight" (
                                  right_					VARCHAR NOT NULL,			-- LA_Right.id
                                  beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                  endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
-                                 CONSTRAINT mortgageRight_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion),
+                                 PRIMARY KEY(id),
+                                 UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
 --	mortgage												-- REFERENCES "LA_Mortgage",
 --	right_													-- REFERENCES "LA_Right",
     -- But FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
     -- Therefore:
-                                 CONSTRAINT mortgage_fk FOREIGN KEY (mortgage, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Mortgage"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                 CONSTRAINT right_fk FOREIGN KEY (right_, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Right"(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                 FOREIGN KEY (mortgage, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Mortgage"(id, beginLifeSpanVersion, endLifeSpanVersion),
+                                 FOREIGN KEY (right_, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Right"(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 
 
@@ -412,52 +422,58 @@ CREATE TYPE "LA_BAUnitType" AS ENUM (
 CREATE TABLE "LA_BAUnit" (
                              id			VARCHAR NOT NULL,				-- uID.namespace || '-' || uID.localID
                              type		"LA_BAUnitType" NOT NULL,
-                             uid			"Oid" NOT NULL, 				-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YigabyteDB
-                             beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                             endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                             uID			"Oid" NOT NULL, 				-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YigabyteDB
 --	quality					"DQ_Element", 					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
-                             CONSTRAINT bau_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion),
 --	rrr													 	-- REFERENCES "LA_RRR",
     -- But FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
     -- Therefore:
 --	CONSTRAINT bau_rrr_fk FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_RRR"
-                             CONSTRAINT bau_right_fk FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Right",
-                             CONSTRAINT bau_restriction_fk FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Restriction",
-                             CONSTRAINT bau_responsibility_fk FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Responsibility"
+                             right_					VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
+                             restriction				VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
+                             responsibility			VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
+                             beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                             endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                             PRIMARY KEY(id),
+                             UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
+                             FOREIGN KEY (right_, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Right" (id, beginLifeSpanVersion, endLifeSpanVersion),
+                             FOREIGN KEY (restriction, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Restriction" (id, beginLifeSpanVersion, endLifeSpanVersion),
+                             FOREIGN KEY (responsibility, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Responsibility" (id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 
 CREATE TABLE "LA_RequiredRelationshipBAUnit" (
                                                  id						VARCHAR NOT NULL,
-                                                 bu1						VARCHAR NOT NULL,			-- LA_BAUnit.id
-                                                 bu2						VARCHAR NOT NULL,			-- LA_BAUnit.id
                                                  relationship			VARCHAR NOT NULL,
-                                                 beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                                 endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element",								-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",						-- Omitted for simplicity
-                                                 CONSTRAINT rrbu_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion),
---	su1														"Oid" REFERENCES "LA_SpatialUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
---	su2														"Oid" REFERENCES "LA_SpatialUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
+--	su1														"Oid" REFERENCES "LA_BAUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
+--	su2														"Oid" REFERENCES "LA_BAUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
     -- Therefore:
-                                                 FOREIGN KEY (bu1, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                                 FOREIGN KEY (bu2, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                                 bu1						VARCHAR NOT NULL,			-- LA_BAUnit.id
+                                                 bu2						VARCHAR NOT NULL,			-- LA_BAUnit.id
+                                                 beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                                 endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                                 PRIMARY KEY(id),
+                                                 UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
+                                                 FOREIGN KEY (bu1, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_BAUnit" (id, beginLifeSpanVersion, endLifeSpanVersion),
+                                                 FOREIGN KEY (bu2, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_BAUnit" (id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
 
 CREATE TABLE "baunitAsParty" (
                                  id						VARCHAR NOT NULL,
+--	unit											"Oid" REFERENCES "LA_Party", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
+--	party											"Oid" REFERENCES "LA_BAUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
+    -- Therefore:
                                  unit					VARCHAR NOT NULL,		-- LA_BAUnit.id
                                  party					VARCHAR NOT NULL,		-- LA_Party.id
                                  beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                  endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
---	unit											"Oid" REFERENCES "LA_Party", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
---	party											"Oid" REFERENCES "LA_BAUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
-    -- Therefore:
+                                 PRIMARY KEY(id),
+                                 UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
                                  FOREIGN KEY (unit, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                 FOREIGN KEY (party, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                 CONSTRAINT bauasp_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                 FOREIGN KEY (party, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 
 --***************************************************************************
@@ -534,7 +550,8 @@ CREATE TABLE "LA_SpatialUnitGroup" (
                                        endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element", 					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
-                                       CONSTRAINT sug_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                       PRIMARY KEY(id),
+                                       UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
@@ -542,8 +559,8 @@ CREATE TABLE "LA_SpatialUnitGroup" (
 -- Spatial Unit::LA_Level - Set of spatial units (4.1.23), with a geometric, and/or topological, and/or thematic coherence
 --
 CREATE TABLE "LA_Level" (
-                            id						VARCHAR NOT NULL,				--  suID.namespace || '-' || suID.localId
-                            lid						VARCHAR NOT NULL,				-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
+                            id						VARCHAR NOT NULL,				--  lID.namespace || '-' || lID.localId
+                            lID						"Oid" NOT NULL,					-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
                             name					VARCHAR,
                             registerType			"LA_RegisterType",
                             structure				"LA_StructureType",
@@ -552,7 +569,8 @@ CREATE TABLE "LA_Level" (
                             endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element",					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
-                            CONSTRAINT l_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                            PRIMARY KEY(id),
+                            UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
@@ -573,12 +591,9 @@ CREATE TABLE "LA_SpatialUnit" (
                                   endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element",					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
---	part													-- REFERENCES "LA_SpatialUnitGroup",
-    -- But FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
-    -- Therefore:
-                                  FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_SpatialUnitGroup"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                  CONSTRAINT su_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                  CONSTRAINT level_fk FOREIGN KEY (level, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_Level"(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                  PRIMARY KEY(id),
+                                  UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
+                                  FOREIGN KEY (level) REFERENCES "LA_Level"(id)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
@@ -594,14 +609,15 @@ CREATE TYPE "ISO19125_Type" AS ENUM (
     );
 CREATE TABLE "LA_RequiredRelationshipSpatialUnit" (
                                                       id						VARCHAR NOT NULL,
+--	quality					"DQ_Element",								-- Omitted for simplicity
+--	source 					"CI_ResponsibleParty",						-- Omitted for simplicity
                                                       su1						VARCHAR NOT NULL,			-- LA_SpatialUnit.id
                                                       su2						VARCHAR NOT NULL,			-- LA_SpatialUnit.id
                                                       relationship			"ISO19125_Type",
                                                       beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                                       endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
---	quality					"DQ_Element",								-- Omitted for simplicity
---	source 					"CI_ResponsibleParty",						-- Omitted for simplicity
-                                                      CONSTRAINT rrsu_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion),
+                                                      PRIMARY KEY(id),
+                                                      UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
 --	su1														"Oid" REFERENCES "LA_SpatialUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
 --	su2														"Oid" REFERENCES "LA_SpatialUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
     -- Therefore:
@@ -632,29 +648,45 @@ CREATE TABLE "LA_LegalSpaceBuildingUnit" (
                                              referencePoint				geometry(POINT),
                                              lsbuID						"Oid" NOT NULL,
                                              surfaceRelation				"LA_SurfaceRelationType",
-                                             beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                             endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality						"DQ_Element",								-- Omitted for simplicity
 --	source 						"CI_ResponsibleParty",						-- Omitted for simplicity
                                              extPhysicalBuildingUnitID	"ExtPhysicalBuildingUnit",
                                              type 						"LA_BuildingUnitType",
-                                             CONSTRAINT lsbu_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                             beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                             endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                             PRIMARY KEY(id),
+                                             UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
+CREATE TABLE "suSuGroup" (
+                             id						VARCHAR NOT NULL,
+--	part												"Oid" REFERENCES "LA_SpatialUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
+--	whole												"Oid" REFERENCES "LA_BAUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
+    -- Therefore:
+                             part					VARCHAR NOT NULL,		--  suID.namespace || '-' || suID.localId
+                             whole					VARCHAR NOT NULL,		-- sugID.namespace || '-' || sugID.localId
+                             beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                             endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                             PRIMARY KEY(id),
+                             UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
+                             FOREIGN KEY (part, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion, endLifeSpanVersion),
+                             FOREIGN KEY (whole, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion, endLifeSpanVersion)
+);
 
 CREATE TABLE "suBaunit" (
                             id						VARCHAR NOT NULL,
-                            su						VARCHAR NOT NULL,		-- LA_SpatialUnit.id
+                            su						VARCHAR NOT NULL,		-- -- sugID.namespace || '-' || sugID.localId
                             baunit					VARCHAR NOT NULL,		-- LA_BAUnit.id
                             beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	su												"Oid" REFERENCES "LA_SpatialUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
 --	baunit											"Oid" REFERENCES "LA_BAUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
     -- Therefore:
+                            PRIMARY KEY(id),
+                            UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
                             FOREIGN KEY (su, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                            FOREIGN KEY (baunit, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                            CONSTRAINT subau_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                            FOREIGN KEY (baunit, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 
 
@@ -682,15 +714,17 @@ CREATE TABLE "LA_BoundaryFaceString"(
                                         bfsID					"Oid" NOT NULL,							-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
                                         geometry				geometry(MULTILINESTRING),
 --	locationByText			VARCHAR,								-- Ignored - we assume 2D polygon-based spatial units
-                                        beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                        endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element",							-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty"					-- Omitted for simplicity
 --	su																-- REFERENCES "LA_SpatialUnit",
     -- But FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
     -- Therefore:
-                                        FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                        CONSTRAINT bfs_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                        su 						VARCHAR NOT NULL,						--  suID.namespace || '-' || suID.localId
+                                        beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                        endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                        PRIMARY KEY(id),
+                                        UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
+                                        FOREIGN KEY (su, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
@@ -739,15 +773,18 @@ CREATE TABLE "LA_Point" (
                             pointType				"LA_PointType" NOT NULL DEFAULT 'control',
                             productionMethod		"LI_Lineage",
                             transAndResult			"LA_Transformation",
-                            beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element",						-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty"				-- Omitted for simplicity
 --	bfs															-- REFERENCES "LA_BoundaryFaceString",
     -- But FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
     -- Therefore:
-                            FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                            CONSTRAINT p_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                            bfs						VARCHAR NOT NULL,					--  bfsid.namespace || '-' || bfsid.localId
+                            pb						VARCHAR NOT NULL,					--  pbID.namespace || '-' || pbID.localId
+                            beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                            PRIMARY KEY(id),
+                            UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
+                            FOREIGN KEY (bfs, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
@@ -756,8 +793,8 @@ CREATE TABLE "LA_Point" (
 --***************************************************************************
 
 CREATE TABLE "PolygonLevel" (
-                                id						VARCHAR NOT NULL,				--  suID.namespace || '-' || suID.localId
-                                lid						VARCHAR NOT NULL,				--  suID.namespace || '-' || suID.localId
+                                id						VARCHAR NOT NULL,				--  lID.namespace || '-' || lID.localId
+                                lID						"Oid" NOT NULL,					-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
                                 name					VARCHAR,
                                 registerType			"LA_RegisterType",
                                 structure				"LA_StructureType" DEFAULT 'polygon',
@@ -766,7 +803,8 @@ CREATE TABLE "PolygonLevel" (
                                 endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element",					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
-                                CONSTRAINT pl_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                PRIMARY KEY(id),
+                                UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
@@ -784,7 +822,8 @@ CREATE TABLE "PolygonSpatialUnitGroup" (
                                            endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element",								-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",						-- Omitted for simplicity
-                                           CONSTRAINT psug_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                           PRIMARY KEY(id),
+                                           UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
@@ -805,17 +844,21 @@ CREATE TABLE "PolygonSpatialUnit" (
                                       referencePoint			geometry(POINT),
                                       suID					"Oid",
                                       surfaceRelation			"LA_SurfaceRelationType",
-                                      beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                      endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 --	quality					"DQ_Element",								-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",						-- Omitted for simplicity
---	part																-- REFERENCES "PolygonLevel",
+--	level																-- REFERENCES "PolygonLevel",
     -- But FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
     -- Therefore:
-                                      FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "PolygonLevel"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                      CONSTRAINT psu_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                      level					VARCHAR NOT NULL,							--  lID.namespace || '-' || lID.localId
+                                      beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                      endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                      PRIMARY KEY(id),
+                                      UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
+                                      FOREIGN KEY (level, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "PolygonLevel"(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
+ALTER TABLE "suBaunit" ADD CONSTRAINT suBaunit_polygonSpatialUnit_fk FOREIGN KEY (su) REFERENCES "PolygonSpatialUnit"(id);
+
 
 --
 -- Polygon_Profile::Polygon_Boundary
@@ -831,12 +874,18 @@ CREATE TABLE "PolygonBoundary" (
 --	spatialUnit												-- REFERENCES "PolygonSpatialUnitGroup",
     -- But FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
     -- Therefore:
-                                   FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "PolygonSpatialUnitGroup"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                   CONSTRAINT spatialUnit_fk FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "PolygonSpatialUnit"(id, beginLifeSpanVersion, endLifeSpanVersion),
-                                   CONSTRAINT pb_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion)
+                                   psu						VARCHAR NOT NULL,				--  suID.namespace || '-' || suID.localId
+                                   psug					VARCHAR NOT NULL,				--  sugID.namespace || '-' || sugID.localId
+                                   PRIMARY KEY(id),
+                                   UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
+                                   FOREIGN KEY (psu, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "PolygonSpatialUnit"(id, beginLifeSpanVersion, endLifeSpanVersion),
+                                   FOREIGN KEY (psug, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "PolygonSpatialUnitGroup"(id, beginLifeSpanVersion, endLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
-ALTER TABLE "LA_Point" ADD CONSTRAINT point_fk FOREIGN KEY (id, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "PolygonBoundary" (id, beginLifeSpanVersion, endLifeSpanVersion);
+ALTER TABLE "LA_Point"
+    ADD CONSTRAINT point_polygonBoundary_fk
+        FOREIGN KEY (pb, beginLifeSpanVersion, endLifeSpanVersion) REFERENCES "PolygonBoundary" (id, beginLifeSpanVersion, endLifeSpanVersion);
 
 --COMMIT;
+

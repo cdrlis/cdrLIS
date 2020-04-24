@@ -1,4 +1,4 @@
-package logic
+package dblogic
 
 // CRUDer CRUD
 type CRUDer interface {

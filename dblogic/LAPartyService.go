@@ -1,4 +1,4 @@
-package logic
+package dblogic
 
 import (
 	ladm "github.com/cdrlis/cdrLIS/LADM"

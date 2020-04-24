@@ -1,7 +1,7 @@
 package logic
 
 // Database CRUD
-type DatabaseCRUD interface {
+type DatabaseCRUDer interface {
 	Create(value interface{}) error
 	Read(out interface{}, where ...interface{}) error
 	ReadAll(out interface{}, where ...interface{}) error

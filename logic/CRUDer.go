@@ -1,6 +1,6 @@
 package logic
 
-// IRepository CRUD
+// CRUDer CRUD
 type CRUDer interface {
 	Create(value interface{}) error
 	Read(out interface{}, where ...interface{}) error

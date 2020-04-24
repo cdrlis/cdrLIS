@@ -13,9 +13,14 @@ import "github.com/cdrlis/cdrLIS/LADM/common"
 
 type LAGroupParty struct {
 	LAParty
-	GroupID common.Oid
-	Type    LAGroupPartyType
+	GroupID common.Oid       `gorm:"column:groupid" json:"groupID"`
+	Type    LAGroupPartyType `gorm:"column:type" json:"type"`
+
 	Parties []LAPartyMember
+}
+
+func (LAGroupParty) TableName() string {
+	return "LA_GroupParty"
 }
 
 // LAGroupPartyType Group party type

@@ -29,14 +29,6 @@ func (handler *PartyHandler) GetParties(w http.ResponseWriter, r *http.Request, 
 		respondError(w, 500, err.Error())
 		return
 	}
-	var partyList []string
-	for _, party := range *parties {
-		name := "-"
-		if party.Name != nil {
-			name = *party.Name
-		}
-		partyList = append(partyList, name)
-	}
 	respondJSON(w, 200, parties)
 }
 
@@ -82,4 +74,50 @@ func (handler *PartyHandler) DeleteParty(w http.ResponseWriter, r *http.Request,
 	}
 	handler.Service.DeleteParty(*party)
 	respondEmpty(w, 204)
+}
+
+func (handler *PartyHandler) GetPartyTypes(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	types, err := handler.Service.GetPartyTypeList()
+	if err != nil {
+		respondError(w, 500, err.Error())
+		return
+	}
+	respondJSON(w, 200, types)
+}
+
+func (handler *PartyHandler) GetPartyRoles(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	types, err := handler.Service.GetPartyRoleList()
+	if err != nil {
+		respondError(w, 500, err.Error())
+		return
+	}
+	respondJSON(w, 200, types)
+}
+
+
+// Group party
+
+func (handler *PartyHandler) CreateGroupParty(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	decoder := json.NewDecoder(r.Body)
+	var party ladm.LAGroupParty
+	err := decoder.Decode(&party)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	createdParty, err := handler.Service.CreateGroupParty(party)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 201, createdParty)
+}
+
+func (handler *PartyHandler) GetGroupParties(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	parties, err := handler.Service.GetGroupPartyList()
+	if err != nil {
+		respondError(w, 500, err.Error())
+		return
+	}
+	respondJSON(w, 200, parties)
 }

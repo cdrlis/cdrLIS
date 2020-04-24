@@ -18,16 +18,21 @@ import (
 // a source); see Figure 9.
 type LAParty struct {
 	common.VersionedObject
-	ID     string         `gorm:"column:id;primary_key" json:"-"`
-	ExtPid *common.Oid    `gorm:"column:extpid" json:"extPID"`
-	Name   *string        `gorm:"column:name" json:"name"`
-	Pid    common.Oid     `gorm:"column:pid;type:Oid" json:"pID"`
+	ID     string               `gorm:"column:id;primary_key" json:"-"`
+	ExtPid *common.Oid          `gorm:"column:extpid" json:"extPID"`
+	Name   *string              `gorm:"column:name" json:"name"`
+	Pid    common.Oid           `gorm:"column:pid;type:Oid" json:"pID"`
 	Role   LAPartyRoleTypeArray `gorm:"type:varchar(100)[]" json:"role"`
-	Type   LAPartyType         `gorm:"column:type" json:"type"`
+	Type   LAPartyType          `gorm:"column:type" json:"type"`
 
 	Groups []LAPartyMember
+
 	Unit []LABAunit // baunitAsParty
-	RRR  []LARRR    // rrrParty
+
+	// rrrParty
+	Right          []LARight
+	Responsibility []LAResponsibility
+	Restriction    []LARestriction
 }
 
 func (LAParty) TableName() string {
@@ -39,9 +44,9 @@ type LAPartyType string
 
 const (
 	BAUnit           LAPartyType = "baunit"
-	Group                        = "group"
-	NaturalPerson                = "naturalPerson"
-	NonNaturalPerson             = "nonNaturalPerson"
+	Group            LAPartyType = "group"
+	NaturalPerson    LAPartyType = "naturalPerson"
+	NonNaturalPerson LAPartyType = "nonNaturalPerson"
 )
 
 type LAPartyRoleTypeArray pq.StringArray
@@ -55,18 +60,18 @@ func (a LAPartyRoleTypeArray) Value() (driver.Value, error) {
 }
 
 // LAPartyRoleType Party role type
-type LAPartyRoleType string // TODO Temporary not used (GORM debuging)
+type LAPartyRoleType string
 
 const (
 	Bank               LAPartyRoleType = "bank"
-	CertifiedSurveyor                  = "certifiedSurveyor"
-	Citizen                            = "citizen"
-	Conveyancer                        = "conveyancer"
-	Employee                           = "employee"
-	Farmer                             = "farmer"
-	MoneyProvider                      = "moneyProvider"
-	Notary                             = "notary"
-	StateAdministrator                 = "stateAdministrator"
-	Surveyor                           = "surveyor"
-	Writer                             = "writer"
+	CertifiedSurveyor  LAPartyRoleType = "certifiedSurveyor"
+	Citizen            LAPartyRoleType = "citizen"
+	Conveyancer        LAPartyRoleType = "conveyancer"
+	Employee           LAPartyRoleType = "employee"
+	Farmer             LAPartyRoleType = "farmer"
+	MoneyProvider      LAPartyRoleType = "moneyProvider"
+	Notary             LAPartyRoleType = "notary"
+	StateAdministrator LAPartyRoleType = "stateAdministrator"
+	Surveyor           LAPartyRoleType = "surveyor"
+	Writer             LAPartyRoleType = "writer"
 )

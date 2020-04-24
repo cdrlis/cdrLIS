@@ -44,14 +44,6 @@ type LASpatialUnit struct {
 	PlusBfs  []LABoundaryFaceString // plus
 }
 
-// Should they be defined in the interface LASpatialUniter ?!f
-
-type LASpatialUniter interface {
-	AreaClosed() bool
-	ComputeArea() LAAreaValue
-	CreateArea() geometry.GMMultiSurface
-}
-
 func (su LASpatialUnit) AreaClosed() bool {
 	multiSurface := su.CreateArea()
 	closed, _ := multiSurface.AsGeometry().IsClosed()

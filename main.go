@@ -1,9 +1,7 @@
 package main
 
 import (
-	"github.com/cdrlis/cdrLIS/logic"
-	"github.com/cdrlis/cdrLIS/dbcontext"
-
+	"github.com/cdrlis/cdrLIS/crud"
 	"net/http"
 
 	"github.com/cdrlis/cdrLIS/handler"
@@ -23,8 +21,7 @@ func main() {
 	}
 	db.LogMode(true)
 
-	ladmDB := dbcontext.CRUDContext{DB: db}
-	service := logic.LAPartyService{Context: ladmDB}
+	service := crud.LAPartyCRUD{DB: db}
 	partyHandler := handler.PartyHandler{Service: service}
 
 	router := httprouter.New()
@@ -34,11 +31,6 @@ func main() {
 	router.GET("/party/:namespace/:localId", partyHandler.GetParty)
 	router.PUT("/party/:namespace/:localId", partyHandler.UpdateParty)
 	router.DELETE("/party/:namespace/:localId", partyHandler.DeleteParty)
-	
-	router.GET("/type/party", partyHandler.GetPartyTypes)
-	router.GET("/role/party", partyHandler.GetPartyRoles)
-
-	router.GET("/groupParty", partyHandler.GetGroupParties)
 
 	http.ListenAndServe(":3000", router)
 

@@ -41,7 +41,7 @@ func (crud LAPartyCRUD) ReadAll(where ...interface{}) (interface{}, error) {
 	return &parties, nil
 }
 
-func (crud LAPartyCRUD) Update(partyIn interface{}, where ...interface{}) (interface{}, error) {
+func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 	party := partyIn.(*ladm.LAParty)
 	currentTime := time.Now()
 	var oldParty ladm.LAParty
@@ -57,7 +57,7 @@ func (crud LAPartyCRUD) Update(partyIn interface{}, where ...interface{}) (inter
 	return party, nil
 }
 
-func (crud LAPartyCRUD) Delete(partyIn interface{}, where ...interface{}) error {
+func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 	party := partyIn.(ladm.LAParty)
 	currentTime := time.Now()
 	var oldParty ladm.LAParty

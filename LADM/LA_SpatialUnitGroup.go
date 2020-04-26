@@ -25,3 +25,7 @@ type LASpatialUnitGroup struct {
 
 	SpatialUnits []LASpatialUnit // suSuGroup
 }
+
+func (LASpatialUnitGroup) TableName() string {
+	return "LA_SpatialUnitGroup"
+}

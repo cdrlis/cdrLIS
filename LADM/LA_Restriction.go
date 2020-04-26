@@ -13,6 +13,10 @@ type LARestriction struct {
 	Type          LARestrictionType
 }
 
+func (LARestriction) TableName() string {
+	return "LA_Restriction"
+}
+
 // LARestrictionType Restriction type
 type LARestrictionType string
 

@@ -29,6 +29,10 @@ type LAPoint struct {
 	Bfs []LABoundaryFaceString // pointBfs
 }
 
+func (LAPoint) TableName() string {
+	return "LA_Point"
+}
+
 // LILinage Linage
 type LILineage string // TODO external package
 

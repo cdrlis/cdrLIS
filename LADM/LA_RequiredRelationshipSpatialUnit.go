@@ -16,6 +16,10 @@ type LARequiredRelationshipSpatialUnit struct {
 	relationship iso19125Type
 }
 
+func (LARequiredRelationshipSpatialUnit) TableName() string {
+	return "LA_RequiredRelationshipSpatialUnit"
+}
+
 type iso19125Type string
 
 const (

@@ -30,3 +30,7 @@ type LABoundaryFaceString struct {
 	MinusSu []LASpatialUnit // minus
 	PlusSu  []LASpatialUnit // plus
 }
+
+func (LABoundaryFaceString) TableName() string {
+	return "LA_BoundaryFaceString"
+}

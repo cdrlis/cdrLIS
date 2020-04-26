@@ -30,5 +30,5 @@ type LARRR struct {
 	TimeSpec    *time.Time
 
 	Party *LAParty  // rrrParty
-	Unit  *LABAunit // unitRrr
+	Unit  *LABAUnit // unitRrr
 }

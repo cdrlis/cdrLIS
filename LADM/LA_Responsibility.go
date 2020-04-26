@@ -12,6 +12,10 @@ type LAResponsibility struct {
 	Type LAResponsibilityType
 }
 
+func (LAResponsibility) TableName() string {
+	return "LA_Responsibility"
+}
+
 // LAResponsibilityType Responsibility type
 type LAResponsibilityType string
 

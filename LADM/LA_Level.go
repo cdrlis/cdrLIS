@@ -16,6 +16,10 @@ type LALevel struct {
 	Su []LASpatialUnit // suLevel
 }
 
+func (LALevel) TableName() string {
+	return "LA_Level"
+}
+
 //
 // LA_RegisterType: the LA_RegisterType code list includes all the various register types, such as rural or
 // urban, used in a specific land administration profile implementation. The LA_RegisterType code list is

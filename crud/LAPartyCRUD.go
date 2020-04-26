@@ -2,8 +2,8 @@ package crud
 
 import (
 	"errors"
+	"fmt"
 	ladm "github.com/cdrlis/cdrLIS/LADM"
-	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	"time"
 )
@@ -15,7 +15,7 @@ type LAPartyCRUD struct {
 func (crud LAPartyCRUD) Read(where ...interface{}) (interface{}, error) {
 	var party ladm.LAParty
 	if where != nil {
-		if crud.DB.Set("gorm:auto_preload", true).Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", where).First(&party).RowsAffected == 0 {
+		if crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", where).Preload("Groups").Preload("Groups.Group").First(&party).RowsAffected == 0 {
 			return nil, errors.New("Entity not found")
 		}
 		return party, nil
@@ -26,7 +26,7 @@ func (crud LAPartyCRUD) Read(where ...interface{}) (interface{}, error) {
 func (crud LAPartyCRUD) Create(partyIn interface{}) (interface{}, error) {
 	party := partyIn.(ladm.LAParty)
 	currentTime := time.Now()
-	party.ID = uuid.New().String()
+	party.ID = fmt.Sprintf("%v-%v", party.Pid.Namespace, party.Pid.LocalID)
 	party.BeginLifespanVersion = currentTime
 	party.EndLifespanVersion = nil
 	crud.DB.Create(&party)
@@ -50,7 +50,7 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 	}
 	oldParty.EndLifespanVersion = &currentTime
 	crud.DB.Save(&oldParty)
-	party.ID = uuid.New().String()
+	party.ID = fmt.Sprintf("%v-%v", party.Pid.Namespace, party.Pid.LocalID)
 	party.BeginLifespanVersion = currentTime
 	party.EndLifespanVersion = nil
 	crud.DB.Create(&party)

@@ -20,6 +20,10 @@ type LAMortgage struct {
 	Rights []LARight // mortageRight
 }
 
+func (LAMortgage) TableName() string {
+	return "LA_Mortgage"
+}
+
 type Currency struct {
 	Amount float32
 	Code   iso4217

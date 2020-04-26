@@ -44,6 +44,10 @@ type LASpatialUnit struct {
 	PlusBfs  []LABoundaryFaceString // plus
 }
 
+func (LASpatialUnit) TableName() string {
+	return "LA_SpatialUnit"
+}
+
 func (su LASpatialUnit) AreaClosed() bool {
 	multiSurface := su.CreateArea()
 	closed, _ := multiSurface.AsGeometry().IsClosed()

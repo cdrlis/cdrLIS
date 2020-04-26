@@ -12,6 +12,9 @@ type LALegalSpaceBuildingUnit struct {
 	Type                      *LABuildingUnitType
 }
 
+func (LALegalSpaceBuildingUnit) TableName() string {
+	return "LA_LegalSpaceBuildingUnit"
+}
 
 //
 // LA_BuildingUnitType: the LA_BuildingUnitType code list includes all the various building unit types, such

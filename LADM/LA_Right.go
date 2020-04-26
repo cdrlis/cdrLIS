@@ -14,6 +14,10 @@ type LARight struct {
 	mortgage []LAMortgage // mortgageRight
 }
 
+func (LARight) TableName() string {
+	return "LA_Right"
+}
+
 // LARightType Right type
 type LARightType string
 

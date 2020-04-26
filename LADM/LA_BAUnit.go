@@ -34,7 +34,7 @@ type LABAUnit struct {
 	SU    []LASpatialUnit // suBaunit
 }
 
-func (LABAunit) TableName() string {
+func (LABAUnit) TableName() string {
 	return "LA_BAUnit"
 }
 

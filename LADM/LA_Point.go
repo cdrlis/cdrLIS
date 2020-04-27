@@ -18,13 +18,13 @@ import (
 type LAPoint struct {
 	common.VersionedObject
 
-	InterpolationRole LAInterpolationType
-	Monumentation     *LAMonumentationType
-	OriginalLocation  *geometry.GMPoint
-	PID               common.Oid
-	PointType         LAPointType
-	ProductionMethod  *LILineage
-	TransAndResult    *LATransformation
+	InterpolationRole LAInterpolationType  `gorm:"column:interpolationrole" json:"interpolationRole"`
+	Monumentation     *LAMonumentationType `gorm:"column:monumentation" json:"monumentation"`
+	OriginalLocation  *geometry.GMPoint    `gorm:"column:originallocation" json:"originalLocation"`
+	PID               common.Oid           `gorm:"column:pid" json:"pID"`
+	PointType         LAPointType          `gorm:"column:pointtype" json:"pointType"`
+	ProductionMethod  *LILineage           `gorm:"column:productionmethod" json:"productionMethod"`
+	TransAndResult    *LATransformation    `gorm:"column:transandresult" json:"transAndResult"`
 
 	Bfs []LABoundaryFaceString // pointBfs
 }
@@ -41,10 +41,10 @@ type LAInterpolationType string
 
 const (
 	End      LAInterpolationType = "end"
-	Isolated                     = "isolated"
-	Mid                          = "mid"
-	MidArc                       = "midarc"
-	Start                        = "start"
+	Isolated LAInterpolationType = "isolated"
+	Mid      LAInterpolationType = "mid"
+	MidArc   LAInterpolationType = "midarc"
+	Start    LAInterpolationType = "start"
 )
 
 // LAMonumentationType Monumentation type
@@ -52,9 +52,9 @@ type LAMonumentationType string
 
 const (
 	Beacon       LAMonumentationType = "beacon"
-	Cornserstone                     = "cornserstone"
-	Marker                           = "marker"
-	NotMarked                        = "notMarked"
+	Cornserstone LAMonumentationType = "cornserstone"
+	Marker       LAMonumentationType = "marker"
+	NotMarked    LAMonumentationType = "notMarked"
 )
 
 // LAPointType Point type
@@ -62,5 +62,5 @@ type LAPointType string
 
 const (
 	Control  LAPointType = "control"
-	NoSource             = "noSource"
+	NoSource LAPointType = "noSource"
 )

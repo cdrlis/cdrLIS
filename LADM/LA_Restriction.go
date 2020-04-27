@@ -9,8 +9,8 @@ package ladm
 type LARestriction struct {
 	LARRR
 
-	PartyRequired *bool
-	Type          LARestrictionType
+	PartyRequired *bool             `gorm:"column:partyrequired" json:"partyRequired"`
+	Type          LARestrictionType `gorm:"column:type" json:"type"`
 }
 
 func (LARestriction) TableName() string {
@@ -22,9 +22,9 @@ type LARestrictionType string
 
 const (
 	AdminPublicServitude LARestrictionType = "adminPublicServitude"
-	Monument                               = "monument"
-	MonumentPartly                         = "monumentPartly"
-	NoBuilding                             = "noBuilding"
-	Servitude                              = "servitude"
-	ServitudePartly                        = "servitudePartly"
+	Monument             LARestrictionType = "monument"
+	MonumentPartly       LARestrictionType = "monumentPartly"
+	NoBuilding           LARestrictionType = "noBuilding"
+	Servitude            LARestrictionType = "servitude"
+	ServitudePartly      LARestrictionType = "servitudePartly"
 )

@@ -7,9 +7,9 @@ import (
 // LALegalSpaceBuildingUnit Legal space building unit
 type LALegalSpaceBuildingUnit struct {
 	LASpatialUnit
-	//	LASpatialUniter
-	ExtPhysicalBuildingUnitID *external.ExtPhysicalBuildingUnit
-	Type                      *LABuildingUnitType
+
+	ExtPhysicalBuildingUnitID *external.ExtPhysicalBuildingUnit `gorm:"column:extaddressid" json:"extAddressID"`
+	Type                      *LABuildingUnitType               `gorm:"column:type" json:"type"`
 }
 
 func (LALegalSpaceBuildingUnit) TableName() string {
@@ -26,5 +26,5 @@ type LABuildingUnitType string
 
 const (
 	Individual LABuildingUnitType = "individual"
-	Shared                        = "shared"
+	Shared     LABuildingUnitType = "shared"
 )

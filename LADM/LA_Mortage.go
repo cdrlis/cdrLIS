@@ -12,10 +12,10 @@ package ladm
 type LAMortgage struct {
 	LARestriction
 
-	Amount       *Currency
-	InterestRate *float32
-	Ranking      *int
-	Type         *LAMortgageType
+	Amount       *Currency       `gorm:"column:amount" json:"amount"`
+	InterestRate *float32        `gorm:"column:interestRate" json:"interestrate"`
+	Ranking      *int            `gorm:"column:ranking" json:"ranking"`
+	Type         *LAMortgageType `gorm:"column:type" json:"type"`
 
 	Rights []LARight // mortageRight
 }
@@ -26,20 +26,20 @@ func (LAMortgage) TableName() string {
 
 type Currency struct {
 	Amount float32
-	Code   iso4217
+	Code   ISO4217Type
 }
 
 // Currency based on ISO 4217
-type iso4217 string
+type ISO4217Type string
 
 const (
-	AED iso4217 = "AED"
+	AED ISO4217Type = "AED"
 	// ...
-	EUR = "EUR"
+	EUR ISO4217Type = "EUR"
 	// ...
-	USD = "USD"
+	USD ISO4217Type = "USD"
 	// ...
-	ZWL = "ZWL"
+	ZWL ISO4217Type = "ZWL"
 )
 
 // LAMortageType Mortage type
@@ -47,6 +47,6 @@ type LAMortgageType string
 
 const (
 	LevelPayment LAMortgageType = "levelPayment"
-	Linear                      = "linear"
-	Microcredit                 = "microcredit"
+	Linear       LAMortgageType = "linear"
+	Microcredit  LAMortgageType = "microcredit"
 )

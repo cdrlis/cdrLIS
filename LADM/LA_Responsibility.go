@@ -9,7 +9,7 @@ package ladm
 type LAResponsibility struct {
 	LARRR
 
-	Type LAResponsibilityType
+	Type LAResponsibilityType `gorm:"column:type" json:"type"`
 }
 
 func (LAResponsibility) TableName() string {
@@ -21,5 +21,5 @@ type LAResponsibilityType string
 
 const (
 	MonumentMaintenance LAResponsibilityType = "monumentMaintenance"
-	WaterwayMaintenance                      = "waterwayMaintenance"
+	WaterwayMaintenance LAResponsibilityType = "waterwayMaintenance"
 )

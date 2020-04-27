@@ -26,13 +26,13 @@ import (
 type LASpatialUnit struct {
 	common.VersionedObject
 
-	ExtAddressID    *external.ExtAddress
-	Area            *LAAreaValue
-	Dimension       *LADimensionType
-	Label           *string
-	ReferencePoint  *geometry.GMPoint
-	SuID            common.Oid
-	SurfaceRelation *LASurfaceRelationType
+	ExtAddressID    *external.ExtAddress   `gorm:"column:extaddressid" json:"extAddressID"`
+	Area            *LAAreaValue           `gorm:"column:area" json:"area"`
+	Dimension       *LADimensionType       `gorm:"column:dimension" json:"dimension"`
+	Label           *string                `gorm:"column:label" json:"label"`
+	ReferencePoint  *geometry.GMPoint      `gorm:"column:referencepoint" json:"referencePoint"`
+	SuID            common.Oid             `gorm:"column:suid" json:"suID"`
+	SurfaceRelation *LASurfaceRelationType `gorm:"column:surfacerelation" json:"surfaceRelation"`
 
 	Baunit      []LABAunit                          // suBaunit
 	SuHierarchy []LASpatialUnit                     // suHierarchy

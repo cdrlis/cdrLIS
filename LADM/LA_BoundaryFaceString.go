@@ -22,9 +22,9 @@ import (
 type LABoundaryFaceString struct {
 	common.VersionedObject
 
-	BfsID          common.Oid
-	Geometry       *geometry.GMMultiCurve
-	LocationByText *string
+	BfsID          common.Oid             `gorm:"column:bfsid" json:"bfsID"`
+	Geometry       *geometry.GMMultiCurve `gorm:"column:geometry" json:"geometry"`
+	LocationByText *string                `gorm:"column:locationbytext" json:"locationByText"`
 
 	point   []LAPoint       // pointBfs
 	MinusSu []LASpatialUnit // minus

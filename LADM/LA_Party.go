@@ -22,10 +22,10 @@ type LAParty struct {
 	ExtPid *common.Oid          `gorm:"column:extpid" json:"extPID"`
 	Name   *string              `gorm:"column:name" json:"name"`
 	Pid    common.Oid           `gorm:"column:pid;type:Oid" json:"pID"`
-	Role   LAPartyRoleTypeArray `gorm:"type:varchar(100)[]" json:"role"`
+	Role   LAPartyRoleTypeArray `gorm:"column:role" json:"role"`
 	Type   LAPartyType          `gorm:"column:type" json:"type"`
 
-	Groups []LAPartyMember 		`gorm:"foreignkey:PartyID;association_foreignkey:ID" json:"groups"`
+	Groups []LAPartyMember `gorm:"foreignkey:PartyID;association_foreignkey:ID" json:"groups"`
 
 	Unit []LABAunit // baunitAsParty
 

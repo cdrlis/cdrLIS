@@ -23,11 +23,11 @@ import (
 type LARRR struct {
 	common.VersionedObject
 
-	Description *string
-	RID         common.Oid
-	Share       *common.Fraction
-	ShareCheck  *bool
-	TimeSpec    *time.Time
+	Description *string          `gorm:"column:description" json:"description"`
+	RID         common.Oid       `gorm:"column:rid" json:"rID"`
+	Share       *common.Fraction `gorm:"column:share" json:"share"`
+	ShareCheck  *bool            `gorm:"column:sharecheck" json:"shareCheck"`
+	TimeSpec    *time.Time       `gorm:"column:timespec" json:"timeSpec"`
 
 	Party *LAParty  // rrrParty
 	Unit  *LABAunit // unitRrr

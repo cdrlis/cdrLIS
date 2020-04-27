@@ -7,11 +7,11 @@ import "github.com/cdrlis/cdrLIS/LADM/common"
 type LALevel struct {
 	common.VersionedObject
 
-	LID          common.Oid
-	Name         *string
-	RegisterType *LARegisterType
-	Structure    *LAStructureType
-	Type         *LALevelContentType
+	LID          common.Oid          `gorm:"column:lid" json:"lID"`
+	Name         *string             `gorm:"column:name" json:"name"`
+	RegisterType *LARegisterType     `gorm:"column:registertype" json:"registerType"`
+	Structure    *LAStructureType    `gorm:"column:structure" json:"structure"`
+	Type         *LALevelContentType `gorm:"column:type" json:"type"`
 
 	Su []LASpatialUnit // suLevel
 }
@@ -30,11 +30,11 @@ type LARegisterType string
 
 const (
 	Urban       LARegisterType = "urban"
-	Rural                      = "rural"
-	Mining                     = "mining"
-	PublicSpace                = "publicSpace"
-	Forest                     = "forest"
-	All                        = "all"
+	Rural       LARegisterType = "rural"
+	Mining      LARegisterType = "mining"
+	PublicSpace LARegisterType = "publicSpace"
+	Forest      LARegisterType = "forest"
+	All         LARegisterType = "all"
 )
 
 //
@@ -48,11 +48,11 @@ type LAStructureType string
 
 const (
 	Point            LAStructureType = "point"
-	Polygon                          = "polygon"
-	Text                             = "text"
-	Topological                      = "topological"
-	UnstructuredLine                 = "unstructuredLine"
-	Sketch                           = "sketch"
+	Polygon          LAStructureType = "polygon"
+	Text             LAStructureType = "text"
+	Topological      LAStructureType = "topological"
+	UnstructuredLine LAStructureType = "unstructuredLine"
+	Sketch           LAStructureType = "sketch"
 )
 
 //
@@ -66,11 +66,11 @@ type LALevelContentType string
 
 const (
 	Building       LALevelContentType = "building"
-	Customary                         = "customary"
-	MixedLCT                          = "mixed" // Due to conflict with LASurfaceRelationType, Mixed can't be used.
-	Network                           = "network"
-	PrimaryRight                      = "primaryRight"
-	Responsibility                    = "responsibility"
-	Restriction                       = "restriction"
-	Informal                          = "informal"
+	Customary      LALevelContentType = "customary"
+	MixedLCT       LALevelContentType = "mixed" // Due to conflict with LASurfaceRelationType, Mixed can't be used.
+	Network        LALevelContentType = "network"
+	PrimaryRight   LALevelContentType = "primaryRight"
+	Responsibility LALevelContentType = "responsibility"
+	Restriction    LALevelContentType = "restriction"
+	Informal       LALevelContentType = "informal"
 )

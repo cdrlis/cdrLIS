@@ -9,7 +9,7 @@ package ladm
 type LARight struct {
 	LARRR
 
-	Type LARightType
+	Type LARightType `gorm:"column:type" json:"type"`
 
 	mortgage []LAMortgage // mortgageRight
 }
@@ -23,33 +23,33 @@ type LARightType string
 
 const (
 	AgriActivity            LARightType = "agriActivity"
-	BelowTheDepth                       = "belowTheDepth"
-	BoatHarbour                         = "boatHarbour"
-	CommonwealthAcquisition             = "commonwealthAcquisition"
-	Covenant                            = "covenant"
-	Easement                            = "easement"
-	ExcludedArea                        = "excludedArea"
-	//	Forest                              = "forest"	// TODO Check
-	Freeholding         = "freeholding"
-	Grazing             = "Grazing"
-	HousingLand         = "housingLand"
-	IndustrialState     = "industrialState"
-	LandsLease          = "landsLease"
-	Lease               = "lease"
-	MainRoad            = "mainRoad"
-	MarinePark          = "marinePark"
-	MineTenure          = "mineTenure"
-	NationalPark        = "nationalPark"
-	Occupation          = "occupation"
-	Ownership           = "ownership"
-	PortAuthority       = "portAuthority"
-	ProfitPrendre       = "profitPrendre"
-	Railway             = "railway"
-	Reserve             = "reserve"
-	StateForest         = "stateForest"
-	StateLand           = "stateLand"
-	TimberReserve       = "timberReserve"
-	TransferredProperty = "transferredProperty"
-	WaterResource       = "waterResource"
-	WaterRights         = "WaterRights"
+	BelowTheDepth           LARightType = "belowTheDepth"
+	BoatHarbour             LARightType = "boatHarbour"
+	CommonwealthAcquisition LARightType = "commonwealthAcquisition"
+	Covenant                LARightType = "covenant"
+	Easement                LARightType = "easement"
+	ExcludedArea            LARightType = "excludedArea"
+	Forest1                 LARightType = "forest" // TODO Check
+	Freeholding             LARightType = "freeholding"
+	Grazing                 LARightType = "Grazing"
+	HousingLand             LARightType = "housingLand"
+	IndustrialState         LARightType = "industrialState"
+	LandsLease              LARightType = "landsLease"
+	Lease                   LARightType = "lease"
+	MainRoad                LARightType = "mainRoad"
+	MarinePark              LARightType = "marinePark"
+	MineTenure              LARightType = "mineTenure"
+	NationalPark            LARightType = "nationalPark"
+	Occupation              LARightType = "occupation"
+	Ownership               LARightType = "ownership"
+	PortAuthority           LARightType = "portAuthority"
+	ProfitPrendre           LARightType = "profitPrendre"
+	Railway                 LARightType = "railway"
+	Reserve                 LARightType = "reserve"
+	StateForest             LARightType = "stateForest"
+	StateLand               LARightType = "stateLand"
+	TimberReserve           LARightType = "timberReserve"
+	TransferredProperty     LARightType = "transferredProperty"
+	WaterResource           LARightType = "waterResource"
+	WaterRights             LARightType = "WaterRights"
 )

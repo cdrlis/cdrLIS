@@ -9,7 +9,7 @@ import (
 type LABoundaryFace struct {
 	common.VersionedObject
 
-	BfID           common.Oid
-	Geometry       *geometry.GMMultiSurface
-	LocationByText *string
+	BfID           common.Oid               `gorm:"column:bfid" json:"bfID"`
+	Geometry       *geometry.GMMultiSurface `gorm:"column:geometry" json:"geometry"`
+	LocationByText *string                  `gorm:"column:locationbytext" json:"locationByText"`
 }

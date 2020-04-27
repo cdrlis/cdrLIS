@@ -11,24 +11,24 @@ import "github.com/cdrlis/cdrLIS/LADM/common"
 
 type LARequiredRelationshipSpatialUnit struct {
 	common.VersionedObject
-	su1          *LASpatialUnit
-	su2          *LASpatialUnit
-	relationship iso19125Type
+	Su1          *LASpatialUnit `gorm:"column:su1" json:"su1"`
+	Su2          *LASpatialUnit `gorm:"column:su2" json:"su2"`
+	Relationship ISO19125Type   `gorm:"column:relationship" json:"relationship"`
 }
 
 func (LARequiredRelationshipSpatialUnit) TableName() string {
 	return "LA_RequiredRelationshipSpatialUnit"
 }
 
-type iso19125Type string
+type ISO19125Type string
 
 const (
-	ST_Equals     iso19125Type = "ST_Equals"
-	ST_Disjoint                = "ST_Disjoint"
-	ST_Intersects              = "ST_Intersects"
-	ST_Touches                 = "ST_Touches"
-	ST_Crosses                 = "ST_Crosses"
-	ST_Within                  = "ST_Within"
-	ST_Contains                = "ST_Contains"
-	ST_Overlaps                = "ST_Overlaps"
+	ST_Equals     ISO19125Type = "ST_Equals"
+	ST_Disjoint   ISO19125Type = "ST_Disjoint"
+	ST_Intersects ISO19125Type = "ST_Intersects"
+	ST_Touches    ISO19125Type = "ST_Touches"
+	ST_Crosses    ISO19125Type = "ST_Crosses"
+	ST_Within     ISO19125Type = "ST_Within"
+	ST_Contains   ISO19125Type = "ST_Contains"
+	ST_Overlaps   ISO19125Type = "ST_Overlaps"
 )

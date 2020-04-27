@@ -26,8 +26,8 @@ type LABAunit struct {
 	common.VersionedObject
 
 	Name *string
-	Type LABAUnitType
-	UID  common.Oid
+	Type LABAUnitType `gorm:"column:type" json:"type"`
+	UID  common.Oid   `gorm:"column:uid" json:"uID"`
 
 	Party []LAParty       // baunitAsParty
 	RRR   []LARRR         // unitRrr
@@ -43,6 +43,6 @@ type LABAUnitType string
 
 const (
 	BasicPropertyUnit LABAUnitType = "basicPropertyUnit"
-	LeasedUnit                     = "leasedUnit"
-	RightOfUseUnit                 = "rightOfUseUnit"
+	LeasedUnit        LABAUnitType = "leasedUnit"
+	RightOfUseUnit    LABAUnitType = "rightOfUseUnit"
 )

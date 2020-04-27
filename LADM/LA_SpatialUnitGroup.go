@@ -17,11 +17,11 @@ import (
 type LASpatialUnitGroup struct {
 	common.VersionedObject
 
-	HierarchyLevel int
-	Label          *string
-	Name           *string
-	ReferencePoint *geometry.GMPoint
-	SugID          common.Oid
+	HierarchyLevel int               `gorm:"column:hierarchylevel" json:"hierarchyLevel"`
+	Label          *string           `gorm:"column:label" json:"label"`
+	Name           *string           `gorm:"column:name" json:"name"`
+	ReferencePoint *geometry.GMPoint `gorm:"column:referencepoint" json:"referencePoint"`
+	SugID          common.Oid        `gorm:"column:sugid" json:"sugID"`
 
 	SpatialUnits []LASpatialUnit // suSuGroup
 }

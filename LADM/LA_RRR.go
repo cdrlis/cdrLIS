@@ -30,5 +30,5 @@ type LARRR struct {
 	TimeSpec    *time.Time       `gorm:"column:timespec" json:"timeSpec"`
 
 	Party *LAParty  // rrrParty
-	Unit  *LABAunit // unitRrr
+	Unit  *LABAUnit // unitRrr
 }

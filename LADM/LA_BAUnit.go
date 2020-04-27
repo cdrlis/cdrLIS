@@ -22,7 +22,7 @@ import (
 // spatial sources (i.e. the extent – part of – of a basic administrative unit can be described on a spatial source).
 // See Figure 10.
 
-type LABAunit struct {
+type LABAUnit struct {
 	common.VersionedObject
 
 	Name *string
@@ -34,7 +34,7 @@ type LABAunit struct {
 	SU    []LASpatialUnit // suBaunit
 }
 
-func (LABAunit) TableName() string {
+func (LABAUnit) TableName() string {
 	return "LA_BAUnit"
 }
 

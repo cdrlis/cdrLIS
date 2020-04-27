@@ -27,7 +27,7 @@ type LAParty struct {
 
 	Groups []LAPartyMember `gorm:"foreignkey:PartyID;association_foreignkey:ID" json:"groups"`
 
-	Unit []LABAunit // baunitAsParty
+	Unit []LABAUnit // baunitAsParty
 
 	// rrrParty
 	Right          []LARight

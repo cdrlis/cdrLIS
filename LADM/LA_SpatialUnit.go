@@ -34,7 +34,7 @@ type LASpatialUnit struct {
 	SuID            common.Oid             `gorm:"column:suid" json:"suID"`
 	SurfaceRelation *LASurfaceRelationType `gorm:"column:surfacerelation" json:"surfaceRelation"`
 
-	Baunit      []LABAunit                          // suBaunit
+	Baunit      []LABAUnit                          // suBaunit
 	SuHierarchy []LASpatialUnit                     // suHierarchy
 	RelationSu  []LARequiredRelationshipSpatialUnit // relationSu
 	Level       *LALevel                            // suLevel

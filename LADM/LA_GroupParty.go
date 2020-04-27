@@ -16,7 +16,7 @@ type LAGroupParty struct {
 	GroupID common.Oid       `gorm:"column:groupid" json:"groupID"`
 	Type    LAGroupPartyType `gorm:"column:type" json:"type"`
 
-	Parties []LAPartyMember
+	Parties []LAPartyMember	`gorm:"foreignkey:GroupID,GroupBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"parties"`
 }
 
 func (LAGroupParty) TableName() string {

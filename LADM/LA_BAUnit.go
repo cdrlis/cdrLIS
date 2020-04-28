@@ -24,14 +24,18 @@ import (
 
 type LABAUnit struct {
 	common.VersionedObject
-
-	Name *string
+	ID   string       `gorm:"column:id;primary_key" json:"-"`
+	Name *string      // TODO: Add column to db
 	Type LABAUnitType `gorm:"column:type" json:"type"`
 	UID  common.Oid   `gorm:"column:uid" json:"uID"`
 
-	Party []LAParty       // baunitAsParty
-	RRR   []LARRR         // unitRrr
-	SU    []LASpatialUnit // suBaunit
+	Party []LAParty // baunitAsParty
+
+	Rights           []LARight          `gorm:"foreignkey:UnitID,UnitBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rights"`
+	Responsibilities []LAResponsibility `gorm:"foreignkey:UnitID,UnitBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"responsibilities"`
+	Restrictions     []LARestriction    `gorm:"foreignkey:UnitID,UnitBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"restrictions"`
+
+	SU []LASpatialUnit // suBaunit
 }
 
 func (LABAUnit) TableName() string {

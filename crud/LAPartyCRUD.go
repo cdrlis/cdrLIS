@@ -15,7 +15,17 @@ type LAPartyCRUD struct {
 func (crud LAPartyCRUD) Read(where ...interface{}) (interface{}, error) {
 	var party ladm.LAParty
 	if where != nil {
-		if crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", where).Preload("Groups").Preload("Groups.Group").First(&party).RowsAffected == 0 {
+		if crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", where).
+			Preload("Groups").
+			Preload("Groups.Group").
+			Preload("Rights").
+			Preload("Rights.Unit").
+			Preload("Responsibilities").
+			Preload("Responsibilities.Unit").
+			Preload("Restrictions").
+			Preload("Restrictions.Unit").
+			First(&party).
+			RowsAffected == 0 {
 			return nil, errors.New("Entity not found")
 		}
 		return party, nil

@@ -9,9 +9,9 @@ package ladm
 type LARight struct {
 	LARRR
 
-	Type LARightType `gorm:"column:type" json:"type"`
+	Type     LARightType  `gorm:"column:type" json:"type"`
 
-	mortgage []LAMortgage // mortgageRight
+	Mortgage []LAMortgage `json:"-"` // mortgageRight
 }
 
 func (LARight) TableName() string {

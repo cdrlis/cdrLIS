@@ -30,9 +30,9 @@ type LAParty struct {
 	Unit []LABAUnit // baunitAsParty
 
 	// rrrParty
-	Right          []LARight
-	Responsibility []LAResponsibility
-	Restriction    []LARestriction
+	Rights           []LARight          `gorm:"foreignkey:PartyID,PartyBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rights"`
+	Responsibilities []LAResponsibility `gorm:"foreignkey:PartyID,PartyBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"responsibilities"`
+	Restrictions     []LARestriction    `gorm:"foreignkey:PartyID,PartyBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"restrictions"`
 }
 
 func (LAParty) TableName() string {

@@ -35,6 +35,7 @@ type LASpatialUnit struct {
 	SurfaceRelation *LASurfaceRelationType `gorm:"column:surfacerelation" json:"surfaceRelation"`
 
 	Baunit      []LABAUnit                          // suBaunit
+
 	SuHierarchy []LASpatialUnit                     // suHierarchy
 	RelationSu  []LARequiredRelationshipSpatialUnit // relationSu
 	Level       *LALevel                            // suLevel

@@ -21,7 +21,7 @@ type LAParty struct {
 	ID     string               `gorm:"column:id;primary_key" json:"-"`
 	ExtPid *common.Oid          `gorm:"column:extpid" json:"extPID"`
 	Name   *string              `gorm:"column:name" json:"name"`
-	Pid    common.Oid           `gorm:"column:pid;type:Oid" json:"pID"`
+	PID    common.Oid           `gorm:"column:pid;type:Oid" json:"pID"`
 	Role   LAPartyRoleTypeArray `gorm:"column:role" json:"role"`
 	Type   LAPartyType          `gorm:"column:type" json:"type"`
 

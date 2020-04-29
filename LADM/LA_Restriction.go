@@ -1,5 +1,7 @@
 package ladm
 
+import "time"
+
 //
 // Administrative::LA_Restriction
 //
@@ -11,6 +13,14 @@ type LARestriction struct {
 
 	PartyRequired *bool             `gorm:"column:partyrequired" json:"partyRequired"`
 	Type          LARestrictionType `gorm:"column:type" json:"type"`
+
+	PartyID                   string           `gorm:"column:party" json:"-"`
+	PartyBeginLifespanVersion time.Time        `gorm:"column:partybeginlifespanversion" json:"-"`
+	Party                     *LAParty         `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:PartyID,PartyBeginLifespanVersion" json:"party"`
+
+	UnitID                   string           `gorm:"column:baunit" json:"-"`
+	UnitBeginLifespanVersion time.Time        `gorm:"column:baunitbeginlifespanversion" json:"-"`
+	Unit                     LABAUnit         `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:UnitID,UnitBeginLifespanVersion" json:"unit"`
 }
 
 func (LARestriction) TableName() string {

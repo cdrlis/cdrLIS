@@ -35,7 +35,7 @@ type LABAUnit struct {
 	Responsibilities []LAResponsibility `gorm:"foreignkey:UnitID,UnitBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"responsibilities"`
 	Restrictions     []LARestriction    `gorm:"foreignkey:UnitID,UnitBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"restrictions"`
 
-	SU []LASpatialUnit // suBaunit
+	SU []SuBAUnit `gorm:"foreignkey:BaUnitID,BaUnitBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"su"`
 }
 
 func (LABAUnit) TableName() string {

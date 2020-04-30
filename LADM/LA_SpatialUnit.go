@@ -4,6 +4,7 @@ import (
 	"github.com/cdrlis/cdrLIS/LADM/common"
 	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
 	"github.com/cdrlis/cdrLIS/LADM/external"
+	"time"
 )
 
 //
@@ -26,6 +27,7 @@ import (
 type LASpatialUnit struct {
 	common.VersionedObject
 
+	ID              string                 `gorm:"column:id;primary_key" json:"-"`
 	ExtAddressID    *external.ExtAddress   `gorm:"column:extaddressid" json:"extAddressID"`
 	Area            *LAAreaValue           `gorm:"column:area" json:"area"`
 	Dimension       *LADimensionType       `gorm:"column:dimension" json:"dimension"`
@@ -34,12 +36,17 @@ type LASpatialUnit struct {
 	SuID            common.Oid             `gorm:"column:suid" json:"suID"`
 	SurfaceRelation *LASurfaceRelationType `gorm:"column:surfacerelation" json:"surfaceRelation"`
 
-	Baunit      []LABAUnit                          // suBaunit
+	// suLevel
+	LevelID                   string    `gorm:"column:level" json:"-"`
+	LevelBeginLifespanVersion time.Time `gorm:"column:levelbeginlifespanversion" json:"-"`
+	Level                     *LALevel  `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:LevelID,LevelBeginLifespanVersion" json:"level"`
+
+	Baunit []SuBAUnit `gorm:"foreignkey:SUID,SUBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"baunit"`
 
 	SuHierarchy []LASpatialUnit                     // suHierarchy
 	RelationSu  []LARequiredRelationshipSpatialUnit // relationSu
-	Level       *LALevel                            // suLevel
-	Whole       []LASpatialUnitGroup                // suSuGroup
+
+	Whole []LASpatialUnitGroup // suSuGroup
 
 	MinusBfs []LABoundaryFaceString // minus
 	PlusBfs  []LABoundaryFaceString // plus

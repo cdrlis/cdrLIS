@@ -27,6 +27,9 @@ func main() {
 	baunitCRUD := crud.LABAUnitCRUD{DB:db}
 	baunitHandler := handler.BAUnitHandler{CRUD:baunitCRUD}
 
+	sunitCRUD := crud.LASpatialUnitCRUD{DB:db}
+	sunitHandler := handler.SpatialUnitHandler{CRUD:sunitCRUD}
+
 	router := httprouter.New()
 
 	router.GET("/party", partyHandler.GetParties)
@@ -40,6 +43,12 @@ func main() {
 	router.GET("/baunit/:namespace/:localId", baunitHandler.GetBAUnit)
 	router.PUT("/baunit/:namespace/:localId", baunitHandler.UpdateBAUnit)
 	router.DELETE("/baunit/:namespace/:localId", baunitHandler.DeleteBAUnit)
+
+	router.GET("/spatialunit", sunitHandler.GetSpatialUnits)
+	router.POST("/spatialunit", sunitHandler.CreateSpatialUnit)
+	router.GET("/spatialunit/:namespace/:localId", sunitHandler.GetSpatialUnit)
+	router.PUT("/spatialunit/:namespace/:localId", sunitHandler.UpdateSpatialUnit)
+	router.DELETE("/spatialunit/:namespace/:localId", sunitHandler.DeleteSpatialUnit)
 
 	http.ListenAndServe(":3000", router)
 

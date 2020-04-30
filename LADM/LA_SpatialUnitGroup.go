@@ -17,6 +17,7 @@ import (
 type LASpatialUnitGroup struct {
 	common.VersionedObject
 
+	ID             string            `gorm:"column:id;primary_key" json:"-"`
 	HierarchyLevel int               `gorm:"column:hierarchylevel" json:"hierarchyLevel"`
 	Label          *string           `gorm:"column:label" json:"label"`
 	Name           *string           `gorm:"column:name" json:"name"`

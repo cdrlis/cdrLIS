@@ -15,15 +15,17 @@ type LABAUnitCRUD struct {
 func (crud LABAUnitCRUD) Read(where ...interface{}) (interface{}, error) {
 	var baUnit ladm.LABAUnit
 	if where != nil {
-		if crud.DB.Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", where).
+		reader := crud.DB.Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", where).
 			Preload("Rights").
 			Preload("Rights.Party").
 			Preload("Responsibilities").
 			Preload("Responsibilities.Party").
 			Preload("Restrictions").
 			Preload("Restrictions.Party").
-			First(&baUnit).
-			RowsAffected == 0 {
+			Preload("SU").
+			Preload("SU.SU").
+			First(&baUnit)
+		if reader.RowsAffected == 0 {
 			return nil, errors.New("Entity not found")
 		}
 		return baUnit, nil
@@ -68,11 +70,11 @@ func (crud LABAUnitCRUD) Update(partyIn interface{}) (interface{}, error) {
 func (crud LABAUnitCRUD) Delete(partyIn interface{}) error {
 	baUnit := partyIn.(ladm.LABAUnit)
 	currentTime := time.Now()
-	var oldParty ladm.LABAUnit
-	if crud.DB.Set("gorm:auto_preload", true).Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", baUnit.UID).First(&oldParty).RowsAffected == 0 {
+	var oldBaUnit ladm.LABAUnit
+	if crud.DB.Set("gorm:auto_preload", true).Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", baUnit.UID).First(&oldBaUnit).RowsAffected == 0 {
 		return errors.New("Entity not found")
 	}
-	oldParty.EndLifespanVersion = &currentTime
-	crud.DB.Save(&oldParty)
+	oldBaUnit.EndLifespanVersion = &currentTime
+	crud.DB.Save(&oldBaUnit)
 	return nil
 }

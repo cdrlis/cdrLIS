@@ -19,7 +19,7 @@ type LAResponsibility struct {
 
 	UnitID                   string           `gorm:"column:baunit" json:"-"`
 	UnitBeginLifespanVersion time.Time        `gorm:"column:baunitbeginlifespanversion" json:"-"`
-	Unit                     LABAUnit         `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:UnitID,UnitBeginLifespanVersion" json:"unit"`
+	Unit                     *LABAUnit         `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:UnitID,UnitBeginLifespanVersion" json:"unit"`
 }
 
 func (LAResponsibility) TableName() string {

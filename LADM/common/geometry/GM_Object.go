@@ -2,8 +2,8 @@ package geometry
 
 import (
 	"database/sql/driver"
+	"encoding/json"
 	"errors"
-
 	"github.com/paulsmith/gogeos/geos"
 )
 
@@ -11,14 +11,15 @@ import (
 const SRID = "3765" // Croatian SRID
 
 // GMObject Point geometry type
-type GMObject geos.Geometry
+type GMObject struct{
+	geos.Geometry
+}
 
 // Value converts the given GMObject struct into WKT such that it can be stored in a
 // database. Implements Valuer interface for use with database operations.
 func (g GMObject) Value() (driver.Value, error) {
-	geometry := geos.Geometry(g)
 
-	str, err := geometry.ToWKT()
+	str, err := g.ToWKT()
 	if err != nil {
 		return nil, err
 	}
@@ -47,13 +48,27 @@ func (g *GMObject) Scan(value interface{}) error {
 		return errors.New("cannot get geometry from hex")
 	}
 
-	geometry := GMObject(*geom)
+	geometry := GMObject{Geometry:*geom}
 	*g = geometry
 
 	return nil
 }
 
-// AsGeometry Returns underlying geometry type
-func (g *GMObject) AsGeometry() *geos.Geometry {
-	return (*geos.Geometry)(g)
+func (g *GMObject) MarshalJSON() ([]byte, error) {
+	wkt, err := g.ToWKT()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(wkt)
+}
+
+func (g *GMObject) UnmarshalJSON(data []byte) error {
+	str := string(data)
+	geom, err := geos.FromWKT(str)
+	if err != nil {
+		return err
+	}
+	geometry := GMObject{Geometry:*geom}
+	*g = geometry
+	return nil
 }

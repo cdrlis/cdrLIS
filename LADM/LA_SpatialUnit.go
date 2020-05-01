@@ -56,14 +56,14 @@ func (LASpatialUnit) TableName() string {
 
 func (su LASpatialUnit) AreaClosed() bool {
 	multiSurface := su.CreateArea()
-	closed, _ := multiSurface.AsGeometry().IsClosed()
+	closed, _ := multiSurface.IsClosed()
 	return closed
 }
 
 func (su LASpatialUnit) ComputeArea() LAAreaValue {
 	var av LAAreaValue
 	multiSurface := su.CreateArea()
-	area, _ := multiSurface.AsGeometry().Area()
+	area, _ := multiSurface.Area()
 	av.AreaSize, av.Type = Area(area), CalculatedArea
 	return av
 }

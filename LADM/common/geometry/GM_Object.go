@@ -63,8 +63,12 @@ func (g *GMObject) MarshalJSON() ([]byte, error) {
 }
 
 func (g *GMObject) UnmarshalJSON(data []byte) error {
-	str := string(data)
-	geom, err := geos.FromWKT(str)
+	var wkt string
+	err := json.Unmarshal(data, &wkt)
+	if err != nil {
+		return err
+	}
+	geom, err := geos.FromWKT(wkt)
 	if err != nil {
 		return err
 	}

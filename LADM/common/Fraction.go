@@ -16,7 +16,7 @@ type Fraction struct {
 
 // Value Returns Oid value
 func (fraction Fraction) Value() (driver.Value, error) {
-	return fmt.Sprint("(%d,%d)",fraction.Numerator, fraction.Denominator), nil
+	return fmt.Sprintf("(%d,%d)",fraction.Numerator, fraction.Denominator), nil
 }
 
 // Scan Reads Oid

@@ -22,7 +22,7 @@ import (
 
 type LARRR struct {
 	common.VersionedObject
-
+	ID          string           `gorm:"column:id;primary_key" json:"-"`
 	Description *string          `gorm:"column:description" json:"description"`
 	RID         common.Oid       `gorm:"column:rid" json:"rID"`
 	Share       *common.Fraction `gorm:"column:share" json:"share"`

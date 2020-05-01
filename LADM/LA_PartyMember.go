@@ -12,15 +12,16 @@ import (
 // class between LA_Party and LA_GroupParty, see Figure 9.
 type LAPartyMember struct {
 	common.VersionedObject
-	Share                     *common.Fraction `gorm:"column:fraction" json:"fraction"`
+	ID    string           `gorm:"column:id;primary_key" json:"-"`
+	Share *common.Fraction `gorm:"column:fraction" json:"fraction"`
 
-	PartyID                   string           `gorm:"column:parties" json:"-"`
-	PartyBeginLifespanVersion time.Time        `gorm:"column:partiesbeginlifespanversion" json:"-"`
-	Party                     *LAParty         `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:PartyID,PartyBeginLifespanVersion" json:"party"`
+	PartyID                   string    `gorm:"column:parties;primary_key" json:"-"`
+	PartyBeginLifespanVersion time.Time `gorm:"column:partiesbeginlifespanversion;primary_key" json:"-"`
+	Party                     *LAParty  `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:PartyID,PartyBeginLifespanVersion" json:"party"`
 
-	GroupID                   string           `gorm:"column:groups" json:"-"`
-	GroupBeginLifespanVersion time.Time        `gorm:"column:groupsbeginlifespanversion" json:"-"`
-	Group                     *LAGroupParty    `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:GroupID,GroupBeginLifespanVersion" json:"group"`
+	GroupID                   string        `gorm:"column:groups;primary_key" json:"-"`
+	GroupBeginLifespanVersion time.Time     `gorm:"column:groupsbeginlifespanversion;primary_key" json:"-"`
+	Group                     *LAGroupParty `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:GroupID,GroupBeginLifespanVersion" json:"group"`
 }
 
 func (LAPartyMember) TableName() string {

@@ -39,7 +39,7 @@ func (crud LAPartyCRUD) Create(partyIn interface{}) (interface{}, error) {
 	party.ID = fmt.Sprintf("%v-%v", party.PID.Namespace, party.PID.LocalID)
 	party.BeginLifespanVersion = currentTime
 	party.EndLifespanVersion = nil
-	crud.DB.Create(&party)
+	crud.DB.Set("gorm:save_associations", false).Create(&party)
 	return &party, nil
 }
 
@@ -61,12 +61,12 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 		return nil, errors.New("Entity not found")
 	}
 	oldParty.EndLifespanVersion = &currentTime
-	crud.DB.Save(&oldParty)
+	crud.DB.Set("gorm:save_associations", false).Save(&oldParty)
 
 	party.ID = fmt.Sprintf("%v-%v", party.PID.Namespace, party.PID.LocalID)
 	party.BeginLifespanVersion = currentTime
 	party.EndLifespanVersion = nil
-	crud.DB.Create(&party)
+	crud.DB.Set("gorm:save_associations", false).Create(&party)
 
 	reader = crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion = ?", party.PID, currentTime).
 		Preload("Groups", "endlifespanversion IS NULL").
@@ -79,38 +79,38 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 	}
 	for _, group := range oldParty.Groups {
 		group.EndLifespanVersion = &currentTime
-		crud.DB.Save(&group)
+		crud.DB.Set("gorm:save_associations", false).Save(&group)
 		group.BeginLifespanVersion = currentTime
 		group.EndLifespanVersion = nil
 		group.PartyBeginLifespanVersion = currentTime
-		crud.DB.Create(&group)
+		crud.DB.Set("gorm:save_associations", false).Create(&group)
 	}
 
 	for _, right := range oldParty.Rights {
 		right.EndLifespanVersion = &currentTime
-		crud.DB.Save(&right)
+		crud.DB.Set("gorm:save_associations", false).Save(&right)
 		right.BeginLifespanVersion = currentTime
 		right.EndLifespanVersion = nil
 		right.PartyBeginLifespanVersion = currentTime
-		crud.DB.Create(&right)
+		crud.DB.Set("gorm:save_associations", false).Create(&right)
 	}
 
 	for _, responsibility := range oldParty.Responsibilities {
 		responsibility.EndLifespanVersion = &currentTime
-		crud.DB.Save(&responsibility)
+		crud.DB.Set("gorm:save_associations", false).Save(&responsibility)
 		responsibility.BeginLifespanVersion = currentTime
 		responsibility.EndLifespanVersion = nil
 		responsibility.PartyBeginLifespanVersion = currentTime
-		crud.DB.Create(&responsibility)
+		crud.DB.Set("gorm:save_associations", false).Create(&responsibility)
 	}
 
 	for _, restriction := range oldParty.Restrictions {
 		restriction.EndLifespanVersion = &currentTime
-		crud.DB.Save(&restriction)
+		crud.DB.Set("gorm:save_associations", false).Save(&restriction)
 		restriction.BeginLifespanVersion = currentTime
 		restriction.EndLifespanVersion = nil
 		restriction.PartyBeginLifespanVersion = currentTime
-		crud.DB.Create(&restriction)
+		crud.DB.Set("gorm:save_associations", false).Create(&restriction)
 	}
 	return party, nil
 }
@@ -124,7 +124,7 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 		return errors.New("Entity not found")
 	}
 	oldParty.EndLifespanVersion = &currentTime
-	crud.DB.Save(&oldParty)
+	crud.DB.Set("gorm:save_associations", false).Save(&oldParty)
 
 	reader = crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion = ?", party.PID, currentTime).
 		Preload("Groups", "endlifespanversion IS NULL").
@@ -137,22 +137,22 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 	}
 	for _, group := range oldParty.Groups {
 		group.EndLifespanVersion = &currentTime
-		crud.DB.Save(&group)
+		crud.DB.Set("gorm:save_associations", false).Save(&group)
 	}
 
 	for _, right := range oldParty.Rights {
 		right.EndLifespanVersion = &currentTime
-		crud.DB.Save(&right)
+		crud.DB.Set("gorm:save_associations", false).Save(&right)
 	}
 
 	for _, responsibility := range oldParty.Responsibilities {
 		responsibility.EndLifespanVersion = &currentTime
-		crud.DB.Save(&responsibility)
+		crud.DB.Set("gorm:save_associations", false).Save(&responsibility)
 	}
 
 	for _, restriction := range oldParty.Restrictions {
 		restriction.EndLifespanVersion = &currentTime
-		crud.DB.Save(&restriction)
+		crud.DB.Set("gorm:save_associations", false).Save(&restriction)
 	}
 	return nil
 }

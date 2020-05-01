@@ -25,7 +25,7 @@ import (
 type LABAUnit struct {
 	common.VersionedObject
 	ID   string       `gorm:"column:id;primary_key" json:"-"`
-	Name *string      // TODO: Add column to db
+	Name *string      `gorm:"-" json:"-"`// TODO: Add column to db
 	Type LABAUnitType `gorm:"column:type" json:"type"`
 	UID  common.Oid   `gorm:"column:uid" json:"uID"`
 

@@ -46,30 +46,62 @@ func (crud LASpatialUnitCRUD) ReadAll(where ...interface{}) (interface{}, error)
 	return &sUnits, nil
 }
 
-func (crud LASpatialUnitCRUD) Update(partyIn interface{}) (interface{}, error) {
-	sUnit := partyIn.(*ladm.LASpatialUnit)
+func (crud LASpatialUnitCRUD) Update(sunitIn interface{}) (interface{}, error) {
+	sUnit := sunitIn.(*ladm.LASpatialUnit)
 	currentTime := time.Now()
 	var oldSUnit ladm.LASpatialUnit
-	if crud.DB.Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", sUnit.SuID).First(&oldSUnit).RowsAffected == 0 {
+	reader := crud.DB.Where("suid = ?::\"Oid\" AND endlifespanversion IS NULL", sUnit.SuID).
+		First(&oldSUnit)
+	if reader.RowsAffected == 0 {
 		return nil, errors.New("Entity not found")
 	}
 	oldSUnit.EndLifespanVersion = &currentTime
-	crud.DB.Save(&oldSUnit)
+	crud.DB.Set("gorm:save_associations", false).Save(&oldSUnit)
+
 	sUnit.ID = fmt.Sprintf("%v-%v", sUnit.SuID.Namespace, sUnit.SuID.LocalID)
 	sUnit.BeginLifespanVersion = currentTime
 	sUnit.EndLifespanVersion = nil
-	crud.DB.Create(&sUnit)
+	sUnit.LevelID = oldSUnit.LevelID
+	sUnit.LevelBeginLifespanVersion = oldSUnit.LevelBeginLifespanVersion
+	crud.DB.Set("gorm:save_associations", false).Create(&sUnit)
+
+	reader = crud.DB.Where("suid = ?::\"Oid\" AND endlifespanversion = ?", sUnit.SuID, currentTime).
+		Preload("Baunit", "endlifespanversion IS NULL").
+		First(&oldSUnit)
+	if reader.RowsAffected == 0 {
+		return nil, errors.New("Entity not found")
+	}
+	for _, baUnit := range oldSUnit.Baunit {
+		baUnit.EndLifespanVersion = &currentTime
+		crud.DB.Set("gorm:save_associations", false).Save(&baUnit)
+		baUnit.BeginLifespanVersion = currentTime
+		baUnit.EndLifespanVersion = nil
+		baUnit.SUBeginLifespanVersion = currentTime
+		crud.DB.Set("gorm:save_associations", false).Create(&baUnit)
+	}
 	return sUnit, nil
 }
 
-func (crud LASpatialUnitCRUD) Delete(partyIn interface{}) error {
-	sUnit := partyIn.(ladm.LASpatialUnit)
+func (crud LASpatialUnitCRUD) Delete(sunitIn interface{}) error {
+	baunit := sunitIn.(ladm.LASpatialUnit)
 	currentTime := time.Now()
-	var oldSUnit ladm.LASpatialUnit
-	if crud.DB.Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", sUnit.SuID).First(&oldSUnit).RowsAffected == 0 {
+	var oldBaunit ladm.LASpatialUnit
+	reader := crud.DB.Where("suid = ?::\"Oid\" AND endlifespanversion IS NULL", baunit.SuID).First(&oldBaunit)
+	if reader.RowsAffected == 0 {
 		return errors.New("Entity not found")
 	}
-	oldSUnit.EndLifespanVersion = &currentTime
-	crud.DB.Save(&oldSUnit)
+	oldBaunit.EndLifespanVersion = &currentTime
+	crud.DB.Set("gorm:save_associations", false).Save(&oldBaunit)
+
+	reader = crud.DB.Where("suid = ?::\"Oid\" AND endlifespanversion = ?", baunit.SuID, currentTime).
+		Preload("Baunit", "endlifespanversion IS NULL").
+		First(&oldBaunit)
+	if reader.RowsAffected == 0 {
+		return errors.New("Entity not found")
+	}
+	for _, baUnit := range oldBaunit.Baunit {
+		baUnit.EndLifespanVersion = &currentTime
+		crud.DB.Set("gorm:save_associations", false).Save(&baUnit)
+	}
 	return nil
 }

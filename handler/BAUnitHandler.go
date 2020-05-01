@@ -33,13 +33,13 @@ func (handler *BAUnitHandler) GetBAUnits(w http.ResponseWriter, r *http.Request,
 
 func (handler *BAUnitHandler) CreateBAUnit(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	decoder := json.NewDecoder(r.Body)
-	var party ladm.LABAUnit
-	err := decoder.Decode(&party)
+	var baunit ladm.LABAUnit
+	err := decoder.Decode(&baunit)
 	if err != nil {
 		respondError(w, 400, err.Error())
 		return
 	}
-	createdBaUnit, err := handler.CRUD.Create(party)
+	createdBaUnit, err := handler.CRUD.Create(baunit)
 	if err != nil {
 		respondError(w, 400, err.Error())
 		return

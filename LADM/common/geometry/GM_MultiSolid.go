@@ -11,8 +11,8 @@ type GMMultiSolid GMObject
 
 // Value converts the given GMMultiSolid struct into WKT such that it can be stored in a
 // database. Implements Valuer interface for use with database operations.
-func (g *GMMultiSolid) Value() (driver.Value, error) {
-	return (*GMObject)(g).Value()
+func (g GMMultiSolid) Value() (driver.Value, error) {
+	return (GMObject)(g).Value()
 }
 
 // Scan converts the hexadecimal representation of geometry into the given GMMultiSolid

@@ -43,13 +43,11 @@ type LASpatialUnit struct {
 
 	Baunit []SuBAUnit `gorm:"foreignkey:SUID,SUBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"baunit"`
 
-	SuHierarchy []LASpatialUnit                     // suHierarchy
-	RelationSu  []LARequiredRelationshipSpatialUnit // relationSu
-
-	Whole []LASpatialUnitGroup // suSuGroup
-
-	MinusBfs []LABoundaryFaceString // minus
-	PlusBfs  []LABoundaryFaceString // plus
+	SuHierarchy []LASpatialUnit                     `gorm:"-" json:"-"` // suHierarchy
+	RelationSu  []LARequiredRelationshipSpatialUnit `gorm:"-" json:"-"` // relationSu
+	Whole       []LASpatialUnitGroup                `gorm:"-" json:"-"` // suSuGroup
+	MinusBfs    []LABoundaryFaceString              `gorm:"-" json:"-"` // minus
+	PlusBfs     []LABoundaryFaceString              `gorm:"-" json:"-"` // plus
 }
 
 func (LASpatialUnit) TableName() string {

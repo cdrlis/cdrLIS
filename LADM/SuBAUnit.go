@@ -14,13 +14,15 @@ import (
 type SuBAUnit struct {
 	common.VersionedObject
 
-	SUID                       string         `gorm:"column:su" json:"-"`
-	SUBeginLifespanVersion     time.Time      `gorm:"column:subeginlifespanversion" json:"-"`
-	SU                         *LASpatialUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:SUID,SUBeginLifespanVersion" json:"su"`
+	ID                     string         `gorm:"column:id;primary_key" json:"-"`
 
-	BaUnitID                   string         `gorm:"column:baunit" json:"-"`
-	BaUnitBeginLifespanVersion time.Time      `gorm:"column:baunitbeginlifespanversion" json:"-"`
-	BaUnit                     *LABAUnit      `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:BaUnitID,BaUnitBeginLifespanVersion" json:"baunit"`
+	SUID                   string         `gorm:"column:su" json:"-"`
+	SUBeginLifespanVersion time.Time      `gorm:"column:subeginlifespanversion" json:"-"`
+	SU                     *LASpatialUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:SUID,SUBeginLifespanVersion" json:"su"`
+
+	BaUnitID                   string    `gorm:"column:baunit" json:"-"`
+	BaUnitBeginLifespanVersion time.Time `gorm:"column:baunitbeginlifespanversion" json:"-"`
+	BaUnit                     *LABAUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:BaUnitID,BaUnitBeginLifespanVersion" json:"baunit"`
 }
 
 func (SuBAUnit) TableName() string {

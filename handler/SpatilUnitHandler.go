@@ -33,13 +33,13 @@ func (handler *SpatialUnitHandler) GetSpatialUnits(w http.ResponseWriter, r *htt
 
 func (handler *SpatialUnitHandler) CreateSpatialUnit(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	decoder := json.NewDecoder(r.Body)
-	var party ladm.LASpatialUnit
-	err := decoder.Decode(&party)
+	var spatialUnit ladm.LASpatialUnit
+	err := decoder.Decode(&spatialUnit)
 	if err != nil {
 		respondError(w, 400, err.Error())
 		return
 	}
-	createdBaUnit, err := handler.CRUD.Create(party)
+	createdBaUnit, err := handler.CRUD.Create(spatialUnit)
 	if err != nil {
 		respondError(w, 400, err.Error())
 		return
@@ -48,30 +48,30 @@ func (handler *SpatialUnitHandler) CreateSpatialUnit(w http.ResponseWriter, r *h
 }
 
 func (handler *SpatialUnitHandler) UpdateSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	uid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
+	suid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
 	decoder := json.NewDecoder(r.Body)
-	_, err := handler.CRUD.Read(uid)
+	_, err := handler.CRUD.Read(suid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
 	}
-	var newBaUnit ladm.LABAUnit
-	err = decoder.Decode(&newBaUnit)
+	var newSpatialUnit ladm.LASpatialUnit
+	err = decoder.Decode(&newSpatialUnit)
 	if err != nil {
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.CRUD.Update(&newBaUnit)
-	respondJSON(w, 200, newBaUnit)
+	handler.CRUD.Update(&newSpatialUnit)
+	respondJSON(w, 200, newSpatialUnit)
 }
 
 func (handler *SpatialUnitHandler) DeleteSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	uid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
-	baUnit, err := handler.CRUD.Read(uid)
+	suid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
+	spatialUnit, err := handler.CRUD.Read(suid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.CRUD.Delete(baUnit)
+	handler.CRUD.Delete(spatialUnit)
 	respondEmpty(w, 204)
 }

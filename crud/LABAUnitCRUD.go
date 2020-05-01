@@ -16,14 +16,14 @@ func (crud LABAUnitCRUD) Read(where ...interface{}) (interface{}, error) {
 	var baUnit ladm.LABAUnit
 	if where != nil {
 		reader := crud.DB.Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", where).
-			Preload("Rights").
-			Preload("Rights.Party").
-			Preload("Responsibilities").
-			Preload("Responsibilities.Party").
-			Preload("Restrictions").
-			Preload("Restrictions.Party").
-			Preload("SU").
-			Preload("SU.SU").
+			Preload("Rights", "endlifespanversion IS NULL").
+			Preload("Rights.Party", "endlifespanversion IS NULL").
+			Preload("Responsibilities", "endlifespanversion IS NULL").
+			Preload("Responsibilities.Party", "endlifespanversion IS NULL").
+			Preload("Restrictions", "endlifespanversion IS NULL").
+			Preload("Restrictions.Party", "endlifespanversion IS NULL").
+			Preload("SU", "endlifespanversion IS NULL").
+			Preload("SU.SU", "endlifespanversion IS NULL").
 			First(&baUnit)
 		if reader.RowsAffected == 0 {
 			return nil, errors.New("Entity not found")
@@ -55,7 +55,7 @@ func (crud LABAUnitCRUD) Update(partyIn interface{}) (interface{}, error) {
 	baUnit := partyIn.(*ladm.LABAUnit)
 	currentTime := time.Now()
 	var oldBaUnit ladm.LAParty
-	if crud.DB.Set("gorm:auto_preload", true).Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", baUnit.UID).First(&oldBaUnit).RowsAffected == 0 {
+	if crud.DB.Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", baUnit.UID).First(&oldBaUnit).RowsAffected == 0 {
 		return nil, errors.New("Entity not found")
 	}
 	oldBaUnit.EndLifespanVersion = &currentTime
@@ -71,7 +71,7 @@ func (crud LABAUnitCRUD) Delete(partyIn interface{}) error {
 	baUnit := partyIn.(ladm.LABAUnit)
 	currentTime := time.Now()
 	var oldBaUnit ladm.LABAUnit
-	if crud.DB.Set("gorm:auto_preload", true).Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", baUnit.UID).First(&oldBaUnit).RowsAffected == 0 {
+	if crud.DB.Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", baUnit.UID).First(&oldBaUnit).RowsAffected == 0 {
 		return errors.New("Entity not found")
 	}
 	oldBaUnit.EndLifespanVersion = &currentTime

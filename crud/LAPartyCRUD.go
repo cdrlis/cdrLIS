@@ -16,14 +16,14 @@ func (crud LAPartyCRUD) Read(where ...interface{}) (interface{}, error) {
 	var party ladm.LAParty
 	if where != nil {
 		reader := crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", where).
-			Preload("Groups").
-			Preload("Groups.Group").
-			Preload("Rights").
-			Preload("Rights.Unit").
-			Preload("Responsibilities").
-			Preload("Responsibilities.Unit").
-			Preload("Restrictions").
-			Preload("Restrictions.Unit").
+			Preload("Groups", "endlifespanversion IS NULL").
+			Preload("Groups.Group", "endlifespanversion IS NULL").
+			Preload("Rights", "endlifespanversion IS NULL").
+			Preload("Rights.Unit", "endlifespanversion IS NULL").
+			Preload("Responsibilities", "endlifespanversion IS NULL").
+			Preload("Responsibilities.Unit", "endlifespanversion IS NULL").
+			Preload("Restrictions", "endlifespanversion IS NULL").
+			Preload("Restrictions.Unit", "endlifespanversion IS NULL").
 			First(&party)
 		if reader.RowsAffected == 0 {
 			return nil, errors.New("Entity not found")
@@ -55,7 +55,7 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 	party := partyIn.(*ladm.LAParty)
 	currentTime := time.Now()
 	var oldParty ladm.LAParty
-	if crud.DB.Set("gorm:auto_preload", true).Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).First(&oldParty).RowsAffected == 0 {
+	if crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).First(&oldParty).RowsAffected == 0 {
 		return nil, errors.New("Entity not found")
 	}
 	oldParty.EndLifespanVersion = &currentTime
@@ -71,7 +71,7 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 	party := partyIn.(ladm.LAParty)
 	currentTime := time.Now()
 	var oldParty ladm.LAParty
-	if crud.DB.Set("gorm:auto_preload", true).Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).First(&oldParty).RowsAffected == 0 {
+	if crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).First(&oldParty).RowsAffected == 0 {
 		return errors.New("Entity not found")
 	}
 	oldParty.EndLifespanVersion = &currentTime

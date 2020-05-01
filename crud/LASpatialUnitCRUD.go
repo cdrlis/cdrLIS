@@ -16,9 +16,9 @@ func (crud LASpatialUnitCRUD) Read(where ...interface{}) (interface{}, error) {
 	var sUnit ladm.LASpatialUnit
 	if where != nil {
 		reader := crud.DB.Where("suid = ?::\"Oid\" AND endlifespanversion IS NULL", where).
-			Preload("Level").
-			Preload("Baunit").
-			Preload("Baunit.BaUnit").
+			Preload("Level", "endlifespanversion IS NULL").
+			Preload("Baunit", "endlifespanversion IS NULL").
+			Preload("Baunit.BaUnit", "endlifespanversion IS NULL").
 			First(&sUnit)
 		if reader.RowsAffected == 0 {
 			return nil, errors.New("Entity not found")
@@ -50,7 +50,7 @@ func (crud LASpatialUnitCRUD) Update(partyIn interface{}) (interface{}, error) {
 	sUnit := partyIn.(*ladm.LASpatialUnit)
 	currentTime := time.Now()
 	var oldSUnit ladm.LASpatialUnit
-	if crud.DB.Set("gorm:auto_preload", true).Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", sUnit.SuID).First(&oldSUnit).RowsAffected == 0 {
+	if crud.DB.Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", sUnit.SuID).First(&oldSUnit).RowsAffected == 0 {
 		return nil, errors.New("Entity not found")
 	}
 	oldSUnit.EndLifespanVersion = &currentTime
@@ -66,7 +66,7 @@ func (crud LASpatialUnitCRUD) Delete(partyIn interface{}) error {
 	sUnit := partyIn.(ladm.LASpatialUnit)
 	currentTime := time.Now()
 	var oldSUnit ladm.LASpatialUnit
-	if crud.DB.Set("gorm:auto_preload", true).Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", sUnit.SuID).First(&oldSUnit).RowsAffected == 0 {
+	if crud.DB.Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", sUnit.SuID).First(&oldSUnit).RowsAffected == 0 {
 		return errors.New("Entity not found")
 	}
 	oldSUnit.EndLifespanVersion = &currentTime

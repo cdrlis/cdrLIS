@@ -9,21 +9,22 @@ import (
 )
 
 type SpatialUnitHandler struct {
-	CRUD CRUDer
+	SpatialUnitCRUD CRUDer
+	LevelCRUD       CRUDer
 }
 
 func (handler *SpatialUnitHandler) GetSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	uid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
-	baUnit, err := handler.CRUD.Read(uid)
+	uid := common.Oid{Namespace: p.ByName("namespace"), LocalID: p.ByName("localId")}
+	suUnit, err := handler.SpatialUnitCRUD.Read(uid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
 	}
-	respondJSON(w, 200, baUnit)
+	respondJSON(w, 200, suUnit)
 }
 
 func (handler *SpatialUnitHandler) GetSpatialUnits(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	baUnits, err := handler.CRUD.ReadAll()
+	baUnits, err := handler.SpatialUnitCRUD.ReadAll()
 	if err != nil {
 		respondError(w, 500, err.Error())
 		return
@@ -39,7 +40,14 @@ func (handler *SpatialUnitHandler) CreateSpatialUnit(w http.ResponseWriter, r *h
 		respondError(w, 400, err.Error())
 		return
 	}
-	createdBaUnit, err := handler.CRUD.Create(spatialUnit)
+	level, err := handler.LevelCRUD.Read(spatialUnit.Level.LID)
+	if err != nil {
+		respondError(w, 404, err.Error())
+		return
+	}
+	spatialUnit.LevelID = level.(ladm.LALevel).ID
+	spatialUnit.LevelBeginLifespanVersion = level.(ladm.LALevel).BeginLifespanVersion
+	createdBaUnit, err := handler.SpatialUnitCRUD.Create(spatialUnit)
 	if err != nil {
 		respondError(w, 400, err.Error())
 		return
@@ -48,9 +56,9 @@ func (handler *SpatialUnitHandler) CreateSpatialUnit(w http.ResponseWriter, r *h
 }
 
 func (handler *SpatialUnitHandler) UpdateSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	suid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
+	suid := common.Oid{Namespace: p.ByName("namespace"), LocalID: p.ByName("localId")}
 	decoder := json.NewDecoder(r.Body)
-	_, err := handler.CRUD.Read(suid)
+	_, err := handler.SpatialUnitCRUD.Read(suid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
@@ -61,17 +69,17 @@ func (handler *SpatialUnitHandler) UpdateSpatialUnit(w http.ResponseWriter, r *h
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.CRUD.Update(&newSpatialUnit)
+	handler.SpatialUnitCRUD.Update(&newSpatialUnit)
 	respondJSON(w, 200, newSpatialUnit)
 }
 
 func (handler *SpatialUnitHandler) DeleteSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	suid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
-	spatialUnit, err := handler.CRUD.Read(suid)
+	suid := common.Oid{Namespace: p.ByName("namespace"), LocalID: p.ByName("localId")}
+	spatialUnit, err := handler.SpatialUnitCRUD.Read(suid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.CRUD.Delete(spatialUnit)
+	handler.SpatialUnitCRUD.Delete(spatialUnit)
 	respondEmpty(w, 204)
 }

@@ -15,7 +15,7 @@ type LALevel struct {
 	Structure    *LAStructureType    `gorm:"column:structure" json:"structure"`
 	Type         *LALevelContentType `gorm:"column:type" json:"type"`
 
-	SU []LASpatialUnit `gorm:"foreignkey:LevelID,LevelBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"level"`
+	SU []LASpatialUnit `gorm:"foreignkey:LevelID,LevelBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"-"`
 }
 
 func (LALevel) TableName() string {

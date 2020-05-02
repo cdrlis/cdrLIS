@@ -690,7 +690,7 @@ CREATE TABLE "LA_LegalSpaceBuildingUnit" (
 CREATE TABLE "suSuGroup" (
                              id						VARCHAR NOT NULL,
 --	part												"Oid" REFERENCES "LA_SpatialUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
---	whole												"Oid" REFERENCES "LA_BAUnit", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
+--	whole												"Oid" REFERENCES "LA_SpatialUnitGroup", --FOREIGN KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
     -- Therefore:
                              part					VARCHAR NOT NULL,		--  suID.namespace || '-' || suID.localId
                              partBeginLifeSpanVersion 	    TIMESTAMP NOT NULL,
@@ -701,7 +701,7 @@ CREATE TABLE "suSuGroup" (
                              PRIMARY KEY(id, beginLifeSpanVersion),
                              UNIQUE(id, beginLifeSpanVersion, endLifeSpanVersion),
                              FOREIGN KEY (part, partBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
-                             FOREIGN KEY (whole, wholeBeginLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion)
+                             FOREIGN KEY (whole, wholeBeginLifeSpanVersion) REFERENCES "LA_SpatialUnitGroup"(id, beginLifeSpanVersion)
 );
 
 CREATE TABLE "suBaunit" (
@@ -893,7 +893,7 @@ CREATE TABLE "PolygonSpatialUnit" (
                                       FOREIGN KEY (level, levelBeginLifeSpanVersion) REFERENCES "PolygonLevel"(id, beginLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
-ALTER TABLE "suBaunit" ADD CONSTRAINT suBaunit_polygonSpatialUnit_fk FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "PolygonSpatialUnit"(id, beginLifeSpanVersion);
+--ALTER TABLE "suBaunit" ADD CONSTRAINT suBaunit_polygonSpatialUnit_fk FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "PolygonSpatialUnit"(id, beginLifeSpanVersion);
 
 
 --

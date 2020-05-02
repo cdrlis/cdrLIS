@@ -9,12 +9,12 @@ import (
 )
 
 type LevelHandler struct {
-	CRUD CRUDer
+	LevelCRUD CRUDer
 }
 
 func (handler *LevelHandler) GetLevel(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	lid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
-	level, err := handler.CRUD.Read(lid)
+	level, err := handler.LevelCRUD.Read(lid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
@@ -23,7 +23,7 @@ func (handler *LevelHandler) GetLevel(w http.ResponseWriter, r *http.Request, p 
 }
 
 func (handler *LevelHandler) GetLevels(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	levels, err := handler.CRUD.ReadAll()
+	levels, err := handler.LevelCRUD.ReadAll()
 	if err != nil {
 		respondError(w, 500, err.Error())
 		return
@@ -39,7 +39,7 @@ func (handler *LevelHandler) CreateLevel(w http.ResponseWriter, r *http.Request,
 		respondError(w, 400, err.Error())
 		return
 	}
-	createdLevel, err := handler.CRUD.Create(level)
+	createdLevel, err := handler.LevelCRUD.Create(level)
 	if err != nil {
 		respondError(w, 400, err.Error())
 		return
@@ -50,7 +50,7 @@ func (handler *LevelHandler) CreateLevel(w http.ResponseWriter, r *http.Request,
 func (handler *LevelHandler) UpdateLevel(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	lid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
 	decoder := json.NewDecoder(r.Body)
-	_, err := handler.CRUD.Read(lid)
+	_, err := handler.LevelCRUD.Read(lid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
@@ -61,17 +61,17 @@ func (handler *LevelHandler) UpdateLevel(w http.ResponseWriter, r *http.Request,
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.CRUD.Update(&newLevel)
+	handler.LevelCRUD.Update(&newLevel)
 	respondJSON(w, 200, newLevel)
 }
 
 func (handler *LevelHandler) DeleteLevel(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	lid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
-	level, err := handler.CRUD.Read(lid)
+	level, err := handler.LevelCRUD.Read(lid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.CRUD.Delete(level)
+	handler.LevelCRUD.Delete(level)
 	respondEmpty(w, 204)
 }

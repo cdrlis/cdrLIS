@@ -34,7 +34,7 @@ func (crud LASpatialUnitCRUD) Create(partyIn interface{}) (interface{}, error) {
 	sUnit.ID = fmt.Sprintf("%v-%v", sUnit.SuID.Namespace, sUnit.SuID.LocalID)
 	sUnit.BeginLifespanVersion = currentTime
 	sUnit.EndLifespanVersion = nil
-	crud.DB.Create(&sUnit)
+	crud.DB.Set("gorm:save_associations", false).Create(&sUnit)
 	return &sUnit, nil
 }
 

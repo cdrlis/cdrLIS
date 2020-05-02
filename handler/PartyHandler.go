@@ -9,12 +9,12 @@ import (
 )
 
 type PartyHandler struct {
-	CRUD CRUDer
+	PartyCRUD CRUDer
 }
 
 func (handler *PartyHandler) GetParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	pid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
-	party, err := handler.CRUD.Read(pid)
+	party, err := handler.PartyCRUD.Read(pid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
@@ -23,7 +23,7 @@ func (handler *PartyHandler) GetParty(w http.ResponseWriter, r *http.Request, p 
 }
 
 func (handler *PartyHandler) GetParties(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	parties, err := handler.CRUD.ReadAll()
+	parties, err := handler.PartyCRUD.ReadAll()
 	if err != nil {
 		respondError(w, 500, err.Error())
 		return
@@ -39,7 +39,7 @@ func (handler *PartyHandler) CreateParty(w http.ResponseWriter, r *http.Request,
 		respondError(w, 400, err.Error())
 		return
 	}
-	createdParty, err := handler.CRUD.Create(party)
+	createdParty, err := handler.PartyCRUD.Create(party)
 	if err != nil {
 		respondError(w, 400, err.Error())
 		return
@@ -50,7 +50,7 @@ func (handler *PartyHandler) CreateParty(w http.ResponseWriter, r *http.Request,
 func (handler *PartyHandler) UpdateParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	pid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
 	decoder := json.NewDecoder(r.Body)
-	_, err := handler.CRUD.Read(pid)
+	_, err := handler.PartyCRUD.Read(pid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
@@ -61,17 +61,17 @@ func (handler *PartyHandler) UpdateParty(w http.ResponseWriter, r *http.Request,
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.CRUD.Update(&newParty)
+	handler.PartyCRUD.Update(&newParty)
 	respondJSON(w, 200, newParty)
 }
 
 func (handler *PartyHandler) DeleteParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	pid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
-	party, err := handler.CRUD.Read(pid)
+	party, err := handler.PartyCRUD.Read(pid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.CRUD.Delete(party)
+	handler.PartyCRUD.Delete(party)
 	respondEmpty(w, 204)
 }

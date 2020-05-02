@@ -22,16 +22,14 @@ func main() {
 	db.LogMode(true)
 
 	partyCRUD := crud.LAPartyCRUD{DB: db}
-	partyHandler := handler.PartyHandler{CRUD: partyCRUD}
+	levelCRUD := crud.LALevelCRUD{DB: db}
+	sunitCRUD := crud.LASpatialUnitCRUD{DB: db}
+	baunitCRUD := crud.LABAUnitCRUD{DB: db}
 
-	baunitCRUD := crud.LABAUnitCRUD{DB:db}
-	baunitHandler := handler.BAUnitHandler{CRUD:baunitCRUD}
-
-	sunitCRUD := crud.LASpatialUnitCRUD{DB:db}
-	sunitHandler := handler.SpatialUnitHandler{CRUD:sunitCRUD}
-
-	levelCRUD := crud.LALevelCRUD{DB:db}
-	levelHandler := handler.LevelHandler{CRUD:levelCRUD}
+	partyHandler := handler.PartyHandler{PartyCRUD: partyCRUD}
+	baunitHandler := handler.BAUnitHandler{BAUnitCRUD: baunitCRUD}
+	sunitHandler := handler.SpatialUnitHandler{SpatialUnitCRUD: sunitCRUD, LevelCRUD: levelCRUD}
+	levelHandler := handler.LevelHandler{LevelCRUD: levelCRUD}
 
 	router := httprouter.New()
 

@@ -33,7 +33,7 @@ func (id *Oid) Scan(value interface{}) error {
 	re := regexp.MustCompile("\\((.*?),(.*?)\\)") // TODO Better regex is needed
 	match := re.FindStringSubmatch(str)
 
-	oid := Oid{Namespace: match[1], LocalID: match[2]}
+	oid := Oid{Namespace: match[2], LocalID: match[1]}
 	*id = oid
 
 	return nil

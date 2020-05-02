@@ -7,13 +7,15 @@ import "github.com/cdrlis/cdrLIS/LADM/common"
 type LALevel struct {
 	common.VersionedObject
 
+	ID           string              `gorm:"column:id;primary_key" json:"-"`
+
 	LID          common.Oid          `gorm:"column:lid" json:"lID"`
 	Name         *string             `gorm:"column:name" json:"name"`
 	RegisterType *LARegisterType     `gorm:"column:registertype" json:"registerType"`
 	Structure    *LAStructureType    `gorm:"column:structure" json:"structure"`
 	Type         *LALevelContentType `gorm:"column:type" json:"type"`
 
-	Su []LASpatialUnit // suLevel
+	SU []LASpatialUnit `gorm:"foreignkey:LevelID,LevelBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"level"`
 }
 
 func (LALevel) TableName() string {

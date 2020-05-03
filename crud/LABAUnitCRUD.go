@@ -2,7 +2,6 @@ package crud
 
 import (
 	"errors"
-	"fmt"
 	ladm "github.com/cdrlis/cdrLIS/LADM"
 	"github.com/jinzhu/gorm"
 	"time"
@@ -36,7 +35,7 @@ func (crud LABAUnitCRUD) Read(where ...interface{}) (interface{}, error) {
 func (crud LABAUnitCRUD) Create(partyIn interface{}) (interface{}, error) {
 	baUnit := partyIn.(ladm.LABAUnit)
 	currentTime := time.Now()
-	baUnit.ID = fmt.Sprintf("%v-%v", baUnit.UID.Namespace, baUnit.UID.LocalID)
+	baUnit.ID = baUnit.UID.String()
 	baUnit.BeginLifespanVersion = currentTime
 	baUnit.EndLifespanVersion = nil
 	crud.DB.Set("gorm:save_associations", false).Create(&baUnit)
@@ -63,7 +62,7 @@ func (crud LABAUnitCRUD) Update(baunitIn interface{}) (interface{}, error) {
 	oldBaunit.EndLifespanVersion = &currentTime
 	crud.DB.Set("gorm:save_associations", false).Save(&oldBaunit)
 
-	baunit.ID = fmt.Sprintf("%v-%v", baunit.UID.Namespace, baunit.UID.LocalID)
+	baunit.ID = baunit.UID.String()
 	baunit.BeginLifespanVersion = currentTime
 	baunit.EndLifespanVersion = nil
 	crud.DB.Set("gorm:save_associations", false).Create(&baunit)

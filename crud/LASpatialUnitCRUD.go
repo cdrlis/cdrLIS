@@ -2,7 +2,6 @@ package crud
 
 import (
 	"errors"
-	"fmt"
 	ladm "github.com/cdrlis/cdrLIS/LADM"
 	"github.com/jinzhu/gorm"
 	"time"
@@ -31,7 +30,7 @@ func (crud LASpatialUnitCRUD) Read(where ...interface{}) (interface{}, error) {
 func (crud LASpatialUnitCRUD) Create(partyIn interface{}) (interface{}, error) {
 	sUnit := partyIn.(ladm.LASpatialUnit)
 	currentTime := time.Now()
-	sUnit.ID = fmt.Sprintf("%v-%v", sUnit.SuID.Namespace, sUnit.SuID.LocalID)
+	sUnit.ID = sUnit.SuID.String()
 	sUnit.BeginLifespanVersion = currentTime
 	sUnit.EndLifespanVersion = nil
 	crud.DB.Set("gorm:save_associations", false).Create(&sUnit)
@@ -58,7 +57,7 @@ func (crud LASpatialUnitCRUD) Update(sunitIn interface{}) (interface{}, error) {
 	oldSUnit.EndLifespanVersion = &currentTime
 	crud.DB.Set("gorm:save_associations", false).Save(&oldSUnit)
 
-	sUnit.ID = fmt.Sprintf("%v-%v", sUnit.SuID.Namespace, sUnit.SuID.LocalID)
+	sUnit.ID = sUnit.SuID.String()
 	sUnit.BeginLifespanVersion = currentTime
 	sUnit.EndLifespanVersion = nil
 	sUnit.LevelID = oldSUnit.LevelID

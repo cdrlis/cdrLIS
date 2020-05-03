@@ -3,7 +3,9 @@ package common
 import (
 	"database/sql/driver"
 	"errors"
+	"fmt"
 	"regexp"
+	"strings"
 )
 
 // Oid Object identifier
@@ -37,4 +39,13 @@ func (id *Oid) Scan(value interface{}) error {
 	*id = oid
 
 	return nil
+}
+
+func (id Oid) String() string {
+	return fmt.Sprintf("%v-%v", id.Namespace, id.LocalID)
+}
+
+func (Oid) Parse(id string) Oid {
+	parts := strings.Split(id,"-")
+	return Oid{Namespace: parts[0], LocalID: parts[1]}
 }

@@ -7,22 +7,22 @@ import (
 	"time"
 )
 
-type LAPartyCRUD struct {
+type LAGroupPartyCRUD struct {
 	DB *gorm.DB
 }
 
-func (crud LAPartyCRUD) Read(where ...interface{}) (interface{}, error) {
-	var party ladm.LAParty
+func (crud LAGroupPartyCRUD) Read(where ...interface{}) (interface{}, error) {
+	var party ladm.LAGroupParty
 	if where != nil {
-		reader := crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", where).
-			Preload("Groups", "endlifespanversion IS NULL").
-			Preload("Groups.Group", "endlifespanversion IS NULL").
-			Preload("Rights", "endlifespanversion IS NULL").
-			Preload("Rights.Unit", "endlifespanversion IS NULL").
-			Preload("Responsibilities", "endlifespanversion IS NULL").
-			Preload("Responsibilities.Unit", "endlifespanversion IS NULL").
-			Preload("Restrictions", "endlifespanversion IS NULL").
-			Preload("Restrictions.Unit", "endlifespanversion IS NULL").
+		reader := crud.DB.Where("groupid = ?::\"Oid\" AND endlifespanversion IS NULL", where).
+//			Preload("Groups", "endlifespanversion IS NULL").
+//			Preload("Groups.Group", "endlifespanversion IS NULL").
+//			Preload("Rights", "endlifespanversion IS NULL").
+//			Preload("Rights.Unit", "endlifespanversion IS NULL").
+//			Preload("Responsibilities", "endlifespanversion IS NULL").
+//			Preload("Responsibilities.Unit", "endlifespanversion IS NULL").
+//			Preload("Restrictions", "endlifespanversion IS NULL").
+//			Preload("Restrictions.Unit", "endlifespanversion IS NULL").
 			First(&party)
 		if reader.RowsAffected == 0 {
 			return nil, errors.New("Entity not found")
@@ -32,29 +32,29 @@ func (crud LAPartyCRUD) Read(where ...interface{}) (interface{}, error) {
 	return nil, nil
 }
 
-func (crud LAPartyCRUD) Create(partyIn interface{}) (interface{}, error) {
-	party := partyIn.(ladm.LAParty)
+func (crud LAGroupPartyCRUD) Create(partyIn interface{}) (interface{}, error) {
+	party := partyIn.(ladm.LAGroupParty)
 	currentTime := time.Now()
-	party.ID = party.PID.String()
+	party.ID = party.GroupID.String()
 	party.BeginLifespanVersion = currentTime
 	party.EndLifespanVersion = nil
 	crud.DB.Set("gorm:save_associations", false).Create(&party)
 	return &party, nil
 }
 
-func (crud LAPartyCRUD) ReadAll(where ...interface{}) (interface{}, error) {
-	var parties []ladm.LAParty
+func (crud LAGroupPartyCRUD) ReadAll(where ...interface{}) (interface{}, error) {
+	var parties []ladm.LAGroupParty
 	if crud.DB.Where("endlifespanversion IS NULL").Find(&parties).RowsAffected == 0 {
 		return nil, errors.New("Entity not found")
 	}
 	return &parties, nil
 }
 
-func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
-	party := partyIn.(*ladm.LAParty)
+func (crud LAGroupPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
+	party := partyIn.(*ladm.LAGroupParty)
 	currentTime := time.Now()
-	var oldParty ladm.LAParty
-	reader := crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).
+	var oldParty ladm.LAGroupParty
+	reader := crud.DB.Where("groupid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).
 		First(&oldParty)
 	if reader.RowsAffected == 0 {
 		return nil, errors.New("Entity not found")
@@ -66,8 +66,8 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 	party.BeginLifespanVersion = currentTime
 	party.EndLifespanVersion = nil
 	crud.DB.Set("gorm:save_associations", false).Create(&party)
-
-	reader = crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion = ?", party.PID, currentTime).
+/*
+	reader = crud.DB.Where("groupid = ?::\"Oid\" AND endlifespanversion = ?", party.PID, currentTime).
 		Preload("Groups", "endlifespanversion IS NULL").
 		Preload("Rights", "endlifespanversion IS NULL").
 		Preload("Responsibilities", "endlifespanversion IS NULL").
@@ -111,21 +111,22 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 		restriction.PartyBeginLifespanVersion = currentTime
 		crud.DB.Set("gorm:save_associations", false).Create(&restriction)
 	}
+ */
 	return party, nil
 }
 
-func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
-	party := partyIn.(ladm.LAParty)
+func (crud LAGroupPartyCRUD) Delete(partyIn interface{}) error {
+	party := partyIn.(ladm.LAGroupParty)
 	currentTime := time.Now()
-	var oldParty ladm.LAParty
-	reader := crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).First(&oldParty)
+	var oldParty ladm.LAGroupParty
+	reader := crud.DB.Where("groupid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).First(&oldParty)
 	if reader.RowsAffected == 0 {
 		return errors.New("Entity not found")
 	}
 	oldParty.EndLifespanVersion = &currentTime
 	crud.DB.Set("gorm:save_associations", false).Save(&oldParty)
-
-	reader = crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion = ?", party.PID, currentTime).
+/*
+	reader = crud.DB.Where("groupid = ?::\"Oid\" AND endlifespanversion = ?", party.PID, currentTime).
 		Preload("Groups", "endlifespanversion IS NULL").
 		Preload("Rights", "endlifespanversion IS NULL").
 		Preload("Responsibilities", "endlifespanversion IS NULL").
@@ -153,5 +154,6 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 		restriction.EndLifespanVersion = &currentTime
 		crud.DB.Set("gorm:save_associations", false).Save(&restriction)
 	}
+ */
 	return nil
 }

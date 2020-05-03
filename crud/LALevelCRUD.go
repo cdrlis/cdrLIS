@@ -2,7 +2,6 @@ package crud
 
 import (
 	"errors"
-	"fmt"
 	ladm "github.com/cdrlis/cdrLIS/LADM"
 	"github.com/jinzhu/gorm"
 	"time"
@@ -28,7 +27,7 @@ func (crud LALevelCRUD) Read(where ...interface{}) (interface{}, error) {
 func (crud LALevelCRUD) Create(levelIn interface{}) (interface{}, error) {
 	level := levelIn.(ladm.LALevel)
 	currentTime := time.Now()
-	level.ID = fmt.Sprintf("%v-%v", level.LID.Namespace, level.LID.LocalID)
+	level.ID = level.LID.String()
 	level.BeginLifespanVersion = currentTime
 	level.EndLifespanVersion = nil
 	crud.DB.Set("gorm:save_associations", false).Create(&level)
@@ -55,7 +54,7 @@ func (crud LALevelCRUD) Update(levelIn interface{}) (interface{}, error) {
 	oldLevel.EndLifespanVersion = &currentTime
 	crud.DB.Set("gorm:save_associations", false).Save(&oldLevel)
 
-	level.ID = fmt.Sprintf("%v-%v", level.LID.Namespace, level.LID.LocalID)
+	level.ID = level.LID.String()
 	level.BeginLifespanVersion = currentTime
 	level.EndLifespanVersion = nil
 	crud.DB.Set("gorm:save_associations", false).Create(&level)

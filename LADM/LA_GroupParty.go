@@ -14,9 +14,9 @@ import "github.com/cdrlis/cdrLIS/LADM/common"
 type LAGroupParty struct {
 	LAParty
 	GroupID common.Oid       `gorm:"column:groupid" json:"groupID"`
-	Type    LAGroupPartyType `gorm:"column:type" json:"type"`
+//	Type    LAGroupPartyType `gorm:"column:type" json:"type"` TODO: CHECK INHERITANCE
 
-	Parties []LAPartyMember	`gorm:"foreignkey:GroupID,GroupBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"parties"`
+	Parties []LAPartyMember `gorm:"foreignkey:GroupID,GroupBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"parties"`
 }
 
 func (LAGroupParty) TableName() string {
@@ -28,7 +28,7 @@ type LAGroupPartyType string
 
 const (
 	Association LAGroupPartyType = "association"
-	BAUnitGroup                  = "baunitGroup"
-	Family                       = "family"
-	Tribe                        = "tribe"
+	BAUnitGroup LAGroupPartyType = "baunitGroup"
+	Family      LAGroupPartyType = "family"
+	Tribe       LAGroupPartyType = "tribe"
 )

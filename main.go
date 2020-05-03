@@ -22,11 +22,15 @@ func main() {
 	db.LogMode(true)
 
 	partyCRUD := crud.LAPartyCRUD{DB: db}
+	groupPartyCRUD := crud.LAGroupPartyCRUD{DB: db}
+	partyMemberCRUD := crud.LAPartyMemberCRUD{DB: db}
 	levelCRUD := crud.LALevelCRUD{DB: db}
 	sunitCRUD := crud.LASpatialUnitCRUD{DB: db}
 	baunitCRUD := crud.LABAUnitCRUD{DB: db}
 
 	partyHandler := handler.PartyHandler{PartyCRUD: partyCRUD}
+	groupPartyHandler := handler.GroupPartyHandler{GroupPartyCRUD: groupPartyCRUD}
+	partyMemberHandler := handler.PartyMemberHandler{PartyMemberCRUD: partyMemberCRUD, PartyCRUD: partyCRUD, GroupPartyCRUD: groupPartyCRUD}
 	baunitHandler := handler.BAUnitHandler{BAUnitCRUD: baunitCRUD}
 	sunitHandler := handler.SpatialUnitHandler{SpatialUnitCRUD: sunitCRUD, LevelCRUD: levelCRUD}
 	levelHandler := handler.LevelHandler{LevelCRUD: levelCRUD}
@@ -38,6 +42,18 @@ func main() {
 	router.GET("/party/:namespace/:localId", partyHandler.GetParty)
 	router.PUT("/party/:namespace/:localId", partyHandler.UpdateParty)
 	router.DELETE("/party/:namespace/:localId", partyHandler.DeleteParty)
+
+	router.GET("/groupparty", groupPartyHandler.GetParties)
+	router.POST("/groupparty", groupPartyHandler.CreateParty)
+	router.GET("/groupparty/:namespace/:localId", groupPartyHandler.GetParty)
+	router.PUT("/groupparty/:namespace/:localId", groupPartyHandler.UpdateParty)
+	router.DELETE("/groupparty/:namespace/:localId", groupPartyHandler.DeleteParty)
+
+	router.GET("/partymember", partyMemberHandler.GetPartyMembers)
+	router.POST("/partymember", partyMemberHandler.CreatePartyMember)
+	router.GET("/partymember/:partyNamespace/:partyLocalId/:groupNamespace/:groupLocalId", partyMemberHandler.GetPartyMember)
+	router.PUT("/partymember/:partyNamespace/:partyLocalId/:groupNamespace/:groupLocalId", partyMemberHandler.UpdatePartyMember)
+	router.DELETE("/partymember/:partyNamespace/:partyLocalId/:groupNamespace/:groupLocalId", partyMemberHandler.DeletePartyMember)
 
 	router.GET("/baunit", baunitHandler.GetBAUnits)
 	router.POST("/baunit", baunitHandler.CreateBAUnit)

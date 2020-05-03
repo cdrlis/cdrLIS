@@ -13,8 +13,8 @@ type GroupPartyHandler struct {
 }
 
 func (handler *GroupPartyHandler) GetParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	pid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
-	party, err := handler.GroupPartyCRUD.Read(pid)
+	groupId := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
+	party, err := handler.GroupPartyCRUD.Read(groupId)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
@@ -23,55 +23,55 @@ func (handler *GroupPartyHandler) GetParty(w http.ResponseWriter, r *http.Reques
 }
 
 func (handler *GroupPartyHandler) GetParties(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-	parties, err := handler.GroupPartyCRUD.ReadAll()
+	groupParties, err := handler.GroupPartyCRUD.ReadAll()
 	if err != nil {
 		respondError(w, 500, err.Error())
 		return
 	}
-	respondJSON(w, 200, parties)
+	respondJSON(w, 200, groupParties)
 }
 
 func (handler *GroupPartyHandler) CreateParty(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	decoder := json.NewDecoder(r.Body)
-	var party ladm.LAParty
-	err := decoder.Decode(&party)
+	var groupParty ladm.LAGroupParty
+	err := decoder.Decode(&groupParty)
 	if err != nil {
 		respondError(w, 400, err.Error())
 		return
 	}
-	createdParty, err := handler.GroupPartyCRUD.Create(party)
+	createdGroupParty, err := handler.GroupPartyCRUD.Create(groupParty)
 	if err != nil {
 		respondError(w, 400, err.Error())
 		return
 	}
-	respondJSON(w, 201, createdParty)
+	respondJSON(w, 201, createdGroupParty)
 }
 
 func (handler *GroupPartyHandler) UpdateParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	pid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
+	groupId := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
 	decoder := json.NewDecoder(r.Body)
-	_, err := handler.GroupPartyCRUD.Read(pid)
+	_, err := handler.GroupPartyCRUD.Read(groupId)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
 	}
-	var newParty ladm.LAParty
-	err = decoder.Decode(&newParty)
+	var newGroupParty ladm.LAGroupParty
+	err = decoder.Decode(&newGroupParty)
 	if err != nil {
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.GroupPartyCRUD.Update(&newParty)
-	respondJSON(w, 200, newParty)
+	handler.GroupPartyCRUD.Update(&newGroupParty)
+	respondJSON(w, 200, newGroupParty)
 }
 
 func (handler *GroupPartyHandler) DeleteParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	pid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
-	party, err := handler.GroupPartyCRUD.Read(pid)
+	groupId := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
+	groupParty, err := handler.GroupPartyCRUD.Read(groupId)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.GroupPartyCRUD.Delete(party)
+	handler.GroupPartyCRUD.Delete(groupParty)
 	respondEmpty(w, 204)
 }

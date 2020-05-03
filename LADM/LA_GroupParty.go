@@ -12,7 +12,7 @@ import "github.com/cdrlis/cdrLIS/LADM/common"
 // group parties, see Figure 9.
 
 type LAGroupParty struct {
-	LAParty
+	LAParty // TODO: CHECK INHERITANCE
 	GroupID common.Oid       `gorm:"column:groupid" json:"groupID"`
 //	Type    LAGroupPartyType `gorm:"column:type" json:"type"` TODO: CHECK INHERITANCE
 

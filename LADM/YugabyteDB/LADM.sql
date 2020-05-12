@@ -143,7 +143,7 @@ CREATE TYPE "CI_ResponsibleParty" AS (
 --
 --CREATE TABLE "VersionedObject" (
 --	beginLifeSpanVersion 	TIMESTAMP NOT NULL,
---	endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+--	endLifeSpanVersion		TIMESTAMP,
 --	quality					"DQ_Element",
 --	source 					"CI_ResponsibleParty"
 --);
@@ -182,7 +182,7 @@ CREATE TABLE "LA_Party" (
                             role					"LA_PartyRoleType"[],
                             type					"LA_PartyType" NOT NULL,
                             beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                            endLifeSpanVersion		TIMESTAMP,
 --	quality					"DQ_Element",								-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",						-- Omitted for simplicity
                             PRIMARY KEY(id, beginLifeSpanVersion)
@@ -208,7 +208,7 @@ CREATE TABLE "LA_GroupParty" (
                                  role					"LA_PartyRoleType"[],
                                  type					"LA_GroupPartyType" NOT NULL,
                                  beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                 endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                 endLifeSpanVersion		TIMESTAMP,
 --	quality					"DQ_Element",								-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",						-- Omitted for simplicity
                                  PRIMARY KEY(id, beginLifeSpanVersion)
@@ -228,7 +228,7 @@ CREATE TABLE "LA_PartyMember" (
                                   parties						VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
                                   groups						VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
                                   beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                  endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                  endLifeSpanVersion			TIMESTAMP,
                                   partiesBeginLifeSpanVersion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                   groupsBeginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                   PRIMARY KEY(id, beginLifeSpanVersion),
@@ -262,7 +262,7 @@ CREATE TABLE "LA_PartyMember" (
 --	shareCheck	BOOLEAN DEFAULT TRUE,
 --	timeSpec	INTERVAL[],
 --	beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
---	endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+--	endLifeSpanVersion		TIMESTAMP,
 ----	quality					"DQ_Element", 					-- Omitted for simplicity
 ----	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
 --	CONSTRAINT r_pk PRIMARY KEY(id, beginLifeSpanVersion, endLifeSpanVersion),
@@ -289,7 +289,7 @@ CREATE TABLE "LA_Right" (
 --	quality						"DQ_Element", 					-- Omitted for simplicity
 --	source 						"CI_ResponsibleParty",			-- Omitted for simplicity
                             beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
+                            endLifeSpanVersion			TIMESTAMP,
                             party						VARCHAR NOT NULL,				--  pID.namespace || '-' || pID.localId
                             partyBeginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             unit						VARCHAR NOT NULL,				--  uID.namespace || '-' || uID.localId
@@ -315,7 +315,7 @@ CREATE TABLE "LA_Restriction" (
 --	quality					"DQ_Element", 					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
                                   beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                  endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                  endLifeSpanVersion			TIMESTAMP,
                                   party						VARCHAR NOT NULL,				--  pID.namespace || '-' || pID.localId
                                   partyBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                                   unit						VARCHAR NOT NULL,				--  uID.namespace || '-' || uID.localId
@@ -340,7 +340,7 @@ CREATE TABLE "LA_Responsibility" (
 --	quality					"DQ_Element", 					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
                                      beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                     endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                     endLifeSpanVersion			TIMESTAMP,
                                      party						VARCHAR NOT NULL,				--  pID.namespace || '-' || pID.localId
                                      partyBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                                      unit						VARCHAR NOT NULL,				--  uID.namespace || '-' || uID.localId
@@ -375,7 +375,7 @@ CREATE TABLE "LA_Mortgage" (
 --	quality					"DQ_Element", 					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
                                beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                               endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
+                               endLifeSpanVersion			TIMESTAMP,
                                party						VARCHAR NOT NULL,				--  pID.namespace || '-' || pID.localId
                                partyBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                                unit						VARCHAR NOT NULL,				--  uID.namespace || '-' || uID.localId
@@ -425,7 +425,7 @@ CREATE TABLE "LA_BAUnit" (
 --	quality					"DQ_Element", 					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
                              beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                             endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                             endLifeSpanVersion		TIMESTAMP,
                              PRIMARY KEY (id, beginLifeSpanVersion)
 );
 ALTER TABLE "LA_Right"
@@ -448,7 +448,7 @@ CREATE TABLE "LA_RequiredRelationshipBAUnit" (
 --	quality						"DQ_Element",								-- Omitted for simplicity
 --	source 						"CI_ResponsibleParty",						-- Omitted for simplicity
                                                  beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                                 endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                                 endLifeSpanVersion			TIMESTAMP,
                                                  unit1						VARCHAR NOT NULL,			-- LA_BAUnit.id
                                                  unit1BeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                                                  unit2						VARCHAR NOT NULL,			-- LA_BAUnit.id
@@ -542,7 +542,7 @@ CREATE TABLE "LA_SpatialUnitGroup" (
                                        referencePoint			geometry(POINT),
                                        sugID					"Oid" NOT NULL, 				-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YugabyteDB
                                        beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                       endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                       endLifeSpanVersion		TIMESTAMP,
 --	quality					"DQ_Element", 					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
                                        PRIMARY KEY (id, beginLifeSpanVersion)
@@ -560,7 +560,7 @@ CREATE TABLE "LA_Level" (
                             structure				"LA_StructureType",
                             type					"LA_LevelContentType",
                             beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                            endLifeSpanVersion		TIMESTAMP,
 --	quality					"DQ_Element",					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
                             PRIMARY KEY (id, beginLifeSpanVersion)
@@ -582,7 +582,7 @@ CREATE TABLE "LA_SpatialUnit" (
                                   level						VARCHAR NOT NULL,				--  suID.namespace || '-' || suID.localId
                                   levelBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                                   beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                  endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                  endLifeSpanVersion			TIMESTAMP,
 --	quality					"DQ_Element",					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
                                   PRIMARY KEY (id, beginLifeSpanVersion),
@@ -610,7 +610,7 @@ CREATE TABLE "LA_RequiredRelationshipSpatialUnit" (
                                                       su2BeginLifeSpanVersion 		TIMESTAMP NOT NULL,
                                                       relationship					"ISO19125_Type",
                                                       beginLifeSpanVersion 			TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                                      endLifeSpanVersion				TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                                      endLifeSpanVersion				TIMESTAMP,
                                                       PRIMARY KEY (id, beginLifeSpanVersion),
                                                       UNIQUE(su1, su1BeginLifeSpanVersion, su2, su2BeginLifeSpanVersion),
                                                       FOREIGN KEY (su1, su1BeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
@@ -645,7 +645,7 @@ CREATE TABLE "LA_LegalSpaceBuildingUnit" (
                                              extPhysicalBuildingUnitID	"ExtPhysicalBuildingUnit",
                                              type 						"LA_BuildingUnitType",
                                              beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                             endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                             endLifeSpanVersion			TIMESTAMP,
                                              PRIMARY KEY (id, beginLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
@@ -657,15 +657,17 @@ CREATE TABLE "suSuGroup" (
                              wholeBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                              PRIMARY KEY (part, partBeginLifeSpanVersion, whole, wholeBeginLifeSpanVersion),
                              FOREIGN KEY (part, partBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
-                             FOREIGN KEY (whole, wholeBeginLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion)
+                             FOREIGN KEY (whole, wholeBeginLifeSpanVersion) REFERENCES "LA_SpatialUnitGroup"(id, beginLifeSpanVersion)
 );
 
 CREATE TABLE "suBaunit" (
+                            beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            endLifeSpanVersion			TIMESTAMP,
                             su							VARCHAR NOT NULL,		-- -- sugID.namespace || '-' || sugID.localId
                             baunit						VARCHAR NOT NULL,		-- LA_BAUnit.id
                             suBeginLifeSpanVersion 		TIMESTAMP NOT NULL,
                             baunitBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
-                            PRIMARY KEY (su, suBeginLifeSpanVersion, baunit, baunitBeginLifeSpanVersion),
+                            PRIMARY KEY (su, suBeginLifeSpanVersion, baunit, baunitBeginLifeSpanVersion, beginLifeSpanVersion),
                             FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
                             FOREIGN KEY (baunit, baunitBeginLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion)
 );
@@ -698,9 +700,34 @@ CREATE TABLE "LA_BoundaryFaceString"(
 --	quality					"DQ_Element",							-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty"					-- Omitted for simplicity
                                         beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                        endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                        endLifeSpanVersion		TIMESTAMP,
                                         PRIMARY KEY (id, beginLifeSpanVersion)
 );
+
+CREATE TABLE "bfsSpatialUnitPlus" (
+                            beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            endLifeSpanVersion			TIMESTAMP,
+                            su							VARCHAR NOT NULL,		-- -- suID.namespace || '-' || suID.localId
+                            bfs						VARCHAR NOT NULL,		-- LA_BAUnit.id
+                            suBeginLifeSpanVersion 		TIMESTAMP NOT NULL,
+                            bfsBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
+                            PRIMARY KEY (su, suBeginLifeSpanVersion, bfs, bfsBeginLifeSpanVersion, beginLifeSpanVersion),
+                            FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
+                            FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion)
+);
+
+CREATE TABLE "bfsSpatialUnitMinus" (
+                            beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            endLifeSpanVersion			TIMESTAMP,
+                            su							VARCHAR NOT NULL,		-- -- suID.namespace || '-' || suID.localId
+                            bfs						VARCHAR NOT NULL,		-- LA_BAUnit.id
+                            suBeginLifeSpanVersion 		TIMESTAMP NOT NULL,
+                            bfsBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
+                            PRIMARY KEY (su, suBeginLifeSpanVersion, bfs, bfsBeginLifeSpanVersion, beginLifeSpanVersion),
+                            FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
+                            FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion)
+);
+
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
 --
@@ -751,7 +778,7 @@ CREATE TABLE "LA_Point" (
 --	quality						"DQ_Element",						-- Omitted for simplicity
 --	source 						"CI_ResponsibleParty"				-- Omitted for simplicity
                             beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
+                            endLifeSpanVersion			TIMESTAMP,
                             bfs							VARCHAR NOT NULL,					--  bfsid.namespace || '-' || bfsid.localId
                             bfsBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                             pb							VARCHAR NOT NULL,					--  pbID.namespace || '-' || pbID.localId
@@ -775,7 +802,7 @@ CREATE TABLE "PolygonLevel" (
                                 structure				"LA_StructureType" DEFAULT 'polygon',
                                 type					"LA_LevelContentType",
                                 beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                endLifeSpanVersion		TIMESTAMP,
 --	quality					"DQ_Element",					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
                                 PRIMARY KEY (id, beginLifeSpanVersion)
@@ -793,7 +820,7 @@ CREATE TABLE "PolygonSpatialUnitGroup" (
                                            name					VARCHAR,
 --	element					"Oid",
                                            beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                           endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                           endLifeSpanVersion		TIMESTAMP,
 --	quality					"DQ_Element",								-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",						-- Omitted for simplicity
                                            PRIMARY KEY (id, beginLifeSpanVersion)
@@ -822,12 +849,12 @@ CREATE TABLE "PolygonSpatialUnit" (
                                       level						VARCHAR NOT NULL,							--  lID.namespace || '-' || lID.localId
                                       levelBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                                       beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                      endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                      endLifeSpanVersion			TIMESTAMP,
                                       PRIMARY KEY (id, beginLifeSpanVersion),
                                       FOREIGN KEY (level, levelBeginLifeSpanVersion) REFERENCES "PolygonLevel"(id, beginLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
-ALTER TABLE "suBaunit" ADD CONSTRAINT suBaunit_polygonSpatialUnit_fk FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "PolygonSpatialUnit"(id, beginLifeSpanVersion);
+--ALTER TABLE "suBaunit" ADD CONSTRAINT suBaunit_polygonSpatialUnit_fk FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "PolygonSpatialUnit"(id, beginLifeSpanVersion);
 
 
 --
@@ -838,7 +865,7 @@ CREATE TABLE "PolygonBoundary" (
                                    bfsID						"Oid",
                                    geometry					geometry(MULTILINESTRING) NOT NULL,
                                    beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                   endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                   endLifeSpanVersion			TIMESTAMP,
 --	quality						"DQ_Element",					-- Omitted for simplicity
 --	source 						"CI_ResponsibleParty",			-- Omitted for simplicity
                                    psu							VARCHAR NOT NULL,				--  suID.namespace || '-' || suID.localId

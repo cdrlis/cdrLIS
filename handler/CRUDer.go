@@ -1,6 +1,6 @@
 package handler
 
-// CRUDer SpatialUnitCRUD
+// CRUDer BoundaryFaceStringCRUD
 type CRUDer interface {
 	Create(value interface{}) (interface{}, error)
 	Read(where ...interface{}) (interface{}, error)

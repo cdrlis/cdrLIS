@@ -21,6 +21,7 @@ import (
 
 type LABoundaryFaceString struct {
 	common.VersionedObject
+	ID   string       `gorm:"column:id;primary_key" json:"-"`
 
 	BfsID          common.Oid             `gorm:"column:bfsid" json:"bfsID"`
 	Geometry       *geometry.GMMultiCurve `gorm:"column:geometry" json:"geometry"`

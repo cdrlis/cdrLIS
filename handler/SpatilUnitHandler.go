@@ -47,12 +47,12 @@ func (handler *SpatialUnitHandler) CreateSpatialUnit(w http.ResponseWriter, r *h
 	}
 	spatialUnit.LevelID = level.(ladm.LALevel).ID
 	spatialUnit.LevelBeginLifespanVersion = level.(ladm.LALevel).BeginLifespanVersion
-	createdBaUnit, err := handler.SpatialUnitCRUD.Create(spatialUnit)
+	createdSpatialUnit, err := handler.SpatialUnitCRUD.Create(spatialUnit)
 	if err != nil {
 		respondError(w, 400, err.Error())
 		return
 	}
-	respondJSON(w, 201, createdBaUnit)
+	respondJSON(w, 201, createdSpatialUnit)
 }
 
 func (handler *SpatialUnitHandler) UpdateSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {

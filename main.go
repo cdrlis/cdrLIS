@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/cdrlis/cdrLIS/crud"
+	"github.com/rs/cors"
 	"net/http"
 
 	"github.com/cdrlis/cdrLIS/handler"
@@ -71,6 +72,9 @@ func main() {
 	router.PUT("/spatialunit/:namespace/:localId", sunitHandler.UpdateSpatialUnit)
 	router.DELETE("/spatialunit/:namespace/:localId", sunitHandler.DeleteSpatialUnit)
 
+	router.GET("/spatialunit/:namespace/:localId/geometry", sunitHandler.GetSpatialUnitGeometry)
+	router.GET("/spatialunit/:namespace/:localId/area", sunitHandler.GetSpatialUnitArea)
+
 	router.GET("/level", levelHandler.GetLevels)
 	router.POST("/level", levelHandler.CreateLevel)
 	router.GET("/level/:namespace/:localId", levelHandler.GetLevel)
@@ -89,6 +93,7 @@ func main() {
 	router.PUT("/boundaryfacestring-plus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitPlusHandler.UpdateBfsSpatialUnit)
 	router.DELETE("/boundaryfacestring-plus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitPlusHandler.DeleteBfsSpatialUnit)
 
-	http.ListenAndServe(":3000", router)
+	handler := cors.Default().Handler(router)
+	http.ListenAndServe(":3000", handler)
 
 }

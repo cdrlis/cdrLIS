@@ -83,3 +83,23 @@ func (handler *SpatialUnitHandler) DeleteSpatialUnit(w http.ResponseWriter, r *h
 	handler.SpatialUnitCRUD.Delete(spatialUnit)
 	respondEmpty(w, 204)
 }
+
+func (handler *SpatialUnitHandler) GetSpatialUnitGeometry(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	uid := common.Oid{Namespace: p.ByName("namespace"), LocalID: p.ByName("localId")}
+	suUnit, err := handler.SpatialUnitCRUD.Read(uid)
+	if err != nil {
+		respondError(w, 404, err.Error())
+		return
+	}
+	respondJSON(w, 200, suUnit.(ladm.LASpatialUnit).CreateArea())
+}
+
+func (handler *SpatialUnitHandler) GetSpatialUnitArea(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	uid := common.Oid{Namespace: p.ByName("namespace"), LocalID: p.ByName("localId")}
+	suUnit, err := handler.SpatialUnitCRUD.Read(uid)
+	if err != nil {
+		respondError(w, 404, err.Error())
+		return
+	}
+	respondJSON(w, 200, suUnit.(ladm.LASpatialUnit).ComputeArea())
+}

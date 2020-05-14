@@ -21,8 +21,8 @@ func (crud LABAUnitCRUD) Read(where ...interface{}) (interface{}, error) {
 			Preload("Responsibilities.Party", "endlifespanversion IS NULL").
 			Preload("Restrictions", "endlifespanversion IS NULL").
 			Preload("Restrictions.Party", "endlifespanversion IS NULL").
-			Preload("SU", "endlifespanversion IS NULL").
-			Preload("SU.SU", "endlifespanversion IS NULL").
+			Preload("Su", "endlifespanversion IS NULL").
+			Preload("Su.Su", "endlifespanversion IS NULL").
 			First(&baUnit)
 		if reader.RowsAffected == 0 {
 			return nil, errors.New("Entity not found")
@@ -68,7 +68,7 @@ func (crud LABAUnitCRUD) Update(baUnitIn interface{}) (interface{}, error) {
 	crud.DB.Set("gorm:save_associations", false).Create(&baUnit)
 
 	reader = crud.DB.Where("uid = ?::\"Oid\" AND endlifespanversion = ?", baUnit.UID, currentTime).
-		Preload("SU", "endlifespanversion IS NULL").
+		Preload("Su", "endlifespanversion IS NULL").
 		Preload("Rights", "endlifespanversion IS NULL").
 		Preload("Responsibilities", "endlifespanversion IS NULL").
 		Preload("Restrictions", "endlifespanversion IS NULL").
@@ -126,7 +126,7 @@ func (crud LABAUnitCRUD) Delete(baUnitIn interface{}) error {
 	crud.DB.Set("gorm:save_associations", false).Save(&oldBaUnit)
 
 	reader = crud.DB.Where("uid = ?::\"Oid\" AND endlifespanversion = ?", baUnit.UID, currentTime).
-		Preload("SU", "endlifespanversion IS NULL").
+		Preload("Su", "endlifespanversion IS NULL").
 		Preload("Rights", "endlifespanversion IS NULL").
 		Preload("Responsibilities", "endlifespanversion IS NULL").
 		Preload("Restrictions", "endlifespanversion IS NULL").

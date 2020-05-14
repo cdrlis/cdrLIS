@@ -21,15 +21,15 @@ import (
 
 type LABoundaryFaceString struct {
 	common.VersionedObject
-	ID   string       `gorm:"column:id;primary_key" json:"-"`
+	ID string `gorm:"column:id;primary_key" json:"-"`
 
 	BfsID          common.Oid             `gorm:"column:bfsid" json:"bfsID"`
 	Geometry       *geometry.GMMultiCurve `gorm:"column:geometry" json:"geometry"`
 	LocationByText *string                `gorm:"column:locationbytext" json:"locationByText"`
 
-	point   []LAPoint       // pointBfs
-	MinusSu []LASpatialUnit // minus
-	PlusSu  []LASpatialUnit // plus
+	point   []LAPoint            // pointBfs
+	MinusSu []LASpatialUnit      // minus
+	PlusSu  []BfsSpatialUnitPlus `gorm:"foreignkey:BfsID,BfsBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"su"` // plus
 }
 
 func (LABoundaryFaceString) TableName() string {

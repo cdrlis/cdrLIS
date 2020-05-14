@@ -28,6 +28,7 @@ func main() {
 	sunitCRUD := crud.LASpatialUnitCRUD{DB: db}
 	baunitCRUD := crud.LABAUnitCRUD{DB: db}
 	boundaryFaceStringCRUD := crud.LABoundaryFaceStringCRUD{DB: db}
+	bfsSpatialUnitPlusCRUD := crud.BfsSpatialUnitPlusCRUD{DB: db}
 
 	partyHandler := handler.PartyHandler{PartyCRUD: partyCRUD}
 	groupPartyHandler := handler.GroupPartyHandler{GroupPartyCRUD: groupPartyCRUD}
@@ -36,6 +37,7 @@ func main() {
 	sunitHandler := handler.SpatialUnitHandler{SpatialUnitCRUD: sunitCRUD, LevelCRUD: levelCRUD}
 	levelHandler := handler.LevelHandler{LevelCRUD: levelCRUD}
 	boundaryFaceStringHandler := handler.BoundaryFaceStringHandler{BoundaryFaceStringCRUD: boundaryFaceStringCRUD}
+	bfsSpatialUnitPlusHandler := handler.BoundaryFaceStringSpatialUnitHandler{SpatialUnitCRUD: sunitCRUD, BoundaryFaceStringCRUD: boundaryFaceStringCRUD, BfsSpatialUnitCRUD: bfsSpatialUnitPlusCRUD}
 
 	router := httprouter.New()
 
@@ -80,6 +82,12 @@ func main() {
 	router.GET("/boundaryfacestring/:namespace/:localId", boundaryFaceStringHandler.GetBoundaryFaceString)
 	router.PUT("/boundaryfacestring/:namespace/:localId", boundaryFaceStringHandler.UpdateBoundaryFaceString)
 	router.DELETE("/boundaryfacestring/:namespace/:localId", boundaryFaceStringHandler.DeleteBoundaryFaceString)
+
+	router.GET("/boundaryfacestring-plus", bfsSpatialUnitPlusHandler.GetBfsSpatialUnits)
+	router.POST("/boundaryfacestring-plus", bfsSpatialUnitPlusHandler.CreateBfsSpatialUnit)
+	router.GET("/boundaryfacestring-plus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitPlusHandler.GetBfsSpatialUnit)
+	router.PUT("/boundaryfacestring-plus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitPlusHandler.UpdateBfsSpatialUnit)
+	router.DELETE("/boundaryfacestring-plus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitPlusHandler.DeleteBfsSpatialUnit)
 
 	http.ListenAndServe(":3000", router)
 

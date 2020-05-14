@@ -66,6 +66,7 @@ func (crud LASpatialUnitCRUD) Update(spatialUnitIn interface{}) (interface{}, er
 
 	reader = crud.DB.Where("suid = ?::\"Oid\" AND endlifespanversion = ?", spatialUnit.SuID, currentTime).
 		Preload("Baunit", "endlifespanversion IS NULL").
+		Preload("PlusBfs", "endlifespanversion IS NULL").
 		First(&oldSUnit)
 	if reader.RowsAffected == 0 {
 		return nil, errors.New("Entity not found")
@@ -77,6 +78,14 @@ func (crud LASpatialUnitCRUD) Update(spatialUnitIn interface{}) (interface{}, er
 		baUnit.EndLifespanVersion = nil
 		baUnit.SUBeginLifespanVersion = currentTime
 		crud.DB.Set("gorm:save_associations", false).Create(&baUnit)
+	}
+	for _, plusBfs := range oldSUnit.PlusBfs {
+		plusBfs.EndLifespanVersion = &currentTime
+		crud.DB.Set("gorm:save_associations", false).Save(&plusBfs)
+		plusBfs.BeginLifespanVersion = currentTime
+		plusBfs.EndLifespanVersion = nil
+		plusBfs.SuBeginLifespanVersion = currentTime
+		crud.DB.Set("gorm:save_associations", false).Create(&plusBfs)
 	}
 	return spatialUnit, nil
 }
@@ -94,6 +103,7 @@ func (crud LASpatialUnitCRUD) Delete(spatialUnitIn interface{}) error {
 
 	reader = crud.DB.Where("suid = ?::\"Oid\" AND endlifespanversion = ?", spatialUnit.SuID, currentTime).
 		Preload("Baunit", "endlifespanversion IS NULL").
+		Preload("PlusBfs", "endlifespanversion IS NULL").
 		First(&oldSpatialUnit)
 	if reader.RowsAffected == 0 {
 		return errors.New("Entity not found")
@@ -101,6 +111,10 @@ func (crud LASpatialUnitCRUD) Delete(spatialUnitIn interface{}) error {
 	for _, baUnit := range oldSpatialUnit.Baunit {
 		baUnit.EndLifespanVersion = &currentTime
 		crud.DB.Set("gorm:save_associations", false).Save(&baUnit)
+	}
+	for _, plusBfs := range oldSpatialUnit.PlusBfs {
+		plusBfs.EndLifespanVersion = &currentTime
+		crud.DB.Set("gorm:save_associations", false).Save(&plusBfs)
 	}
 	return nil
 }

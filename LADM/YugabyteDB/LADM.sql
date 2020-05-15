@@ -16,7 +16,11 @@ ALTER ROLE yugabyte IN DATABASE yugabyte SET search_path TO "LADM", public;
 DROP TABLE IF EXISTS "baunitAsParty";
 DROP TABLE IF EXISTS "LA_PartyMember";
 
+DROP TABLE IF EXISTS "pointBfs";
+DROP TABLE IF EXISTS "pointPb";
 DROP TABLE IF EXISTS "LA_Point";
+DROP TABLE IF EXISTS "minus";
+DROP TABLE IF EXISTS "plus";
 DROP TABLE IF EXISTS "LA_BoundaryFaceString";
 
 DROP TYPE IF EXISTS "LA_InterpolationType";
@@ -32,7 +36,9 @@ DROP TABLE IF EXISTS "LA_RequiredRelationshipSpatialUnit";
 
 DROP TABLE IF EXISTS "suBaunit";
 DROP TABLE IF EXISTS "suSuGroup";
+DROP TABLE IF EXISTS "suHierarchy";
 DROP TABLE IF EXISTS "LA_SpatialUnit";
+DROP TABLE IF EXISTS "suGroupHierarchy";
 DROP TABLE IF EXISTS "LA_SpatialUnitGroup";
 DROP TABLE IF EXISTS "LA_Level";
 
@@ -651,7 +657,7 @@ CREATE TABLE "LA_LegalSpaceBuildingUnit" (
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
 CREATE TABLE "suSuGroup" (
-                             part						VARCHAR NOT NULL,		--  suID.namespace || '-' || suID.localId
+                             part						VARCHAR NOT NULL,		-- suID.namespace || '-' || suID.localId
                              whole						VARCHAR NOT NULL,		-- sugID.namespace || '-' || sugID.localId
                              partBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                              wholeBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
@@ -661,7 +667,7 @@ CREATE TABLE "suSuGroup" (
 );
 
 CREATE TABLE "suBaunit" (
-                            su							VARCHAR NOT NULL,		-- -- sugID.namespace || '-' || sugID.localId
+                            su							VARCHAR NOT NULL,		-- sugID.namespace || '-' || sugID.localId
                             baunit						VARCHAR NOT NULL,		-- LA_BAUnit.id
                             suBeginLifeSpanVersion 		TIMESTAMP NOT NULL,
                             baunitBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
@@ -669,6 +675,27 @@ CREATE TABLE "suBaunit" (
                             FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
                             FOREIGN KEY (baunit, baunitBeginLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion)
 );
+
+CREATE TABLE "suHierarchy" (
+                               child						VARCHAR NOT NULL,		-- childID.namespace || '-' || childID.localId
+                               parent						VARCHAR NOT NULL,		-- parentID.namespace || '-' || parentID.localId
+                               childBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
+                               parentBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
+                               PRIMARY KEY (child, childBeginLifeSpanVersion),
+                               FOREIGN KEY (child, childBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
+                               FOREIGN KEY (parent, parentBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion)
+);
+
+CREATE TABLE "suGroupHierarchy" (
+                                    element						VARCHAR NOT NULL,		-- childID.namespace || '-' || childID.localId
+                                    set							VARCHAR NOT NULL,		-- parentID.namespace || '-' || parentID.localId
+                                    elementBeginLifeSpanVersion TIMESTAMP NOT NULL,
+                                    setBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
+                                    PRIMARY KEY (element, elementBeginLifeSpanVersion),
+                                    FOREIGN KEY (element, elementBeginLifeSpanVersion) REFERENCES "LA_SpatialUnitGroup"(id, beginLifeSpanVersion),
+                                    FOREIGN KEY (set, setBeginLifeSpanVersion) REFERENCES "LA_SpatialUnitGroup"(id, beginLifeSpanVersion)
+);
+
 
 
 --
@@ -702,6 +729,28 @@ CREATE TABLE "LA_BoundaryFaceString"(
                                         PRIMARY KEY (id, beginLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
+
+CREATE TABLE "minus" (
+                         bfs						VARCHAR NOT NULL,		-- bfsid.namespace || '-' || bfsid.localId
+                         su						VARCHAR NOT NULL,		-- suID.namespace || '-' || suID.localId
+                         bfsBeginLifeSpanVersion TIMESTAMP NOT NULL,
+                         suBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
+                         PRIMARY KEY (bfs, bfsBeginLifeSpanVersion, su, suBeginLifeSpanVersion),
+                         FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion),
+                         FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion)
+);
+
+CREATE TABLE "plus" (
+                        bfs						VARCHAR NOT NULL,		-- bfsid.namespace || '-' || bfsid.localId
+                        su						VARCHAR NOT NULL,		-- suID.namespace || '-' || suID.localId
+                        bfsBeginLifeSpanVersion TIMESTAMP NOT NULL,
+                        suBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
+                        PRIMARY KEY (bfs, bfsBeginLifeSpanVersion, su, suBeginLifeSpanVersion),
+                        FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion),
+                        FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion)
+);
+
+
 
 --
 -- Surveying and Representation::LA_Point
@@ -752,16 +801,20 @@ CREATE TABLE "LA_Point" (
 --	source 						"CI_ResponsibleParty"				-- Omitted for simplicity
                             beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
-                            bfs							VARCHAR NOT NULL,					--  bfsid.namespace || '-' || bfsid.localId
-                            bfsBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
-                            pb							VARCHAR NOT NULL,					--  pbID.namespace || '-' || pbID.localId
-                            pbBeginLifeSpanVersion 		TIMESTAMP NOT NULL,
-                            PRIMARY KEY (id, beginLifeSpanVersion),
-                            UNIQUE(bfs, bfsBeginLifeSpanVersion),
-                            UNIQUE(pb, pbBeginLifeSpanVersion),
-                            FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion)
+                            PRIMARY KEY (id, beginLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
+
+CREATE TABLE "pointBfs" (
+                            point						VARCHAR NOT NULL,		-- pID.namespace || '-' || pID.localId
+                            bfs							VARCHAR NOT NULL,		-- bfsid.namespace || '-' || bfsid.localId
+                            pointBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
+                            bfsBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
+                            PRIMARY KEY (point, pointBeginLifeSpanVersion, bfs, bfsBeginLifeSpanVersion),
+                            FOREIGN KEY (point, pointBeginLifeSpanVersion) REFERENCES "LA_Point"(id, beginLifeSpanVersion),
+                            FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion)
+);
+
 
 --***************************************************************************
 -- LADM 2D Polygon based profile											*
@@ -851,11 +904,16 @@ CREATE TABLE "PolygonBoundary" (
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
 
-ALTER TABLE "LA_Point"
-    ADD CONSTRAINT point_polygonBoundary_fk
-        FOREIGN KEY (pb, pbbeginLifeSpanVersion) REFERENCES "PolygonBoundary" (id, beginLifeSpanVersion);
+CREATE TABLE "pointPb" (
+                           point						VARCHAR NOT NULL,		-- pID.namespace || '-' || pID.localId
+                           pb							VARCHAR NOT NULL,		-- bfsid.namespace || '-' || bfsid.localId
+                           pointBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
+                           pbBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
+                           PRIMARY KEY (point, pointBeginLifeSpanVersion, pb, pbBeginLifeSpanVersion),
+                           FOREIGN KEY (point, pointBeginLifeSpanVersion) REFERENCES "LA_Point"(id, beginLifeSpanVersion),
+                           FOREIGN KEY (pb, pbBeginLifeSpanVersion) REFERENCES "PolygonBoundary"(id, beginLifeSpanVersion)
+);
+
 
 --COMMIT;
-
-
 

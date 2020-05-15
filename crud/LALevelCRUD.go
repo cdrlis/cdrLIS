@@ -60,7 +60,7 @@ func (crud LALevelCRUD) Update(levelIn interface{}) (interface{}, error) {
 	crud.DB.Set("gorm:save_associations", false).Create(&level)
 
 	reader = crud.DB.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
-		Preload("SU", "endlifespanversion IS NULL").
+		Preload("Su", "endlifespanversion IS NULL").
 		First(&oldLevel)
 	if reader.RowsAffected == 0 {
 		return nil, errors.New("Entity not found")
@@ -88,7 +88,7 @@ func (crud LALevelCRUD) Delete(levelIn interface{}) error {
 	crud.DB.Set("gorm:save_associations", false).Save(&oldLevel)
 
 	reader = crud.DB.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
-		Preload("SU", "endlifespanversion IS NULL").
+		Preload("Su", "endlifespanversion IS NULL").
 		First(&oldLevel)
 	if reader.RowsAffected == 0 {
 		return errors.New("Entity not found")

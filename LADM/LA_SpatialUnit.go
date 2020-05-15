@@ -4,6 +4,7 @@ import (
 	"github.com/cdrlis/cdrLIS/LADM/common"
 	"github.com/cdrlis/cdrLIS/LADM/common/geometry"
 	"github.com/cdrlis/cdrLIS/LADM/external"
+	"github.com/paulsmith/gogeos/geos"
 	"time"
 )
 
@@ -43,11 +44,11 @@ type LASpatialUnit struct {
 
 	Baunit []SuBAUnit `gorm:"foreignkey:SUID,SUBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"baunit"`
 
-	SuHierarchy []LASpatialUnit                     `gorm:"-" json:"-"` // suHierarchy
-	RelationSu  []LARequiredRelationshipSpatialUnit `gorm:"-" json:"-"` // relationSu
-	Whole       []LASpatialUnitGroup                `gorm:"-" json:"-"` // suSuGroup
-	MinusBfs    []LABoundaryFaceString              `gorm:"-" json:"-"` // minus
-	PlusBfs     []LABoundaryFaceString              `gorm:"-" json:"-"` // plus
+	SuHierarchy []LASpatialUnit                     `gorm:"-" json:"-"`                                                                                        // suHierarchy
+	RelationSu  []LARequiredRelationshipSpatialUnit `gorm:"-" json:"-"`                                                                                        // relationSu
+	Whole       []LASpatialUnitGroup                `gorm:"-" json:"-"`                                                                                        // suSuGroup
+	MinusBfs    []LABoundaryFaceString              `gorm:"-" json:"-"`                                                                                        // minus
+	PlusBfs     []BfsSpatialUnitPlus                `gorm:"foreignkey:SuID,SuBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"bfs"` // plus
 }
 
 func (LASpatialUnit) TableName() string {
@@ -68,9 +69,22 @@ func (su LASpatialUnit) ComputeArea() LAAreaValue {
 	return av
 }
 
-func (su LASpatialUnit) CreateArea() geometry.GMMultiSurface {
-	var ms geometry.GMMultiSurface
-	return ms
+func (su LASpatialUnit) CreateArea() *geometry.GMMultiSurface {
+	resultPolygon := geos.Must(geos.EmptyPolygon())
+	for _, bfs := range su.PlusBfs{
+		var geom *geos.Geometry
+		if bfs.Bfs.Geometry != nil{
+			geom = &(bfs.Bfs.Geometry.GMObject.Geometry)
+		} else if bfs.Bfs.LocationByText != nil {
+			geom = geos.Must(geos.FromWKT(*(bfs.Bfs.LocationByText)))
+		} else {
+			continue
+		}
+		cords, _ := geom.Coords()
+		polygon := geos.Must(geos.NewPolygon(cords))
+		resultPolygon = geos.Must(resultPolygon.Union(polygon))
+	}
+	return &geometry.GMMultiSurface{GMObject: geometry.GMObject{Geometry: *resultPolygon}}
 }
 
 // LAAreaValue Area value

@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/cdrlis/cdrLIS/crud"
+	"github.com/rs/cors"
 	"net/http"
 
 	"github.com/cdrlis/cdrLIS/handler"
@@ -27,6 +28,8 @@ func main() {
 	levelCRUD := crud.LALevelCRUD{DB: db}
 	sunitCRUD := crud.LASpatialUnitCRUD{DB: db}
 	baunitCRUD := crud.LABAUnitCRUD{DB: db}
+	boundaryFaceStringCRUD := crud.LABoundaryFaceStringCRUD{DB: db}
+	bfsSpatialUnitPlusCRUD := crud.BfsSpatialUnitPlusCRUD{DB: db}
 
 	partyHandler := handler.PartyHandler{PartyCRUD: partyCRUD}
 	groupPartyHandler := handler.GroupPartyHandler{GroupPartyCRUD: groupPartyCRUD}
@@ -34,6 +37,8 @@ func main() {
 	baunitHandler := handler.BAUnitHandler{BAUnitCRUD: baunitCRUD}
 	sunitHandler := handler.SpatialUnitHandler{SpatialUnitCRUD: sunitCRUD, LevelCRUD: levelCRUD}
 	levelHandler := handler.LevelHandler{LevelCRUD: levelCRUD}
+	boundaryFaceStringHandler := handler.BoundaryFaceStringHandler{BoundaryFaceStringCRUD: boundaryFaceStringCRUD}
+	bfsSpatialUnitPlusHandler := handler.BoundaryFaceStringSpatialUnitHandler{SpatialUnitCRUD: sunitCRUD, BoundaryFaceStringCRUD: boundaryFaceStringCRUD, BfsSpatialUnitCRUD: bfsSpatialUnitPlusCRUD}
 
 	router := httprouter.New()
 
@@ -67,12 +72,28 @@ func main() {
 	router.PUT("/spatialunit/:namespace/:localId", sunitHandler.UpdateSpatialUnit)
 	router.DELETE("/spatialunit/:namespace/:localId", sunitHandler.DeleteSpatialUnit)
 
+	router.GET("/spatialunit/:namespace/:localId/geometry", sunitHandler.GetSpatialUnitGeometry)
+	router.GET("/spatialunit/:namespace/:localId/area", sunitHandler.GetSpatialUnitArea)
+
 	router.GET("/level", levelHandler.GetLevels)
 	router.POST("/level", levelHandler.CreateLevel)
 	router.GET("/level/:namespace/:localId", levelHandler.GetLevel)
 	router.PUT("/level/:namespace/:localId", levelHandler.UpdateLevel)
 	router.DELETE("/level/:namespace/:localId", levelHandler.DeleteLevel)
 
-	http.ListenAndServe(":3000", router)
+	router.GET("/boundaryfacestring", boundaryFaceStringHandler.GetBoundaryFaceStrings)
+	router.POST("/boundaryfacestring", boundaryFaceStringHandler.CreateBoundaryFaceString)
+	router.GET("/boundaryfacestring/:namespace/:localId", boundaryFaceStringHandler.GetBoundaryFaceString)
+	router.PUT("/boundaryfacestring/:namespace/:localId", boundaryFaceStringHandler.UpdateBoundaryFaceString)
+	router.DELETE("/boundaryfacestring/:namespace/:localId", boundaryFaceStringHandler.DeleteBoundaryFaceString)
+
+	router.GET("/boundaryfacestring-plus", bfsSpatialUnitPlusHandler.GetBfsSpatialUnits)
+	router.POST("/boundaryfacestring-plus", bfsSpatialUnitPlusHandler.CreateBfsSpatialUnit)
+	router.GET("/boundaryfacestring-plus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitPlusHandler.GetBfsSpatialUnit)
+	router.PUT("/boundaryfacestring-plus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitPlusHandler.UpdateBfsSpatialUnit)
+	router.DELETE("/boundaryfacestring-plus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitPlusHandler.DeleteBfsSpatialUnit)
+
+	handler := cors.Default().Handler(router)
+	http.ListenAndServe(":3000", handler)
 
 }

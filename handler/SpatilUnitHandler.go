@@ -47,12 +47,12 @@ func (handler *SpatialUnitHandler) CreateSpatialUnit(w http.ResponseWriter, r *h
 	}
 	spatialUnit.LevelID = level.(ladm.LALevel).ID
 	spatialUnit.LevelBeginLifespanVersion = level.(ladm.LALevel).BeginLifespanVersion
-	createdBaUnit, err := handler.SpatialUnitCRUD.Create(spatialUnit)
+	createdSpatialUnit, err := handler.SpatialUnitCRUD.Create(spatialUnit)
 	if err != nil {
 		respondError(w, 400, err.Error())
 		return
 	}
-	respondJSON(w, 201, createdBaUnit)
+	respondJSON(w, 201, createdSpatialUnit)
 }
 
 func (handler *SpatialUnitHandler) UpdateSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -82,4 +82,24 @@ func (handler *SpatialUnitHandler) DeleteSpatialUnit(w http.ResponseWriter, r *h
 	}
 	handler.SpatialUnitCRUD.Delete(spatialUnit)
 	respondEmpty(w, 204)
+}
+
+func (handler *SpatialUnitHandler) GetSpatialUnitGeometry(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	uid := common.Oid{Namespace: p.ByName("namespace"), LocalID: p.ByName("localId")}
+	suUnit, err := handler.SpatialUnitCRUD.Read(uid)
+	if err != nil {
+		respondError(w, 404, err.Error())
+		return
+	}
+	respondJSON(w, 200, suUnit.(ladm.LASpatialUnit).CreateArea())
+}
+
+func (handler *SpatialUnitHandler) GetSpatialUnitArea(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	uid := common.Oid{Namespace: p.ByName("namespace"), LocalID: p.ByName("localId")}
+	suUnit, err := handler.SpatialUnitCRUD.Read(uid)
+	if err != nil {
+		respondError(w, 404, err.Error())
+		return
+	}
+	respondJSON(w, 200, suUnit.(ladm.LASpatialUnit).ComputeArea())
 }

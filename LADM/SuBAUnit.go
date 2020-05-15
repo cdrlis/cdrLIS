@@ -14,8 +14,6 @@ import (
 type SuBAUnit struct {
 	common.VersionedObject
 
-	ID                     string         `gorm:"column:id;primary_key" json:"-"`
-
 	SUID                   string         `gorm:"column:su" json:"-"`
 	SUBeginLifespanVersion time.Time      `gorm:"column:subeginlifespanversion" json:"-"`
 	SU                     *LASpatialUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:SUID,SUBeginLifespanVersion" json:"su"`

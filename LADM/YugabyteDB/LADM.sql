@@ -207,16 +207,17 @@ CREATE TYPE "LA_GroupPartyType" AS ENUM (
     'association', 'baunitGroup', 'family', 'tribe'
     );
 CREATE TABLE "LA_GroupParty" (
-                                 id						VARCHAR NOT NULL,							--  groupID.namespace || '-' || groupID.localId
-                                 extPID					"Oid",
-                                 name					VARCHAR,
-                                 groupID					"Oid" NOT NULL,
-                                 role					"LA_PartyRoleType"[],
-                                 type					"LA_GroupPartyType" NOT NULL,
-                                 beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                 endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
---	quality					"DQ_Element",								-- Omitted for simplicity
---	source 					"CI_ResponsibleParty",						-- Omitted for simplicity
+                                 id                   	VARCHAR NOT NULL,                    --  pID.namespace || '-' || pID.localId
+                                 extPID                	"Oid",
+                                 name              		VARCHAR,
+                                 pID               		"Oid" NOT NULL,
+                                 role              		"LA_PartyRoleType"[],
+                                 type              		"LA_PartyType" NOT NULL,
+                                 groupType          		"LA_GroupPartyType" NOT NULL,
+                                 beginLifeSpanVersion  	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                 endLifeSpanVersion      TIMESTAMP,
+-- quality                "DQ_Element",                       -- Omitted for simplicity
+-- source                 "CI_ResponsibleParty",                -- Omitted for simplicity
                                  PRIMARY KEY(id, beginLifeSpanVersion)
 );
 -- INHERITS ("VersionedObject"); -- INHERITS not supported yet
@@ -227,17 +228,17 @@ CREATE TABLE "LA_GroupParty" (
 -- An instance of class LA_PartyMember is a party member. Class LA_PartyMember is an optional association
 -- class between LA_Party and LA_GroupParty, see Figure 9.
 CREATE TABLE "LA_PartyMember" (
-                                  id							VARCHAR NOT NULL,					-- rID.namespace || '-' || rID.localId
-                                  fraction					"Fraction",
---	quality						"DQ_Element",						-- Omitted for simplicity
---	source 						"CI_ResponsibleParty",				-- Omitted for simplicity
-                                  parties						VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
-                                  groups						VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
-                                  beginLifeSpanVersion 		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                  endLifeSpanVersion			TIMESTAMP DEFAULT '-infinity'::timestamp,
-                                  partiesBeginLifeSpanVersion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                  groupsBeginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                  PRIMARY KEY(id, beginLifeSpanVersion),
+                                  parties                 	VARCHAR NOT NULL,           -- rID.namespace || '-' || rID.localId
+                                  groups                  	VARCHAR NOT NULL,           -- rID.namespace || '-' || rID.localId
+                                  partiesBeginLifeSpanVersion	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                  groupsBeginLifeSpanVersion	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                  fraction             		"Fraction",
+-- quality                   "DQ_Element",                 -- Omitted for simplicity
+-- source                    "CI_ResponsibleParty",          -- Omitted for simplicity
+
+                                  beginLifeSpanVersion		TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                  endLifeSpanVersion			TIMESTAMP,
+                                  PRIMARY KEY(parties, groups, beginLifeSpanVersion),
                                   UNIQUE(parties, partiesBeginLifeSpanVersion, groups, groupsBeginLifeSpanVersion),
                                   FOREIGN KEY (parties, partiesBeginLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion),
                                   FOREIGN KEY (groups, groupsBeginLifeSpanVersion) REFERENCES "LA_GroupParty"(id, beginLifeSpanVersion)

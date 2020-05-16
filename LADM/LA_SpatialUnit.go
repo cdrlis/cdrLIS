@@ -70,7 +70,7 @@ func (su LASpatialUnit) ComputeArea() LAAreaValue {
 }
 
 func (su LASpatialUnit) CreateArea() *geometry.GMMultiSurface {
-	resultPolygon := geos.Must(geos.EmptyPolygon())
+	resultBorder := geos.Must(geos.NewLineString())
 	for _, bfs := range su.PlusBfs{
 		var geom *geos.Geometry
 		if bfs.Bfs.Geometry != nil{
@@ -80,9 +80,40 @@ func (su LASpatialUnit) CreateArea() *geometry.GMMultiSurface {
 		} else {
 			continue
 		}
-		cords, _ := geom.Coords()
+		border := geos.Must(geos.NewLineString())
+		nGeometry, err := geom.NGeometry()
+		if err != nil{
+			continue
+		}
+		for i := 0; i < nGeometry; i++ {
+			lineString := geos.Must(geom.Geometry(i))
+			cords, _ := lineString.Coords()
+			border = geos.Must(border.Union(geos.Must(geos.NewLineString(cords...))))
+		}
+		resultBorder = geos.Must(resultBorder.Union(border))
+	}
+	resultBorder = geos.Must(resultBorder.LineMerge())
+	tempResultPolygon := geos.Must(geos.EmptyPolygon())
+	nGeometry, err := resultBorder.NGeometry()
+	if err != nil{
+		return nil
+	}
+	for i := 0; i < nGeometry; i++ {
+		lineString := geos.Must(resultBorder.Geometry(i))
+		cords, _ := lineString.Coords()
 		polygon := geos.Must(geos.NewPolygon(cords))
-		resultPolygon = geos.Must(resultPolygon.Union(polygon))
+		tempResultPolygon = geos.Must(tempResultPolygon.Union(polygon))
+	}
+	wkb, _ := tempResultPolygon.WKB()
+	resultPolygon := geos.Must(geos.FromWKB(wkb))
+	for i := 0; i < nGeometry; i++ {
+		lineString := geos.Must(resultBorder.Geometry(i))
+		cords, _ := lineString.Coords()
+		polygon := geos.Must(geos.NewPolygon(cords))
+		related, _ := polygon.RelatePat(resultPolygon, "2FF1FF212")
+		if related{
+			resultPolygon = geos.Must(resultPolygon.Difference(polygon))
+		}
 	}
 	return &geometry.GMMultiSurface{GMObject: geometry.GMObject{Geometry: *resultPolygon}}
 }

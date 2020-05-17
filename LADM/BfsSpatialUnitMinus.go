@@ -19,5 +19,5 @@ type BfsSpatialUnitMinus struct {
 }
 
 func (BfsSpatialUnitMinus) TableName() string {
-	return "bfsSpatialUnitMinus"
+	return "minus"
 }

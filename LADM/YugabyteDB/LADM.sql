@@ -672,7 +672,9 @@ CREATE TABLE "suBaunit" (
                             baunit						VARCHAR NOT NULL,		-- LA_BAUnit.id
                             suBeginLifeSpanVersion 		TIMESTAMP NOT NULL,
                             baunitBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
-                            PRIMARY KEY (su, suBeginLifeSpanVersion, baunit, baunitBeginLifeSpanVersion),
+                            beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                            PRIMARY KEY (su, suBeginLifeSpanVersion, baunit, baunitBeginLifeSpanVersion, beginLifeSpanVersion),
                             FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
                             FOREIGN KEY (baunit, baunitBeginLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion)
 );
@@ -736,7 +738,9 @@ CREATE TABLE "minus" (
                          su						VARCHAR NOT NULL,		-- suID.namespace || '-' || suID.localId
                          bfsBeginLifeSpanVersion TIMESTAMP NOT NULL,
                          suBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
-                         PRIMARY KEY (bfs, bfsBeginLifeSpanVersion, su, suBeginLifeSpanVersion),
+                         beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                         endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                         PRIMARY KEY (bfs, bfsBeginLifeSpanVersion, su, suBeginLifeSpanVersion, beginLifeSpanVersion),
                          FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion),
                          FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion)
 );
@@ -746,7 +750,9 @@ CREATE TABLE "plus" (
                         su						VARCHAR NOT NULL,		-- suID.namespace || '-' || suID.localId
                         bfsBeginLifeSpanVersion TIMESTAMP NOT NULL,
                         suBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
-                        PRIMARY KEY (bfs, bfsBeginLifeSpanVersion, su, suBeginLifeSpanVersion),
+                        beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                        PRIMARY KEY (bfs, bfsBeginLifeSpanVersion, su, suBeginLifeSpanVersion, beginLifeSpanVersion),
                         FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion),
                         FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion)
 );

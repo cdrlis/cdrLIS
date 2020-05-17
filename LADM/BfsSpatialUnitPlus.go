@@ -19,5 +19,5 @@ type BfsSpatialUnitPlus struct {
 }
 
 func (BfsSpatialUnitPlus) TableName() string {
-	return "bfsSpatialUnitPlus"
+	return "plus"
 }

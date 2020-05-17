@@ -30,6 +30,7 @@ func main() {
 	baunitCRUD := crud.LABAUnitCRUD{DB: db}
 	boundaryFaceStringCRUD := crud.LABoundaryFaceStringCRUD{DB: db}
 	bfsSpatialUnitPlusCRUD := crud.BfsSpatialUnitPlusCRUD{DB: db}
+	bfsSpatialUnitMinusCRUD := crud.BfsSpatialUnitMinusCRUD{DB: db}
 
 	partyHandler := handler.PartyHandler{PartyCRUD: partyCRUD}
 	groupPartyHandler := handler.GroupPartyHandler{GroupPartyCRUD: groupPartyCRUD}
@@ -38,7 +39,8 @@ func main() {
 	sunitHandler := handler.SpatialUnitHandler{SpatialUnitCRUD: sunitCRUD, LevelCRUD: levelCRUD}
 	levelHandler := handler.LevelHandler{LevelCRUD: levelCRUD}
 	boundaryFaceStringHandler := handler.BoundaryFaceStringHandler{BoundaryFaceStringCRUD: boundaryFaceStringCRUD}
-	bfsSpatialUnitPlusHandler := handler.BoundaryFaceStringSpatialUnitHandler{SpatialUnitCRUD: sunitCRUD, BoundaryFaceStringCRUD: boundaryFaceStringCRUD, BfsSpatialUnitCRUD: bfsSpatialUnitPlusCRUD}
+	bfsSpatialUnitPlusHandler := handler.BoundaryFaceStringSpatialUnitPlusHandler{SpatialUnitCRUD: sunitCRUD, BoundaryFaceStringCRUD: boundaryFaceStringCRUD, BfsSpatialUnitCRUD: bfsSpatialUnitPlusCRUD}
+	bfsSpatialUnitMinusHandler := handler.BoundaryFaceStringSpatialUnitMinusHandler{SpatialUnitCRUD: sunitCRUD, BoundaryFaceStringCRUD: boundaryFaceStringCRUD, BfsSpatialUnitCRUD: bfsSpatialUnitMinusCRUD}
 
 	router := httprouter.New()
 
@@ -92,6 +94,12 @@ func main() {
 	router.GET("/boundaryfacestring-plus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitPlusHandler.GetBfsSpatialUnit)
 	router.PUT("/boundaryfacestring-plus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitPlusHandler.UpdateBfsSpatialUnit)
 	router.DELETE("/boundaryfacestring-plus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitPlusHandler.DeleteBfsSpatialUnit)
+
+	router.GET("/boundaryfacestring-minus", bfsSpatialUnitMinusHandler.GetBfsSpatialUnits)
+	router.POST("/boundaryfacestring-minus", bfsSpatialUnitMinusHandler.CreateBfsSpatialUnit)
+	router.GET("/boundaryfacestring-minus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitMinusHandler.GetBfsSpatialUnit)
+	router.PUT("/boundaryfacestring-minus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitMinusHandler.UpdateBfsSpatialUnit)
+	router.DELETE("/boundaryfacestring-minus/:suNamespace/:suLocalId/:bfsNamespace/:bfsLocalId", bfsSpatialUnitMinusHandler.DeleteBfsSpatialUnit)
 
 	handler := cors.Default().Handler(router)
 	http.ListenAndServe(":3000", handler)

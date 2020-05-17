@@ -8,13 +8,13 @@ import (
 	"net/http"
 )
 
-type BoundaryFaceStringSpatialUnitHandler struct {
+type BoundaryFaceStringSpatialUnitPlusHandler struct {
 	BfsSpatialUnitCRUD     CRUDer
 	SpatialUnitCRUD        CRUDer
 	BoundaryFaceStringCRUD CRUDer
 }
 
-func (handler *BoundaryFaceStringSpatialUnitHandler) GetBfsSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (handler *BoundaryFaceStringSpatialUnitPlusHandler) GetBfsSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	suId := common.Oid{ Namespace: p.ByName("suNamespace"), LocalID:p.ByName("suLocalId")}
 	bfsId := common.Oid{ Namespace: p.ByName("bfsNamespace"), LocalID:p.ByName("bfsLocalId")}
 	bfsSpatialUnit, err := handler.BfsSpatialUnitCRUD.Read(suId, bfsId)
@@ -25,7 +25,7 @@ func (handler *BoundaryFaceStringSpatialUnitHandler) GetBfsSpatialUnit(w http.Re
 	respondJSON(w, 200, bfsSpatialUnit)
 }
 
-func (handler *BoundaryFaceStringSpatialUnitHandler) GetBfsSpatialUnits(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (handler *BoundaryFaceStringSpatialUnitPlusHandler) GetBfsSpatialUnits(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	bfsSpatialUnits, err := handler.BfsSpatialUnitCRUD.ReadAll()
 	if err != nil {
 		respondError(w, 500, err.Error())
@@ -34,7 +34,7 @@ func (handler *BoundaryFaceStringSpatialUnitHandler) GetBfsSpatialUnits(w http.R
 	respondJSON(w, 200, bfsSpatialUnits)
 }
 
-func (handler *BoundaryFaceStringSpatialUnitHandler) CreateBfsSpatialUnit(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func (handler *BoundaryFaceStringSpatialUnitPlusHandler) CreateBfsSpatialUnit(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	decoder := json.NewDecoder(r.Body)
 	var bfsSpatialUnit ladm.BfsSpatialUnitPlus
 	err := decoder.Decode(&bfsSpatialUnit)
@@ -62,7 +62,7 @@ func (handler *BoundaryFaceStringSpatialUnitHandler) CreateBfsSpatialUnit(w http
 	respondJSON(w, 201, createdBfsSpatialUnit)
 }
 
-func (handler *BoundaryFaceStringSpatialUnitHandler) UpdateBfsSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (handler *BoundaryFaceStringSpatialUnitPlusHandler) UpdateBfsSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	suId := common.Oid{ Namespace: p.ByName("suNamespace"), LocalID:p.ByName("suLocalId")}
 	bfsId := common.Oid{ Namespace: p.ByName("bfsNamespace"), LocalID:p.ByName("bfsLocalId")}
 	decoder := json.NewDecoder(r.Body)
@@ -83,7 +83,7 @@ func (handler *BoundaryFaceStringSpatialUnitHandler) UpdateBfsSpatialUnit(w http
 	respondJSON(w, 200, newBfsSpatialUnit)
 }
 
-func (handler *BoundaryFaceStringSpatialUnitHandler) DeleteBfsSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func (handler *BoundaryFaceStringSpatialUnitPlusHandler) DeleteBfsSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	suId := common.Oid{ Namespace: p.ByName("suNamespace"), LocalID:p.ByName("suLocalId")}
 	bfsId := common.Oid{ Namespace: p.ByName("bfsNamespace"), LocalID:p.ByName("bfsLocalId")}
 	bfsSpatialUnit, err := handler.BfsSpatialUnitCRUD.Read(suId, bfsId)

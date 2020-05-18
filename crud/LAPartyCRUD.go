@@ -38,7 +38,10 @@ func (crud LAPartyCRUD) Create(partyIn interface{}) (interface{}, error) {
 	party.ID = party.PID.String()
 	party.BeginLifespanVersion = currentTime
 	party.EndLifespanVersion = nil
-	crud.DB.Set("gorm:save_associations", false).Create(&party)
+	writer := crud.DB.Set("gorm:save_associations", false).Create(&party)
+	if writer.Error != nil{
+		return nil, writer.Error
+	}
 	return &party, nil
 }
 
@@ -65,8 +68,10 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 	party.ID = party.PID.String()
 	party.BeginLifespanVersion = currentTime
 	party.EndLifespanVersion = nil
-	crud.DB.Set("gorm:save_associations", false).Create(&party)
-
+	writer := crud.DB.Set("gorm:save_associations", false).Create(&party)
+	if writer.Error != nil{
+		return nil, writer.Error
+	}
 	reader = crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion = ?", party.PID, currentTime).
 		Preload("Groups", "endlifespanversion IS NULL").
 		Preload("Rights", "endlifespanversion IS NULL").

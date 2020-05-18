@@ -37,7 +37,10 @@ func (crud LASpatialUnitCRUD) Create(spatialUnitIn interface{}) (interface{}, er
 	spatialUnit.ID = spatialUnit.SuID.String()
 	spatialUnit.BeginLifespanVersion = currentTime
 	spatialUnit.EndLifespanVersion = nil
-	crud.DB.Set("gorm:save_associations", false).Create(&spatialUnit)
+	writer := crud.DB.Set("gorm:save_associations", false).Create(&spatialUnit)
+	if writer.Error != nil{
+		return nil, writer.Error
+	}
 	return &spatialUnit, nil
 }
 

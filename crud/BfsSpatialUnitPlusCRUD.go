@@ -38,7 +38,10 @@ func (crud BfsSpatialUnitPlusCRUD) Create(bfsSpatialUnitIn interface{}) (interfa
 	bfsSpatialUnit.SuBeginLifespanVersion = bfsSpatialUnit.Su.BeginLifespanVersion
 	bfsSpatialUnit.BfsID = bfsSpatialUnit.Bfs.BfsID.String()
 	bfsSpatialUnit.BfsBeginLifespanVersion = bfsSpatialUnit.Bfs.BeginLifespanVersion
-	crud.DB.Set("gorm:save_associations", false).Create(&bfsSpatialUnit)
+	writer := crud.DB.Set("gorm:save_associations", false).Create(&bfsSpatialUnit)
+	if writer.Error != nil{
+		return nil, writer.Error
+	}
 	return &bfsSpatialUnit, nil
 }
 

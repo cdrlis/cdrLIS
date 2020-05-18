@@ -38,7 +38,10 @@ func (crud LAGroupPartyCRUD) Create(groupPartyIn interface{}) (interface{}, erro
 	groupParty.ID = groupParty.GroupID.String()
 	groupParty.BeginLifespanVersion = currentTime
 	groupParty.EndLifespanVersion = nil
-	crud.DB.Set("gorm:save_associations", false).Create(&groupParty)
+	writer := crud.DB.Set("gorm:save_associations", false).Create(&groupParty)
+	if writer.Error != nil{
+		return nil, writer.Error
+	}
 	return &groupParty, nil
 }
 

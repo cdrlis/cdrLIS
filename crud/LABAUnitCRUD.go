@@ -38,7 +38,10 @@ func (crud LABAUnitCRUD) Create(baUnitIn interface{}) (interface{}, error) {
 	baUnit.ID = baUnit.UID.String()
 	baUnit.BeginLifespanVersion = currentTime
 	baUnit.EndLifespanVersion = nil
-	crud.DB.Set("gorm:save_associations", false).Create(&baUnit)
+	writer := crud.DB.Set("gorm:save_associations", false).Create(&baUnit)
+	if writer.Error != nil{
+		return nil, writer.Error
+	}
 	return &baUnit, nil
 }
 

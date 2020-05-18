@@ -30,7 +30,10 @@ func (crud LALevelCRUD) Create(levelIn interface{}) (interface{}, error) {
 	level.ID = level.LID.String()
 	level.BeginLifespanVersion = currentTime
 	level.EndLifespanVersion = nil
-	crud.DB.Set("gorm:save_associations", false).Create(&level)
+	writer := crud.DB.Set("gorm:save_associations", false).Create(&level)
+	if writer.Error != nil{
+		return nil, writer.Error
+	}
 	return &level, nil
 }
 

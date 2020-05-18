@@ -40,7 +40,10 @@ func (crud LAPartyMemberCRUD) Create(partyMemberIn interface{}) (interface{}, er
 	partyMember.PartyBeginLifespanVersion = partyMember.Party.BeginLifespanVersion
 	partyMember.GroupID = partyMember.Group.GroupID.String()
 	partyMember.GroupBeginLifespanVersion = partyMember.Group.BeginLifespanVersion
-	crud.DB.Set("gorm:save_associations", false).Create(&partyMember)
+	writer := crud.DB.Set("gorm:save_associations", false).Create(&partyMember)
+	if writer.Error != nil{
+		return nil, writer.Error
+	}
 	return &partyMember, nil
 }
 

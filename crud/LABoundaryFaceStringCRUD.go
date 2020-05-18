@@ -30,7 +30,10 @@ func (crud LABoundaryFaceStringCRUD) Create(boundaryFaceStringIn interface{}) (i
 	boundaryFaceString.ID = boundaryFaceString.BfsID.String()
 	boundaryFaceString.BeginLifespanVersion = currentTime
 	boundaryFaceString.EndLifespanVersion = nil
-	crud.DB.Set("gorm:save_associations", false).Create(&boundaryFaceString)
+	writer := crud.DB.Set("gorm:save_associations", false).Create(&boundaryFaceString)
+	if writer.Error != nil{
+		return nil, writer.Error
+	}
 	return &boundaryFaceString, nil
 }
 

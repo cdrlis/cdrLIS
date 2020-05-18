@@ -398,7 +398,9 @@ CREATE TABLE "mortgageRight" (
                                  right_							VARCHAR NOT NULL,			-- LA_Right.id
                                  mortgageBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                                  right_BeginLifeSpanVersion 		TIMESTAMP NOT NULL,
-                                 PRIMARY KEY(mortgage, mortgageBeginLifeSpanVersion, right_, right_BeginLifeSpanVersion),
+                                 beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                 endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                 PRIMARY KEY(mortgage, right_, beginLifeSpanVersion),
                                  FOREIGN KEY (mortgage, mortgageBeginLifeSpanVersion) REFERENCES "LA_Mortgage"(id, beginLifeSpanVersion),
                                  FOREIGN KEY (right_, right_BeginLifeSpanVersion) REFERENCES "LA_Right"(id, beginLifeSpanVersion)
 );
@@ -473,7 +475,9 @@ CREATE TABLE "baunitAsParty" (
                                  party						VARCHAR NOT NULL,		-- LA_Party.id
                                  unitBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                                  partyBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
-                                 PRIMARY KEY (unit, unitBeginLifeSpanVersion, party, partyBeginLifeSpanVersion),
+                                 beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                 endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                 PRIMARY KEY (unit, party, beginLifeSpanVersion),
                                  FOREIGN KEY (unit, unitBeginLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion),
                                  FOREIGN KEY (party, partyBeginLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion)
 );
@@ -662,9 +666,11 @@ CREATE TABLE "suSuGroup" (
                              whole						VARCHAR NOT NULL,		-- sugID.namespace || '-' || sugID.localId
                              partBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                              wholeBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
-                             PRIMARY KEY (part, partBeginLifeSpanVersion, whole, wholeBeginLifeSpanVersion),
+                             beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                             endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                             PRIMARY KEY (part, whole, beginLifeSpanVersion),
                              FOREIGN KEY (part, partBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
-                             FOREIGN KEY (whole, wholeBeginLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion)
+                             FOREIGN KEY (whole, wholeBeginLifeSpanVersion) REFERENCES "LA_SpatialUnitGroup"(id, beginLifeSpanVersion)
 );
 
 CREATE TABLE "suBaunit" (
@@ -674,7 +680,7 @@ CREATE TABLE "suBaunit" (
                             baunitBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                             beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
-                            PRIMARY KEY (su, suBeginLifeSpanVersion, baunit, baunitBeginLifeSpanVersion, beginLifeSpanVersion),
+                            PRIMARY KEY (su, baunit, beginLifeSpanVersion),
                             FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
                             FOREIGN KEY (baunit, baunitBeginLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion)
 );
@@ -684,7 +690,9 @@ CREATE TABLE "suHierarchy" (
                                parent						VARCHAR NOT NULL,		-- parentID.namespace || '-' || parentID.localId
                                childBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                                parentBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
-                               PRIMARY KEY (child, childBeginLifeSpanVersion),
+                               beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                               endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                               PRIMARY KEY (child, beginLifeSpanVersion),
                                FOREIGN KEY (child, childBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
                                FOREIGN KEY (parent, parentBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion)
 );
@@ -694,7 +702,9 @@ CREATE TABLE "suGroupHierarchy" (
                                     set							VARCHAR NOT NULL,		-- parentID.namespace || '-' || parentID.localId
                                     elementBeginLifeSpanVersion TIMESTAMP NOT NULL,
                                     setBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
-                                    PRIMARY KEY (element, elementBeginLifeSpanVersion),
+                                    beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                    endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                                    PRIMARY KEY (element, beginLifeSpanVersion),
                                     FOREIGN KEY (element, elementBeginLifeSpanVersion) REFERENCES "LA_SpatialUnitGroup"(id, beginLifeSpanVersion),
                                     FOREIGN KEY (set, setBeginLifeSpanVersion) REFERENCES "LA_SpatialUnitGroup"(id, beginLifeSpanVersion)
 );
@@ -740,7 +750,7 @@ CREATE TABLE "minus" (
                          suBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                          beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                          endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
-                         PRIMARY KEY (bfs, bfsBeginLifeSpanVersion, su, suBeginLifeSpanVersion, beginLifeSpanVersion),
+                         PRIMARY KEY (bfs, su, beginLifeSpanVersion),
                          FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion),
                          FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion)
 );
@@ -752,7 +762,7 @@ CREATE TABLE "plus" (
                         suBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                         beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
-                        PRIMARY KEY (bfs, bfsBeginLifeSpanVersion, su, suBeginLifeSpanVersion, beginLifeSpanVersion),
+                        PRIMARY KEY (bfs, su, beginLifeSpanVersion),
                         FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion),
                         FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion)
 );
@@ -817,7 +827,9 @@ CREATE TABLE "pointBfs" (
                             bfs							VARCHAR NOT NULL,		-- bfsid.namespace || '-' || bfsid.localId
                             pointBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                             bfsBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
-                            PRIMARY KEY (point, pointBeginLifeSpanVersion, bfs, bfsBeginLifeSpanVersion),
+                            beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                            endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                            PRIMARY KEY (point, bfs, beginLifeSpanVersion),
                             FOREIGN KEY (point, pointBeginLifeSpanVersion) REFERENCES "LA_Point"(id, beginLifeSpanVersion),
                             FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion)
 );
@@ -916,7 +928,9 @@ CREATE TABLE "pointPb" (
                            pb							VARCHAR NOT NULL,		-- bfsid.namespace || '-' || bfsid.localId
                            pointBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                            pbBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
-                           PRIMARY KEY (point, pointBeginLifeSpanVersion, pb, pbBeginLifeSpanVersion),
+                           beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                           endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                           PRIMARY KEY (point, pb, beginLifeSpanVersion),
                            FOREIGN KEY (point, pointBeginLifeSpanVersion) REFERENCES "LA_Point"(id, beginLifeSpanVersion),
                            FOREIGN KEY (pb, pbBeginLifeSpanVersion) REFERENCES "PolygonBoundary"(id, beginLifeSpanVersion)
 );

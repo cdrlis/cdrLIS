@@ -1,6 +1,6 @@
 package geometry
 
-// GMCurve Point geometry type
+// GMCurve geometry type
 type GMCurve struct {
 	GMObject
 }

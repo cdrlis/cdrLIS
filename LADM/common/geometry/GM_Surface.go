@@ -1,6 +1,6 @@
 package geometry
 
-// GMSurface Point geometry type
+// GMSurface geometry type
 type GMSurface struct {
 	GMObject
 }

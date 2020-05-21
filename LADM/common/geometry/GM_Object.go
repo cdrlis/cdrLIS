@@ -10,8 +10,8 @@ import (
 //
 const SRID = "3765" // Croatian SRID
 
-// GMObject Point geometry type
-type GMObject struct{
+// GMObject geometry type
+type GMObject struct {
 	geos.Geometry
 }
 
@@ -48,7 +48,7 @@ func (g *GMObject) Scan(value interface{}) error {
 		return errors.New("cannot get geometry from hex")
 	}
 
-	geometry := GMObject{Geometry:*geom}
+	geometry := GMObject{Geometry: *geom}
 	*g = geometry
 
 	return nil
@@ -72,7 +72,7 @@ func (g *GMObject) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	geometry := GMObject{Geometry:*geom}
+	geometry := GMObject{Geometry: *geom}
 	*g = geometry
 	return nil
 }

@@ -1,6 +1,6 @@
 package geometry
 
-// GMMultiCurve Point geometry type
+// GMMultiCurve geometry type
 type GMMultiCurve struct {
 	GMObject
 }

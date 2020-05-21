@@ -1,6 +1,6 @@
 package geometry
 
-// GMPoint Point geometry type
+// GMPoint geometry type
 type GMPoint struct {
 	GMObject
 }

@@ -1,6 +1,6 @@
 package geometry
 
-// GMMultiSurface Point geometry type
+// GMMultiSurface geometry type
 type GMMultiSurface struct {
 	GMObject
 }

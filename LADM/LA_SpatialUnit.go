@@ -44,11 +44,11 @@ type LASpatialUnit struct {
 
 	Baunit []SuBAUnit `gorm:"foreignkey:SUID,SUBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"baunit"`
 
-	SuHierarchy []LASpatialUnit                     `gorm:"-" json:"-"`                                                                                        // suHierarchy
-	RelationSu  []LARequiredRelationshipSpatialUnit `gorm:"-" json:"-"`                                                                                        // relationSu
-	Whole       []LASpatialUnitGroup                `gorm:"-" json:"-"`                                                                                        // suSuGroup
+	SuHierarchy []LASpatialUnit                     `gorm:"-" json:"-"`                                                                                             // suHierarchy
+	RelationSu  []LARequiredRelationshipSpatialUnit `gorm:"-" json:"-"`                                                                                             // relationSu
+	Whole       []LASpatialUnitGroup                `gorm:"-" json:"-"`                                                                                             // suSuGroup
 	MinusBfs    []BfsSpatialUnitMinus               `gorm:"foreignkey:SuID,SuBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"bfsMinus"` // minus
-	PlusBfs     []BfsSpatialUnitPlus                `gorm:"foreignkey:SuID,SuBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"bfsPlus"` // plus
+	PlusBfs     []BfsSpatialUnitPlus                `gorm:"foreignkey:SuID,SuBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"bfsPlus"`  // plus
 }
 
 func (LASpatialUnit) TableName() string {
@@ -56,19 +56,8 @@ func (LASpatialUnit) TableName() string {
 }
 
 func (su LASpatialUnit) AreaClosed() bool {
-	resultBorder := geos.Must(su.createBorder())
-	nGeometry, err := resultBorder.NGeometry()
-	if err != nil {
-		return false
-	}
-	for i := 0; i < nGeometry; i++ {
-		lineString := geos.Must(resultBorder.Geometry(i))
-		closed, _ := lineString.IsClosed()
-		if !closed {
-			return false
-		}
-	}
-	return true
+	closed, _ := geos.Must(su.Boundary()).IsClosed()
+	return closed
 }
 
 func (su LASpatialUnit) ComputeArea() LAAreaValue {
@@ -80,76 +69,72 @@ func (su LASpatialUnit) ComputeArea() LAAreaValue {
 }
 
 func (su LASpatialUnit) CreateArea() *geometry.GMMultiSurface {
-	resultBorder := geos.Must(su.createBorder())
+	msBoundary := geos.Must(su.Boundary())
 
-	tempResultPolygon := geos.Must(geos.EmptyPolygon())
-	var polygons []*geos.Geometry
+	tempMultiSurface := geos.Must(geos.EmptyPolygon())
+	var ms []*geos.Geometry
 
-	nGeometry, _ := resultBorder.NGeometry()
+	nGeometry, _ := msBoundary.NGeometry()
 	for i := 0; i < nGeometry; i++ {
-		lineString := geos.Must(resultBorder.Geometry(i))
-		closed, _ := lineString.IsClosed()
+		curve := geos.Must(msBoundary.Geometry(i))
+		closed, _ := curve.IsClosed()
 		if !closed {
 			continue
 		}
-		polygon := geos.Must(geos.NewPolygon(geos.MustCoords(lineString.Coords())))
-		polygons = append(polygons, polygon)
-		tempResultPolygon = geos.Must(tempResultPolygon.Union(polygon))
+		surface := geos.Must(geos.NewPolygon(geos.MustCoords(curve.Coords())))
+		ms = append(ms, surface)
+		tempMultiSurface = geos.Must(tempMultiSurface.Union(surface))
 	}
-	resultPolygon := geos.Must(tempResultPolygon.Clone())
+	multiSurface := geos.Must(tempMultiSurface.Clone())
 
-	for _, polygon := range polygons {
-		if related, _ := polygon.RelatePat(resultPolygon, "2FF1FF212"); related {
-			resultPolygon = geos.Must(resultPolygon.Difference(polygon))
+	for _, surface := range ms {
+		if related, _ := surface.RelatePat(multiSurface, "2FF1FF212"); related {
+			multiSurface = geos.Must(multiSurface.Difference(surface))
 		}
 	}
-	return &geometry.GMMultiSurface{GMObject: geometry.GMObject{Geometry: *resultPolygon}}
+	return &geometry.GMMultiSurface{GMObject: geometry.GMObject{Geometry: *multiSurface}}
 }
 
-func (su LASpatialUnit) createBorder() (*geos.Geometry, error) {
-	resultBorder := geos.Must(geos.NewLineString())
+func (su LASpatialUnit) Boundary() (*geos.Geometry, error) {
+	msBoundary := geos.Must(geos.NewLineString())
 	for _, bfs := range su.PlusBfs {
 		var geom *geos.Geometry
 		if bfs.Bfs.Geometry != nil {
 			geom = &(bfs.Bfs.Geometry.GMObject.Geometry)
-		} else if bfs.Bfs.LocationByText != nil {
-			geom = geos.Must(geos.FromWKT(*(bfs.Bfs.LocationByText)))
 		} else {
 			continue
 		}
-		border := geos.Must(geos.NewLineString())
+		curve := geos.Must(geos.NewLineString())
 		nGeometry, err := geom.NGeometry()
 		if err != nil {
 			continue
 		}
 		for i := 0; i < nGeometry; i++ {
-			lineString := geos.Must(geom.Geometry(i))
-			border = geos.Must(border.Union(geos.Must(geos.NewLineString(geos.MustCoords(lineString.Coords())...))))
+			curve := geos.Must(geom.Geometry(i))
+			curve = geos.Must(curve.Union(geos.Must(geos.NewLineString(geos.MustCoords(curve.Coords())...))))
 		}
-		resultBorder = geos.Must(resultBorder.Union(border))
+		msBoundary = geos.Must(msBoundary.Union(curve))
 	}
 	for _, bfs := range su.MinusBfs {
 		var geom *geos.Geometry
 		if bfs.Bfs.Geometry != nil {
 			geom = &(bfs.Bfs.Geometry.GMObject.Geometry)
-		} else if bfs.Bfs.LocationByText != nil {
-			geom = geos.Must(geos.FromWKT(*(bfs.Bfs.LocationByText)))
 		} else {
 			continue
 		}
-		border := geos.Must(geos.NewLineString())
+		curve := geos.Must(geos.NewLineString())
 		nGeometry, err := geom.NGeometry()
 		if err != nil {
 			continue
 		}
 		for i := 0; i < nGeometry; i++ {
 			lineString := geos.Must(geom.Geometry(i))
-			border = geos.Must(border.Union(geos.Must(geos.NewLineString(geos.MustCoords(lineString.Coords())...))))
+			curve = geos.Must(curve.Union(geos.Must(geos.NewLineString(geos.MustCoords(lineString.Coords())...))))
 		}
-		resultBorder = geos.Must(resultBorder.Union(border))
+		msBoundary = geos.Must(msBoundary.Union(curve))
 	}
-	resultBorder = geos.Must(resultBorder.LineMerge())
-	return resultBorder, nil
+	msBoundary = geos.Must(msBoundary.LineMerge())
+	return msBoundary, nil
 }
 
 // LAAreaValue Area value

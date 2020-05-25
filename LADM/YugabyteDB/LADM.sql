@@ -54,13 +54,14 @@ DROP TABLE IF EXISTS "LA_Restriction";
 DROP TYPE IF EXISTS "LA_RestrictionType";
 DROP TABLE IF EXISTS "LA_Responsibility";
 DROP TYPE IF EXISTS "LA_ResponsibilityType";
+DROP TABLE IF EXISTS "LA_RRR";
+DROP TABLE IF EXISTS "LA_GroupParty";
+DROP TYPE IF EXISTS "LA_GroupPartyType";
 DROP TABLE IF EXISTS "LA_Party";
 DROP TYPE IF EXISTS "LA_PartyType";
-DROP TABLE IF EXISTS "LA_GroupParty";
 DROP TYPE IF EXISTS "LA_PartyRoleType";
-DROP TYPE IF EXISTS "LA_GroupPartyType";
 
---DROP TABLE IF EXISTS "LA_RRR";
+
 DROP TYPE IF EXISTS "Fraction";
 
 DROP TABLE IF EXISTS "PolygonBoundary";
@@ -259,24 +260,24 @@ CREATE TABLE "LA_PartyMember" (
 --    loan, with the condition that the property is returned, when the loan is paid off.
 -- 3) LA_Responsibility, with responsibilities as instances.
 CREATE TABLE "LA_RRR" (
-	id			VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
-	description	VARCHAR,
-	rID			"Oid" NOT NULL, 				-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YigabyteDB
-	share		"Fraction",
-	shareCheck	BOOLEAN DEFAULT TRUE,
-	timeSpec	INTERVAL[],
-	beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
+                          id			VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
+                          description	VARCHAR,
+                          rID			"Oid" NOT NULL, 				-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YigabyteDB
+                          share		"Fraction",
+                          shareCheck	BOOLEAN DEFAULT TRUE,
+                          timeSpec	INTERVAL[],
+                          beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                          endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
 ----	quality					"DQ_Element", 					-- Omitted for simplicity
 ----	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
 
-    party						VARCHAR NOT NULL,				--  pID.namespace || '-' || pID.localId
-    partyBeginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    unit						VARCHAR NOT NULL,				--  uID.namespace || '-' || uID.localId
-    unitBeginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	PRIMARY KEY(id, beginLifeSpanVersion),
-	CONSTRAINT share_chk CHECK ((share).numerator > 0 AND (share).denominator > 0 AND (share).numerator <= (share).denominator),
-	FOREIGN KEY (party, partyBeginLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion)
+                          party						VARCHAR NOT NULL,				--  pID.namespace || '-' || pID.localId
+                          partyBeginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                          unit						VARCHAR NOT NULL,				--  uID.namespace || '-' || uID.localId
+                          unitBeginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                          PRIMARY KEY(id, beginLifeSpanVersion),
+                          CONSTRAINT share_chk CHECK ((share).numerator > 0 AND (share).denominator > 0 AND (share).numerator <= (share).denominator),
+                          FOREIGN KEY (party, partyBeginLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion)
 );
 
 CREATE TYPE "LA_RightType" AS ENUM (

@@ -1,6 +1,8 @@
 package ladm
 
-import "time"
+import (
+	"github.com/cdrlis/cdrLIS/LADM/common"
+)
 
 //
 // Administrative::LA_Right
@@ -9,19 +11,13 @@ import "time"
 // to zero or more [0..*] mortgages (i.e. a mortgage is associated to the affected basic administrative unit but it
 // may also be specifically associated to the right which is the object of the mortgage); see Figure 10.
 type LARight struct {
-	LARRR
+	common.VersionedObject
+	ID  string `gorm:"column:id;primary_key" json:"-"`
+	RRR *LARRR `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rrr,omitempty"`
 
-	Type     LARightType  `gorm:"column:type" json:"type"`
+	Type LARightType `gorm:"column:type" json:"type"`
 
 	Mortgage []LAMortgage `json:"-"` // mortgageRight
-
-	PartyID                   string           `gorm:"column:party" json:"-"`
-	PartyBeginLifespanVersion time.Time        `gorm:"column:partybeginlifespanversion" json:"-"`
-	Party                     *LAParty         `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:PartyID,PartyBeginLifespanVersion" json:"party"`
-
-	UnitID                   string           `gorm:"column:baunit" json:"-"`
-	UnitBeginLifespanVersion time.Time        `gorm:"column:baunitbeginlifespanversion" json:"-"`
-	Unit                     *LABAUnit         `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:UnitID,UnitBeginLifespanVersion" json:"unit"`
 }
 
 func (LARight) TableName() string {

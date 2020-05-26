@@ -27,5 +27,17 @@ type LARRR struct {
 	RID         common.Oid       `gorm:"column:rid" json:"rID"`
 	Share       *common.Fraction `gorm:"column:share" json:"share"`
 	ShareCheck  *bool            `gorm:"column:sharecheck" json:"shareCheck"`
-	TimeSpec    *time.Time       `gorm:"column:timespec" json:"timeSpec"`
+	TimeSpec    *time.Time
+
+	Right                     *LARight          `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"right,omitempty"`
+	Restriction               *LARestriction    `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"restriction,omitempty"`
+	Responsibility            *LAResponsibility `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"responsibility,omitempty"`
+
+	PartyID                   string            `gorm:"column:party" json:"-"`
+	PartyBeginLifespanVersion time.Time         `gorm:"column:partybeginlifespanversion" json:"-"`
+	Party                     *LAParty          `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:PartyID,PartyBeginLifespanVersion" json:"party"`
+
+	UnitID                    string            `gorm:"column:baunit" json:"-"`
+	UnitBeginLifespanVersion  time.Time         `gorm:"column:baunitbeginlifespanversion" json:"-"`
+	Unit                      *LABAUnit         `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:UnitID,UnitBeginLifespanVersion" json:"unit"`
 }

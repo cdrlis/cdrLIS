@@ -1,6 +1,8 @@
 package ladm
 
-import "time"
+import (
+	"github.com/cdrlis/cdrLIS/LADM/common"
+)
 
 //
 // Administrative::LA_Responsibility
@@ -9,17 +11,11 @@ import "time"
 // See Figure 10.
 
 type LAResponsibility struct {
-	LARRR
+	common.VersionedObject
+	ID  string `gorm:"column:id;primary_key" json:"-"`
+	RRR *LARRR `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rrr,omitempty"`
 
 	Type LAResponsibilityType `gorm:"column:type" json:"type"`
-
-	PartyID                   string           `gorm:"column:party" json:"-"`
-	PartyBeginLifespanVersion time.Time        `gorm:"column:partybeginlifespanversion" json:"-"`
-	Party                     *LAParty         `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:PartyID,PartyBeginLifespanVersion" json:"party"`
-
-	UnitID                   string           `gorm:"column:baunit" json:"-"`
-	UnitBeginLifespanVersion time.Time        `gorm:"column:baunitbeginlifespanversion" json:"-"`
-	Unit                     *LABAUnit         `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:UnitID,UnitBeginLifespanVersion" json:"unit"`
 }
 
 func (LAResponsibility) TableName() string {

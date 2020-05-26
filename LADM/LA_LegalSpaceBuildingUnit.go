@@ -1,12 +1,15 @@
 package ladm
 
 import (
+	"github.com/cdrlis/cdrLIS/LADM/common"
 	"github.com/cdrlis/cdrLIS/LADM/external"
 )
 
 // LALegalSpaceBuildingUnit Legal space building unit
 type LALegalSpaceBuildingUnit struct {
-	LASpatialUnit
+	common.VersionedObject
+	ID          string         `gorm:"column:id;primary_key" json:"-"`
+	SpatialUnit *LASpatialUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"spatialUnit,omitempty"`
 
 	ExtPhysicalBuildingUnitID *external.ExtPhysicalBuildingUnit `gorm:"column:extaddressid" json:"extAddressID"`
 	Type                      *LABuildingUnitType               `gorm:"column:type" json:"type"`

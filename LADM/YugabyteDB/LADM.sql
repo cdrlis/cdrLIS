@@ -345,7 +345,7 @@ CREATE TABLE "LA_Mortgage" (
                                id						VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
                                rID						"Oid" NOT NULL, 				-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YigabyteDB
                                amount					REAL,
-                               interestRate			REAL,
+                               interestRate			    REAL,
                                ranking					SMALLINT,
                                type					"LA_MortgageType",
 --	quality					"DQ_Element", 					-- Omitted for simplicity
@@ -361,7 +361,8 @@ CREATE TABLE "mortgageRight" (
                                  mortgage						VARCHAR NOT NULL,			-- LA_Mortgage.id
                                  right_							VARCHAR NOT NULL,			-- LA_Right.id
                                  mortgageBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
-                                 right_BeginLifeSpanVersion 		TIMESTAMP NOT NULL,
+                                 right_BeginLifeSpanVersion 	TIMESTAMP NOT NULL,
+                                 index                          INTEGER NOT NULL,
                                  beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                  endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
                                  PRIMARY KEY(mortgage, right_, beginLifeSpanVersion),
@@ -393,8 +394,9 @@ CREATE TYPE "LA_BAUnitType" AS ENUM (
     );
 CREATE TABLE "LA_BAUnit" (
                              id			VARCHAR NOT NULL,				-- uID.namespace || '-' || uID.localID
+                             name		VARCHAR,
                              type		"LA_BAUnitType" NOT NULL,
-                             uID			"Oid" NOT NULL, 				-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YigabyteDB
+                             uID		"Oid" NOT NULL, 				-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YigabyteDB
 --	quality					"DQ_Element", 					-- Omitted for simplicity
 --	source 					"CI_ResponsibleParty",			-- Omitted for simplicity
                              beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -775,6 +777,7 @@ CREATE TABLE "pointBfs" (
                             bfs							VARCHAR NOT NULL,		-- bfsid.namespace || '-' || bfsid.localId
                             pointBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                             bfsBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
+                            index                       INTEGER NOT NULL,
                             beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             endLifeSpanVersion		TIMESTAMP DEFAULT '-infinity'::timestamp,
                             PRIMARY KEY (point, bfs, beginLifeSpanVersion),

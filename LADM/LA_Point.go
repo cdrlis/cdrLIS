@@ -26,7 +26,7 @@ type LAPoint struct {
 	ProductionMethod  *LILineage           `gorm:"column:productionmethod" json:"productionMethod"`
 	TransAndResult    *LATransformation    `gorm:"column:transandresult" json:"transAndResult"`
 
-	Bfs []LABoundaryFaceString // pointBfs
+	Bfs               []PointBfs           `gorm:"foreignkey:PointID,PointBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"bfs,omitempty"`
 }
 
 func (LAPoint) TableName() string {

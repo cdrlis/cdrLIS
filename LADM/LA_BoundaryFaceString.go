@@ -27,9 +27,9 @@ type LABoundaryFaceString struct {
 	Geometry       *geometry.GMMultiCurve `gorm:"column:geometry" json:"geometry"`
 	LocationByText *string                `gorm:"column:locationbytext" json:"locationByText"`
 
-	point   []LAPoint            // pointBfs
-	MinusSu []LASpatialUnit      // minus
-	PlusSu  []BfsSpatialUnitPlus `gorm:"foreignkey:BfsID,BfsBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"su"` // plus
+	point   []LAPoint             // pointBfs
+	MinusSu []BfsSpatialUnitMinus `gorm:"foreignkey:BfsID,BfsBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"suMinus"`
+	PlusSu  []BfsSpatialUnitPlus  `gorm:"foreignkey:BfsID,BfsBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"suPlus"`
 }
 
 func (LABoundaryFaceString) TableName() string {

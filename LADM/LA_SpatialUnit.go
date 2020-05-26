@@ -42,13 +42,16 @@ type LASpatialUnit struct {
 	LevelBeginLifespanVersion time.Time `gorm:"column:levelbeginlifespanversion" json:"-"`
 	Level                     *LALevel  `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:LevelID,LevelBeginLifespanVersion" json:"level"`
 
-	Baunit []SuBAUnit `gorm:"foreignkey:SUID,SUBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"baunit"`
+	BuildingUnit LARequiredRelationshipSpatialUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"building,omitempty"`
 
-	SuHierarchy []LASpatialUnit                     `gorm:"-" json:"-"`                                                                                             // suHierarchy
-	RelationSu  []LARequiredRelationshipSpatialUnit `gorm:"-" json:"-"`                                                                                             // relationSu
-	Whole       []LASpatialUnitGroup                `gorm:"-" json:"-"`                                                                                             // suSuGroup
-	MinusBfs    []BfsSpatialUnitMinus               `gorm:"foreignkey:SuID,SuBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"bfsMinus"` // minus
-	PlusBfs     []BfsSpatialUnitPlus                `gorm:"foreignkey:SuID,SuBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"bfsPlus"`  // plus
+	Baunit       []SuBAUnit                        `gorm:"foreignkey:SUID,SUBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"baunit"`
+
+	SuHierarchy       *SuHierarchy                        `gorm:"foreignkey:ChildID,ChildBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"hierarchy,omitempty"` // suHierarchy
+	RelationSu1       []LARequiredRelationshipSpatialUnit `gorm:"foreignkey:Su1ID,Su1BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"relation1,omitempty"`     // relationSu
+	RelationSu2       []LARequiredRelationshipSpatialUnit `gorm:"foreignkey:Su2ID,Su2BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"relation2,omitempty"`     // relationSu
+	SpatialUnitGroups []SuSuGroup                         `gorm:"foreignkey:PartID,PartBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"groups,omitempty"`      // suSuGroup
+	MinusBfs          []BfsSpatialUnitMinus               `gorm:"foreignkey:SuID,SuBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"bfsMinus"`                 // minus
+	PlusBfs           []BfsSpatialUnitPlus                `gorm:"foreignkey:SuID,SuBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"bfsPlus"`                  // plus
 }
 
 func (LASpatialUnit) TableName() string {

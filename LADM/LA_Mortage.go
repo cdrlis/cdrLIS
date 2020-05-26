@@ -1,5 +1,7 @@
 package ladm
 
+import "github.com/cdrlis/cdrLIS/LADM/common"
+
 //
 // Administrative::LA_Mortgage
 //
@@ -10,14 +12,16 @@ package ladm
 //administrative unit which is affected by the mortgage; see Figure 10.
 
 type LAMortgage struct {
-	LARestriction
+	common.VersionedObject
+	ID          string         `gorm:"column:id;primary_key" json:"-"`
+	Restriction *LARestriction `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"restriction,omitempty"`
 
 	Amount       *Currency       `gorm:"column:amount" json:"amount"`
 	InterestRate *float32        `gorm:"column:interestRate" json:"interestrate"`
 	Ranking      *int            `gorm:"column:ranking" json:"ranking"`
 	Type         *LAMortgageType `gorm:"column:type" json:"type"`
 
-	Rights []LARight // mortageRight
+	Rights []MortgageRight `gorm:"foreignkey:MortgageID,MortgageBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"rights"`
 }
 
 func (LAMortgage) TableName() string {

@@ -25,14 +25,13 @@ type LAParty struct {
 	Role   LAPartyRoleTypeArray `gorm:"column:role" json:"role"`
 	Type   LAPartyType          `gorm:"column:type" json:"type"`
 
-	Groups []LAPartyMember `gorm:"foreignkey:PartyID,PartyBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"groups"`
+	GroupParty *LAGroupParty   `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"groupParty,omitempty"`
 
-	Unit []LABAUnit // baunitAsParty
+	Groups     []LAPartyMember `gorm:"foreignkey:PartyID,PartyBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"groups,omitempty"`
 
-	// rrrParty
-	Rights           []LARight          `gorm:"foreignkey:PartyID,PartyBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rights"`
-	Responsibilities []LAResponsibility `gorm:"foreignkey:PartyID,PartyBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"responsibilities"`
-	Restrictions     []LARestriction    `gorm:"foreignkey:PartyID,PartyBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"restrictions"`
+	Unit       []BAUnitAsParty `gorm:"foreignkey:PartyID,PartyBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"baunitAsParty,omitempty"`
+
+	RRR        []LARRR         `gorm:"foreignkey:PartyID,PartyBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rrr,omitempty"`
 }
 
 func (LAParty) TableName() string {

@@ -1,6 +1,8 @@
 package ladm
 
-import "time"
+import (
+	"github.com/cdrlis/cdrLIS/LADM/common"
+)
 
 //
 // Administrative::LA_Restriction
@@ -9,18 +11,14 @@ import "time"
 // LA_Mortgage is a specialization of LA_Restriction (6.4.6); see Figure 10.
 
 type LARestriction struct {
-	LARRR
+	common.VersionedObject
+	ID  string `gorm:"column:id;primary_key" json:"-"`
+	RRR *LARRR `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rrr,omitempty"`
 
 	PartyRequired *bool             `gorm:"column:partyrequired" json:"partyRequired"`
 	Type          LARestrictionType `gorm:"column:type" json:"type"`
 
-	PartyID                   string           `gorm:"column:party" json:"-"`
-	PartyBeginLifespanVersion time.Time        `gorm:"column:partybeginlifespanversion" json:"-"`
-	Party                     *LAParty         `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:PartyID,PartyBeginLifespanVersion" json:"party"`
-
-	UnitID                   string           `gorm:"column:baunit" json:"-"`
-	UnitBeginLifespanVersion time.Time        `gorm:"column:baunitbeginlifespanversion" json:"-"`
-	Unit                     *LABAUnit         `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:UnitID,UnitBeginLifespanVersion" json:"unit"`
+	Mortgage *LAMortgage `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"mortgage,omitempty"`
 }
 
 func (LARestriction) TableName() string {

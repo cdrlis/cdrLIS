@@ -1,6 +1,9 @@
 package ladm
 
-import "github.com/cdrlis/cdrLIS/LADM/common"
+import (
+	"github.com/cdrlis/cdrLIS/LADM/common"
+	"time"
+)
 
 //
 // Spatial Unit::LA_RequiredRelationshipSpatialUnit
@@ -11,9 +14,16 @@ import "github.com/cdrlis/cdrLIS/LADM/common"
 
 type LARequiredRelationshipSpatialUnit struct {
 	common.VersionedObject
-	Su1          *LASpatialUnit `gorm:"column:su1" json:"su1"`
-	Su2          *LASpatialUnit `gorm:"column:su2" json:"su2"`
-	Relationship ISO19125Type   `gorm:"column:relationship" json:"relationship"`
+
+	Su1ID                   string         `gorm:"column:su1" json:"-"`
+	Su1BeginLifespanVersion *time.Time     `gorm:"column:su1beginlifespanversion" json:"-"`
+	Su1                     *LASpatialUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:Su1ID,Su1BeginLifespanVersion" json:"su1"`
+
+	Su2ID                   string         `gorm:"column:su2" json:"-"`
+	Su2BeginLifespanVersion *time.Time     `gorm:"column:su2beginlifespanversion" json:"-"`
+	Su2                     *LASpatialUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:Su2ID,Su2BeginLifespanVersion" json:"su2"`
+
+	Relationship ISO19125Type `gorm:"column:relationship" json:"relationship"`
 }
 
 func (LARequiredRelationshipSpatialUnit) TableName() string {

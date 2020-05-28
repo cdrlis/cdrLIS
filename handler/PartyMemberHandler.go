@@ -11,7 +11,6 @@ import (
 type PartyMemberHandler struct {
 	PartyMemberCRUD CRUDer
 	PartyCRUD       CRUDer
-	GroupPartyCRUD  CRUDer
 }
 
 func (handler *PartyMemberHandler) GetPartyMember(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -42,18 +41,20 @@ func (handler *PartyMemberHandler) CreatePartyMember(w http.ResponseWriter, r *h
 		respondError(w, 400, err.Error())
 		return
 	}
-	party, err := handler.PartyCRUD.Read(partyMember.Party.PID)
+	partyInteface, err := handler.PartyCRUD.Read(partyMember.Party.PID)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
 	}
-	group, err := handler.GroupPartyCRUD.Read(partyMember.Group.GroupID)
+	groupInterface, err := handler.PartyCRUD.Read(partyMember.Group.PID)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
 	}
-	partyMember.Party.BeginLifespanVersion = party.(ladm.LAParty).BeginLifespanVersion
-	partyMember.Group.BeginLifespanVersion = group.(ladm.LAGroupParty).BeginLifespanVersion
+	party := partyInteface.(ladm.LAParty)
+	group := groupInterface.(ladm.LAParty).GroupParty
+	partyMember.Party = &party
+	partyMember.Group = group
 	createdPartyMember, err := handler.PartyMemberCRUD.Create(partyMember)
 	if err != nil {
 		respondError(w, 400, err.Error())

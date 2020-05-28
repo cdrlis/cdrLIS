@@ -12,7 +12,7 @@ import (
 // class between LA_Party and LA_GroupParty, see Figure 9.
 type LAPartyMember struct {
 	common.VersionedObject
-	ID    string           `gorm:"column:id;primary_key" json:"-"`
+
 	Share *common.Fraction `gorm:"column:fraction" json:"fraction"`
 
 	PartyID                   string    `gorm:"column:parties;primary_key" json:"-"`

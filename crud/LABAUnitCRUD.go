@@ -72,9 +72,11 @@ func (crud LABAUnitCRUD) Update(baUnitIn interface{}) (interface{}, error) {
 
 	reader = crud.DB.Where("uid = ?::\"Oid\" AND endlifespanversion = ?", baUnit.UID, currentTime).
 		Preload("Su", "endlifespanversion IS NULL").
-		Preload("Rights", "endlifespanversion IS NULL").
-		Preload("Responsibilities", "endlifespanversion IS NULL").
-		Preload("Restrictions", "endlifespanversion IS NULL").
+		Preload("RRR", "endlifespanversion IS NULL").
+		Preload("RRR.Right", "endlifespanversion IS NULL").
+		Preload("RRR.Responsibility", "endlifespanversion IS NULL").
+		Preload("RRR.Restriction", "endlifespanversion IS NULL").
+		Preload("RRR.Restriction.Mortgage", "endlifespanversion IS NULL").
 		First(&oldBaUnit)
 	if reader.RowsAffected == 0 {
 		return nil, errors.New("Entity not found")
@@ -88,31 +90,41 @@ func (crud LABAUnitCRUD) Update(baUnitIn interface{}) (interface{}, error) {
 		crud.DB.Set("gorm:save_associations", false).Create(&su)
 	}
 
-	for _, right := range oldBaUnit.Rights {
-		right.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&right)
-		right.BeginLifespanVersion = currentTime
-		right.EndLifespanVersion = nil
-		right.UnitBeginLifespanVersion = currentTime
-		crud.DB.Set("gorm:save_associations", false).Create(&right)
-	}
-
-	for _, responsibility := range oldBaUnit.Responsibilities {
-		responsibility.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&responsibility)
-		responsibility.BeginLifespanVersion = currentTime
-		responsibility.EndLifespanVersion = nil
-		responsibility.UnitBeginLifespanVersion = currentTime
-		crud.DB.Set("gorm:save_associations", false).Create(&responsibility)
-	}
-
-	for _, restriction := range oldBaUnit.Restrictions {
-		restriction.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&restriction)
-		restriction.BeginLifespanVersion = currentTime
-		restriction.EndLifespanVersion = nil
-		restriction.UnitBeginLifespanVersion = currentTime
-		crud.DB.Set("gorm:save_associations", false).Create(&restriction)
+	for _, rrr := range oldBaUnit.RRR {
+		rrr.EndLifespanVersion = &currentTime
+		crud.DB.Set("gorm:save_associations", false).Save(&rrr)
+		rrr.BeginLifespanVersion = currentTime
+		rrr.EndLifespanVersion = nil
+		rrr.PartyBeginLifespanVersion = currentTime
+		crud.DB.Set("gorm:save_associations", false).Create(&rrr)
+		if right := rrr.Right; right != nil{
+			right.EndLifespanVersion = &currentTime
+			crud.DB.Set("gorm:save_associations", false).Save(right)
+			right.BeginLifespanVersion = currentTime
+			right.EndLifespanVersion = nil
+			crud.DB.Set("gorm:save_associations", false).Create(right)
+		}
+		if restriction := rrr.Restriction; restriction != nil{
+			restriction.EndLifespanVersion = &currentTime
+			crud.DB.Set("gorm:save_associations", false).Save(restriction)
+			restriction.BeginLifespanVersion = currentTime
+			restriction.EndLifespanVersion = nil
+			crud.DB.Set("gorm:save_associations", false).Create(restriction)
+			if mortgage := rrr.Restriction.Mortgage; mortgage != nil{
+				mortgage.EndLifespanVersion = &currentTime
+				crud.DB.Set("gorm:save_associations", false).Save(mortgage)
+				mortgage.BeginLifespanVersion = currentTime
+				mortgage.EndLifespanVersion = nil
+				crud.DB.Set("gorm:save_associations", false).Create(mortgage)
+			}
+		}
+		if responsibility := rrr.Responsibility; responsibility != nil{
+			responsibility.EndLifespanVersion = &currentTime
+			crud.DB.Set("gorm:save_associations", false).Save(responsibility)
+			responsibility.BeginLifespanVersion = currentTime
+			responsibility.EndLifespanVersion = nil
+			crud.DB.Set("gorm:save_associations", false).Create(responsibility)
+		}
 	}
 	return baUnit, nil
 }
@@ -130,9 +142,11 @@ func (crud LABAUnitCRUD) Delete(baUnitIn interface{}) error {
 
 	reader = crud.DB.Where("uid = ?::\"Oid\" AND endlifespanversion = ?", baUnit.UID, currentTime).
 		Preload("Su", "endlifespanversion IS NULL").
-		Preload("Rights", "endlifespanversion IS NULL").
-		Preload("Responsibilities", "endlifespanversion IS NULL").
-		Preload("Restrictions", "endlifespanversion IS NULL").
+		Preload("RRR", "endlifespanversion IS NULL").
+		Preload("RRR.Right", "endlifespanversion IS NULL").
+		Preload("RRR.Responsibility", "endlifespanversion IS NULL").
+		Preload("RRR.Restriction", "endlifespanversion IS NULL").
+		Preload("RRR.Restriction.Mortgage", "endlifespanversion IS NULL").
 		First(&oldBaUnit)
 	if reader.RowsAffected == 0 {
 		return errors.New("Entity not found")
@@ -142,19 +156,25 @@ func (crud LABAUnitCRUD) Delete(baUnitIn interface{}) error {
 		crud.DB.Set("gorm:save_associations", false).Save(&su)
 	}
 
-	for _, right := range oldBaUnit.Rights {
-		right.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&right)
-	}
-
-	for _, responsibility := range oldBaUnit.Responsibilities {
-		responsibility.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&responsibility)
-	}
-
-	for _, restriction := range oldBaUnit.Restrictions {
-		restriction.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&restriction)
+	for _, rrr := range oldBaUnit.RRR {
+		rrr.EndLifespanVersion = &currentTime
+		crud.DB.Set("gorm:save_associations", false).Save(&rrr)
+		if right := rrr.Right; right != nil{
+			right.EndLifespanVersion = &currentTime
+			crud.DB.Set("gorm:save_associations", false).Save(right)
+		}
+		if restriction := rrr.Restriction; restriction != nil{
+			restriction.EndLifespanVersion = &currentTime
+			crud.DB.Set("gorm:save_associations", false).Save(restriction)
+			if mortgage := rrr.Restriction.Mortgage; mortgage != nil{
+				mortgage.EndLifespanVersion = &currentTime
+				crud.DB.Set("gorm:save_associations", false).Save(mortgage)
+			}
+		}
+		if responsibility := rrr.Responsibility; responsibility != nil{
+			responsibility.EndLifespanVersion = &currentTime
+			crud.DB.Set("gorm:save_associations", false).Save(responsibility)
+		}
 	}
 	return nil
 }

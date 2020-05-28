@@ -16,10 +16,10 @@ type LAGroupParty struct {
 	ID    string   `gorm:"column:id;primary_key" json:"-"`
 	Party *LAParty `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"party,omitempty"`
 
-	GroupID common.Oid       `gorm:"column:pid" json:"pID"`
-	Type    LAGroupPartyType `gorm:"column:type" json:"type"`
+	PID  common.Oid       `gorm:"column:pid" json:"pID"`
+	Type LAGroupPartyType `gorm:"column:type" json:"type"`
 
-	Parties []LAPartyMember `gorm:"foreignkey:GroupID,GroupBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"parties"`
+	Parties []LAPartyMember `gorm:"foreignkey:PID,GroupBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"parties"`
 }
 
 func (LAGroupParty) TableName() string {

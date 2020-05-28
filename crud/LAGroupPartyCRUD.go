@@ -14,7 +14,7 @@ type LAGroupPartyCRUD struct {
 func (crud LAGroupPartyCRUD) Read(where ...interface{}) (interface{}, error) {
 	var party ladm.LAGroupParty
 	if where != nil {
-		reader := crud.DB.Where("groupid = ?::\"Oid\" AND endlifespanversion IS NULL", where).
+		reader := crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", where).
 //			Preload("Groups", "endlifespanversion IS NULL").
 //			Preload("Groups.Group", "endlifespanversion IS NULL").
 //			Preload("Rights", "endlifespanversion IS NULL").
@@ -35,7 +35,7 @@ func (crud LAGroupPartyCRUD) Read(where ...interface{}) (interface{}, error) {
 func (crud LAGroupPartyCRUD) Create(groupPartyIn interface{}) (interface{}, error) {
 	groupParty := groupPartyIn.(ladm.LAGroupParty)
 	currentTime := time.Now()
-	groupParty.ID = groupParty.GroupID.String()
+	groupParty.ID = groupParty.PID.String()
 	groupParty.BeginLifespanVersion = currentTime
 	groupParty.EndLifespanVersion = nil
 	writer := crud.DB.Set("gorm:save_associations", false).Create(&groupParty)

@@ -34,7 +34,7 @@ func main() {
 
 	partyHandler := handler.PartyHandler{PartyCRUD: partyCRUD}
 	groupPartyHandler := handler.GroupPartyHandler{GroupPartyCRUD: groupPartyCRUD}
-	partyMemberHandler := handler.PartyMemberHandler{PartyMemberCRUD: partyMemberCRUD, PartyCRUD: partyCRUD, GroupPartyCRUD: groupPartyCRUD}
+	partyMemberHandler := handler.PartyMemberHandler{PartyMemberCRUD: partyMemberCRUD, PartyCRUD: partyCRUD}
 	baunitHandler := handler.BAUnitHandler{BAUnitCRUD: baunitCRUD}
 	sunitHandler := handler.SpatialUnitHandler{SpatialUnitCRUD: sunitCRUD, LevelCRUD: levelCRUD}
 	levelHandler := handler.LevelHandler{LevelCRUD: levelCRUD}

@@ -2,7 +2,6 @@ package crud
 
 import (
 	"errors"
-	"fmt"
 	ladm "github.com/cdrlis/cdrLIS/LADM"
 	"github.com/cdrlis/cdrLIS/LADM/common"
 	"github.com/jinzhu/gorm"
@@ -32,17 +31,26 @@ func (crud LAPartyMemberCRUD) Read(where ...interface{}) (interface{}, error) {
 
 func (crud LAPartyMemberCRUD) Create(partyMemberIn interface{}) (interface{}, error) {
 	partyMember := partyMemberIn.(ladm.LAPartyMember)
+	tx := crud.DB.Begin()
+	if partyMember.Group == nil{
+		tx.Rollback()
+		return nil, errors.New("Group not found")
+	}
 	currentTime := time.Now()
-	partyMember.ID = fmt.Sprintf("%v-%v", partyMember.PartyID, partyMember.GroupID)
 	partyMember.BeginLifespanVersion = currentTime
 	partyMember.EndLifespanVersion = nil
 	partyMember.PartyID = partyMember.Party.PID.String()
 	partyMember.PartyBeginLifespanVersion = partyMember.Party.BeginLifespanVersion
-	partyMember.GroupID = partyMember.Group.GroupID.String()
+	partyMember.GroupID = partyMember.Group.PID.String()
 	partyMember.GroupBeginLifespanVersion = partyMember.Group.BeginLifespanVersion
 	writer := crud.DB.Set("gorm:save_associations", false).Create(&partyMember)
 	if writer.Error != nil{
+		tx.Rollback()
 		return nil, writer.Error
+	}
+	commit := tx.Commit()
+	if commit.Error != nil{
+		return nil, commit.Error
 	}
 	return &partyMember, nil
 }
@@ -63,7 +71,7 @@ func (crud LAPartyMemberCRUD) Update(partyMemberIn interface{}) (interface{}, er
 	var oldPartyMember ladm.LAPartyMember
 	reader := crud.DB.Where("parties = ? AND "+
 		"groups = ? AND "+
-		"endlifespanversion IS NULL", partyMember.Party.PID.String(), partyMember.Group.GroupID.String()).
+		"endlifespanversion IS NULL", partyMember.Party.PID.String(), partyMember.Group.PID.String()).
 		First(&oldPartyMember)
 	if reader.RowsAffected == 0 {
 		return nil, errors.New("Entity not found")
@@ -71,12 +79,11 @@ func (crud LAPartyMemberCRUD) Update(partyMemberIn interface{}) (interface{}, er
 	oldPartyMember.EndLifespanVersion = &currentTime
 	crud.DB.Set("gorm:save_associations", false).Save(&oldPartyMember)
 
-	partyMember.ID = fmt.Sprintf("%v-%v", partyMember.PartyID, partyMember.GroupID)
 	partyMember.BeginLifespanVersion = currentTime
 	partyMember.EndLifespanVersion = nil
 	partyMember.PartyID = partyMember.Party.PID.String()
 	partyMember.PartyBeginLifespanVersion = partyMember.Party.BeginLifespanVersion
-	partyMember.GroupID = partyMember.Group.GroupID.String()
+	partyMember.GroupID = partyMember.Group.PID.String()
 	partyMember.GroupBeginLifespanVersion = partyMember.Group.BeginLifespanVersion
 	crud.DB.Set("gorm:save_associations", false).Create(&partyMember)
 

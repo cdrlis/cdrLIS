@@ -2,7 +2,7 @@ package crud
 
 import (
 	"errors"
-	ladm "github.com/cdrlis/cdrLIS/LADM"
+	"github.com/cdrlis/cdrLIS/ladm"
 	"github.com/jinzhu/gorm"
 	"time"
 )
@@ -25,6 +25,7 @@ func (crud LALevelCRUD) Read(where ...interface{}) (interface{}, error) {
 }
 
 func (crud LALevelCRUD) Create(levelIn interface{}) (interface{}, error) {
+	tx := crud.DB.Begin()
 	level := levelIn.(ladm.LALevel)
 	currentTime := time.Now()
 	level.ID = level.LID.String()
@@ -32,7 +33,12 @@ func (crud LALevelCRUD) Create(levelIn interface{}) (interface{}, error) {
 	level.EndLifespanVersion = nil
 	writer := crud.DB.Set("gorm:save_associations", false).Create(&level)
 	if writer.Error != nil{
+		tx.Rollback()
 		return nil, writer.Error
+	}
+	commit := tx.Commit()
+	if commit.Error != nil{
+		return nil, commit.Error
 	}
 	return &level, nil
 }
@@ -46,59 +52,94 @@ func (crud LALevelCRUD) ReadAll(where ...interface{}) (interface{}, error) {
 }
 
 func (crud LALevelCRUD) Update(levelIn interface{}) (interface{}, error) {
+	tx := crud.DB.Begin()
 	level := levelIn.(*ladm.LALevel)
 	currentTime := time.Now()
 	var oldLevel ladm.LALevel
 	reader := crud.DB.Where("lid = ?::\"Oid\" AND endlifespanversion IS NULL", level.LID).
 		First(&oldLevel)
 	if reader.RowsAffected == 0 {
+		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	oldLevel.EndLifespanVersion = &currentTime
-	crud.DB.Set("gorm:save_associations", false).Save(&oldLevel)
-
+	writer := crud.DB.Set("gorm:save_associations", false).Save(&oldLevel)
+	if writer.RowsAffected == 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity not found")
+	}
 	level.ID = level.LID.String()
 	level.BeginLifespanVersion = currentTime
 	level.EndLifespanVersion = nil
-	crud.DB.Set("gorm:save_associations", false).Create(&level)
-
+	writer = crud.DB.Set("gorm:save_associations", false).Create(&level)
+	if writer.Error != nil{
+		tx.Rollback()
+		return nil, writer.Error
+	}
 	reader = crud.DB.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
 		Preload("Su", "endlifespanversion IS NULL").
 		First(&oldLevel)
 	if reader.RowsAffected == 0 {
+		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	for _, su := range oldLevel.SU {
 		su.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&su)
+		writer = crud.DB.Set("gorm:save_associations", false).Save(&su)
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return nil, errors.New("Entity not found")
+		}
 		su.BeginLifespanVersion = currentTime
 		su.EndLifespanVersion = nil
 		su.LevelBeginLifespanVersion = currentTime
-		crud.DB.Set("gorm:save_associations", false).Create(&su)
+		writer = crud.DB.Set("gorm:save_associations", false).Create(&su)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
+	}
+	commit := tx.Commit()
+	if commit.Error != nil{
+		return nil, commit.Error
 	}
 	return level, nil
 }
 
 func (crud LALevelCRUD) Delete(levelIn interface{}) error {
+	tx := crud.DB.Begin()
 	level := levelIn.(ladm.LALevel)
 	currentTime := time.Now()
 	var oldLevel ladm.LALevel
 	reader := crud.DB.Where("lid = ?::\"Oid\" AND endlifespanversion IS NULL", level.LID).First(&oldLevel)
 	if reader.RowsAffected == 0 {
+		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	oldLevel.EndLifespanVersion = &currentTime
-	crud.DB.Set("gorm:save_associations", false).Save(&oldLevel)
-
+	writer := crud.DB.Set("gorm:save_associations", false).Save(&oldLevel)
+	if writer.RowsAffected == 0 {
+		tx.Rollback()
+		return errors.New("Entity not found")
+	}
 	reader = crud.DB.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
 		Preload("Su", "endlifespanversion IS NULL").
 		First(&oldLevel)
 	if reader.RowsAffected == 0 {
+		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	for _, su := range oldLevel.SU {
 		su.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&su)
+		writer = crud.DB.Set("gorm:save_associations", false).Save(&su)
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return errors.New("Entity not found")
+		}
+	}
+	commit := tx.Commit()
+	if commit.Error != nil{
+		return commit.Error
 	}
 	return nil
 }

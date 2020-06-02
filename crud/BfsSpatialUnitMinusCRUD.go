@@ -2,8 +2,8 @@ package crud
 
 import (
 	"errors"
-	ladm "github.com/cdrlis/cdrLIS/LADM"
-	"github.com/cdrlis/cdrLIS/LADM/common"
+	"github.com/cdrlis/cdrLIS/ladm"
+	"github.com/cdrlis/cdrLIS/ladm/common"
 	"github.com/jinzhu/gorm"
 	"time"
 )
@@ -30,6 +30,7 @@ func (crud BfsSpatialUnitMinusCRUD) Read(where ...interface{}) (interface{}, err
 }
 
 func (crud BfsSpatialUnitMinusCRUD) Create(bfsSpatialUnitIn interface{}) (interface{}, error) {
+	tx := crud.DB.Begin()
 	bfsSpatialUnit := bfsSpatialUnitIn.(ladm.BfsSpatialUnitMinus)
 	currentTime := time.Now()
 	bfsSpatialUnit.BeginLifespanVersion = currentTime
@@ -40,7 +41,12 @@ func (crud BfsSpatialUnitMinusCRUD) Create(bfsSpatialUnitIn interface{}) (interf
 	bfsSpatialUnit.BfsBeginLifespanVersion = bfsSpatialUnit.Bfs.BeginLifespanVersion
 	writer := crud.DB.Set("gorm:save_associations", false).Create(&bfsSpatialUnit)
 	if writer.Error != nil{
+		tx.Rollback()
 		return nil, writer.Error
+	}
+	commit := tx.Commit()
+	if commit.Error != nil{
+		return nil, commit.Error
 	}
 	return &bfsSpatialUnit, nil
 }
@@ -61,6 +67,7 @@ func (crud BfsSpatialUnitMinusCRUD) Update(bfsSpatialUnitIn interface{}) (interf
 }
 
 func (crud BfsSpatialUnitMinusCRUD) Delete(bfsSpatialUnitIn interface{}) error {
+	tx := crud.DB.Begin()
 	bfsSpatialUnit := bfsSpatialUnitIn.(ladm.BfsSpatialUnitMinus)
 	currentTime := time.Now()
 	var oldBfsSpatialUnit ladm.BfsSpatialUnitMinus
@@ -68,9 +75,14 @@ func (crud BfsSpatialUnitMinusCRUD) Delete(bfsSpatialUnitIn interface{}) error {
 		"bfs = ? AND "+
 		"endlifespanversion IS NULL", bfsSpatialUnit.Su.SuID.String(), bfsSpatialUnit.Bfs.BfsID.String()).First(&oldBfsSpatialUnit)
 	if reader.RowsAffected == 0 {
+		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	oldBfsSpatialUnit.EndLifespanVersion = &currentTime
 	crud.DB.Set("gorm:save_associations", false).Save(&oldBfsSpatialUnit)
+	commit := tx.Commit()
+	if commit.Error != nil{
+		return commit.Error
+	}
 	return nil
 }

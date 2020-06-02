@@ -2,7 +2,7 @@ package crud
 
 import (
 	"errors"
-	ladm "github.com/cdrlis/cdrLIS/LADM"
+	"github.com/cdrlis/cdrLIS/ladm"
 	"github.com/jinzhu/gorm"
 	"time"
 )

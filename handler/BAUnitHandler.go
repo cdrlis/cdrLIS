@@ -2,8 +2,8 @@ package handler
 
 import (
 	"encoding/json"
-	ladm "github.com/cdrlis/cdrLIS/LADM"
-	"github.com/cdrlis/cdrLIS/LADM/common"
+	"github.com/cdrlis/cdrLIS/ladm"
+	"github.com/cdrlis/cdrLIS/ladm/common"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
@@ -13,7 +13,7 @@ type BAUnitHandler struct {
 }
 
 func (handler *BAUnitHandler) GetBAUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	uid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
+	uid := common.Oid{Namespace: p.ByName("namespace"), LocalID: p.ByName("localId")}
 	baUnit, err := handler.BAUnitCRUD.Read(uid)
 	if err != nil {
 		respondError(w, 404, err.Error())
@@ -48,7 +48,7 @@ func (handler *BAUnitHandler) CreateBAUnit(w http.ResponseWriter, r *http.Reques
 }
 
 func (handler *BAUnitHandler) UpdateBAUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	uid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
+	uid := common.Oid{Namespace: p.ByName("namespace"), LocalID: p.ByName("localId")}
 	decoder := json.NewDecoder(r.Body)
 	_, err := handler.BAUnitCRUD.Read(uid)
 	if err != nil {
@@ -66,7 +66,7 @@ func (handler *BAUnitHandler) UpdateBAUnit(w http.ResponseWriter, r *http.Reques
 }
 
 func (handler *BAUnitHandler) DeleteBAUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	uid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
+	uid := common.Oid{Namespace: p.ByName("namespace"), LocalID: p.ByName("localId")}
 	baUnit, err := handler.BAUnitCRUD.Read(uid)
 	if err != nil {
 		respondError(w, 404, err.Error())

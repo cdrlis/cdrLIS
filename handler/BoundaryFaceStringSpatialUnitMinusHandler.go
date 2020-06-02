@@ -2,8 +2,8 @@ package handler
 
 import (
 	"encoding/json"
-	ladm "github.com/cdrlis/cdrLIS/LADM"
-	"github.com/cdrlis/cdrLIS/LADM/common"
+	"github.com/cdrlis/cdrLIS/ladm"
+	"github.com/cdrlis/cdrLIS/ladm/common"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 )
@@ -15,8 +15,8 @@ type BoundaryFaceStringSpatialUnitMinusHandler struct {
 }
 
 func (handler *BoundaryFaceStringSpatialUnitMinusHandler) GetBfsSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	suId := common.Oid{ Namespace: p.ByName("suNamespace"), LocalID:p.ByName("suLocalId")}
-	bfsId := common.Oid{ Namespace: p.ByName("bfsNamespace"), LocalID:p.ByName("bfsLocalId")}
+	suId := common.Oid{Namespace: p.ByName("suNamespace"), LocalID: p.ByName("suLocalId")}
+	bfsId := common.Oid{Namespace: p.ByName("bfsNamespace"), LocalID: p.ByName("bfsLocalId")}
 	bfsSpatialUnit, err := handler.BfsSpatialUnitCRUD.Read(suId, bfsId)
 	if err != nil {
 		respondError(w, 404, err.Error())
@@ -63,8 +63,8 @@ func (handler *BoundaryFaceStringSpatialUnitMinusHandler) CreateBfsSpatialUnit(w
 }
 
 func (handler *BoundaryFaceStringSpatialUnitMinusHandler) UpdateBfsSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	suId := common.Oid{ Namespace: p.ByName("suNamespace"), LocalID:p.ByName("suLocalId")}
-	bfsId := common.Oid{ Namespace: p.ByName("bfsNamespace"), LocalID:p.ByName("bfsLocalId")}
+	suId := common.Oid{Namespace: p.ByName("suNamespace"), LocalID: p.ByName("suLocalId")}
+	bfsId := common.Oid{Namespace: p.ByName("bfsNamespace"), LocalID: p.ByName("bfsLocalId")}
 	decoder := json.NewDecoder(r.Body)
 	bfsSpatialUnit, err := handler.BfsSpatialUnitCRUD.Read(suId, bfsId)
 	if err != nil {
@@ -84,8 +84,8 @@ func (handler *BoundaryFaceStringSpatialUnitMinusHandler) UpdateBfsSpatialUnit(w
 }
 
 func (handler *BoundaryFaceStringSpatialUnitMinusHandler) DeleteBfsSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	suId := common.Oid{ Namespace: p.ByName("suNamespace"), LocalID:p.ByName("suLocalId")}
-	bfsId := common.Oid{ Namespace: p.ByName("bfsNamespace"), LocalID:p.ByName("bfsLocalId")}
+	suId := common.Oid{Namespace: p.ByName("suNamespace"), LocalID: p.ByName("suLocalId")}
+	bfsId := common.Oid{Namespace: p.ByName("bfsNamespace"), LocalID: p.ByName("bfsLocalId")}
 	bfsSpatialUnit, err := handler.BfsSpatialUnitCRUD.Read(suId, bfsId)
 	if err != nil {
 		respondError(w, 404, err.Error())

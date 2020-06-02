@@ -2,7 +2,7 @@ package crud
 
 import (
 	"errors"
-	ladm "github.com/cdrlis/cdrLIS/LADM"
+	"github.com/cdrlis/cdrLIS/ladm"
 	"github.com/jinzhu/gorm"
 	"time"
 )
@@ -25,6 +25,7 @@ func (crud LABoundaryFaceStringCRUD) Read(where ...interface{}) (interface{}, er
 }
 
 func (crud LABoundaryFaceStringCRUD) Create(boundaryFaceStringIn interface{}) (interface{}, error) {
+	tx := crud.DB.Begin()
 	boundaryFaceString := boundaryFaceStringIn.(ladm.LABoundaryFaceString)
 	currentTime := time.Now()
 	boundaryFaceString.ID = boundaryFaceString.BfsID.String()
@@ -32,7 +33,12 @@ func (crud LABoundaryFaceStringCRUD) Create(boundaryFaceStringIn interface{}) (i
 	boundaryFaceString.EndLifespanVersion = nil
 	writer := crud.DB.Set("gorm:save_associations", false).Create(&boundaryFaceString)
 	if writer.Error != nil{
+		tx.Rollback()
 		return nil, writer.Error
+	}
+	commit := tx.Commit()
+	if commit.Error != nil{
+		return nil, commit.Error
 	}
 	return &boundaryFaceString, nil
 }
@@ -46,59 +52,94 @@ func (crud LABoundaryFaceStringCRUD) ReadAll(where ...interface{}) (interface{},
 }
 
 func (crud LABoundaryFaceStringCRUD) Update(boundaryFaceStringIn interface{}) (interface{}, error) {
+	tx := crud.DB.Begin()
 	boundaryFaceString := boundaryFaceStringIn.(*ladm.LABoundaryFaceString)
 	currentTime := time.Now()
 	var oldBoundaryFaceString ladm.LABoundaryFaceString
 	reader := crud.DB.Where("bfsid = ?::\"Oid\" AND endlifespanversion IS NULL", boundaryFaceString.BfsID).
 		First(&oldBoundaryFaceString)
 	if reader.RowsAffected == 0 {
+		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	oldBoundaryFaceString.EndLifespanVersion = &currentTime
-	crud.DB.Set("gorm:save_associations", false).Save(&oldBoundaryFaceString)
-
+	writer := crud.DB.Set("gorm:save_associations", false).Save(&oldBoundaryFaceString)
+	if reader.RowsAffected == 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity not found")
+	}
 	boundaryFaceString.ID = boundaryFaceString.BfsID.String()
 	boundaryFaceString.BeginLifespanVersion = currentTime
 	boundaryFaceString.EndLifespanVersion = nil
-	crud.DB.Set("gorm:save_associations", false).Create(&boundaryFaceString)
-
+	writer = crud.DB.Set("gorm:save_associations", false).Create(&boundaryFaceString)
+	if writer.Error != nil{
+		tx.Rollback()
+		return nil, writer.Error
+	}
 	reader = crud.DB.Where("bfsid = ?::\"Oid\" AND endlifespanversion = ?", boundaryFaceString.BfsID, currentTime).
 		Preload("PlusSu", "endlifespanversion IS NULL").
 		First(&oldBoundaryFaceString)
 	if reader.RowsAffected == 0 {
+		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	for _, plusSu := range oldBoundaryFaceString.PlusSu {
 		plusSu.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&plusSu)
+		writer = crud.DB.Set("gorm:save_associations", false).Save(&plusSu)
+		if reader.RowsAffected == 0 {
+			tx.Rollback()
+			return nil, errors.New("Entity not found")
+		}
 		plusSu.BeginLifespanVersion = currentTime
 		plusSu.EndLifespanVersion = nil
 		plusSu.BfsBeginLifespanVersion = currentTime
-		crud.DB.Set("gorm:save_associations", false).Create(&plusSu)
+		writer = crud.DB.Set("gorm:save_associations", false).Create(&plusSu)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
+	}
+	commit := tx.Commit()
+	if commit.Error != nil{
+		return nil, commit.Error
 	}
 	return boundaryFaceString, nil
 }
 
 func (crud LABoundaryFaceStringCRUD) Delete(boundaryFaceStringIn interface{}) error {
+	tx := crud.DB.Begin()
 	boundaryFaceString := boundaryFaceStringIn.(ladm.LABoundaryFaceString)
 	currentTime := time.Now()
 	var oldBoundaryFaceString ladm.LABoundaryFaceString
 	reader := crud.DB.Where("bfsid = ?::\"Oid\" AND endlifespanversion IS NULL", boundaryFaceString.BfsID).First(&oldBoundaryFaceString)
 	if reader.RowsAffected == 0 {
+		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	oldBoundaryFaceString.EndLifespanVersion = &currentTime
-	crud.DB.Set("gorm:save_associations", false).Save(&oldBoundaryFaceString)
-
+	writer := crud.DB.Set("gorm:save_associations", false).Save(&oldBoundaryFaceString)
+	if writer.RowsAffected == 0 {
+		tx.Rollback()
+		return errors.New("Entity not found")
+	}
 	reader = crud.DB.Where("bfsid = ?::\"Oid\" AND endlifespanversion = ?", boundaryFaceString.BfsID, currentTime).
 		Preload("PlusSu", "endlifespanversion IS NULL").
 		First(&oldBoundaryFaceString)
-	if reader.RowsAffected == 0 {
+	if writer.RowsAffected == 0 {
+		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	for _, plusSu := range oldBoundaryFaceString.PlusSu {
 		plusSu.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&plusSu)
+		writer = crud.DB.Set("gorm:save_associations", false).Save(&plusSu)
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return errors.New("Entity not found")
+		}
+	}
+	commit := tx.Commit()
+	if commit.Error != nil{
+		return commit.Error
 	}
 	return nil
 }

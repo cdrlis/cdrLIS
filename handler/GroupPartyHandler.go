@@ -2,8 +2,8 @@ package handler
 
 import (
 	"encoding/json"
-	ladm "github.com/cdrlis/cdrLIS/LADM"
-	"github.com/cdrlis/cdrLIS/LADM/common"
+	"github.com/cdrlis/cdrLIS/ladm"
+	"github.com/cdrlis/cdrLIS/ladm/common"
 	"github.com/julienschmidt/httprouter"
 	"net/http"
 )

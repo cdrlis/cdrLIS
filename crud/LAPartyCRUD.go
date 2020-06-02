@@ -2,7 +2,7 @@ package crud
 
 import (
 	"errors"
-	ladm "github.com/cdrlis/cdrLIS/LADM"
+	"github.com/cdrlis/cdrLIS/ladm"
 	"github.com/jinzhu/gorm"
 	"time"
 )
@@ -88,12 +88,15 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 		return nil, errors.New("Entity not found")
 	}
 	oldParty.EndLifespanVersion = &currentTime
-	crud.DB.Set("gorm:save_associations", false).Save(&oldParty)
-
+	writer := crud.DB.Set("gorm:save_associations", false).Save(&oldParty)
+	if writer.RowsAffected == 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity not found")
+	}
 	party.ID = party.PID.String()
 	party.BeginLifespanVersion = currentTime
 	party.EndLifespanVersion = nil
-	writer := crud.DB.Set("gorm:save_associations", false).Create(&party)
+	writer = crud.DB.Set("gorm:save_associations", false).Create(&party)
 	if writer.Error != nil{
 		tx.Rollback()
 		return nil, writer.Error
@@ -114,55 +117,111 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 
 	if groupParty := oldParty.GroupParty; groupParty != nil{
 		groupParty.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&groupParty)
+		writer = crud.DB.Set("gorm:save_associations", false).Save(&groupParty)
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return nil, errors.New("Entity not found")
+		}
 		groupParty.BeginLifespanVersion = currentTime
 		groupParty.EndLifespanVersion = nil
-		crud.DB.Set("gorm:save_associations", false).Create(&groupParty)
+		writer = crud.DB.Set("gorm:save_associations", false).Create(&groupParty)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
 	}
 
 	for _, group := range oldParty.Groups {
 		group.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&group)
+		writer = crud.DB.Set("gorm:save_associations", false).Save(&group)
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return nil, errors.New("Entity not found")
+		}
 		group.BeginLifespanVersion = currentTime
 		group.EndLifespanVersion = nil
 		group.PartyBeginLifespanVersion = currentTime
-		crud.DB.Set("gorm:save_associations", false).Create(&group)
+		writer = crud.DB.Set("gorm:save_associations", false).Create(&group)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
 	}
 
 	for _, rrr := range oldParty.RRR {
 		rrr.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&rrr)
+		writer = crud.DB.Set("gorm:save_associations", false).Save(&rrr)
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return nil, errors.New("Entity not found")
+		}
 		rrr.BeginLifespanVersion = currentTime
 		rrr.EndLifespanVersion = nil
 		rrr.PartyBeginLifespanVersion = currentTime
-		crud.DB.Set("gorm:save_associations", false).Create(&rrr)
+		writer = crud.DB.Set("gorm:save_associations", false).Create(&rrr)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
 		if right := rrr.Right; right != nil{
 			right.EndLifespanVersion = &currentTime
-			crud.DB.Set("gorm:save_associations", false).Save(right)
+			writer = crud.DB.Set("gorm:save_associations", false).Save(right)
+			if writer.RowsAffected == 0 {
+				tx.Rollback()
+				return nil, errors.New("Entity not found")
+			}
 			right.BeginLifespanVersion = currentTime
 			right.EndLifespanVersion = nil
-			crud.DB.Set("gorm:save_associations", false).Create(right)
+			writer = crud.DB.Set("gorm:save_associations", false).Create(right)
+			if writer.Error != nil{
+				tx.Rollback()
+				return nil, writer.Error
+			}
 		}
 		if restriction := rrr.Restriction; restriction != nil{
 			restriction.EndLifespanVersion = &currentTime
-			crud.DB.Set("gorm:save_associations", false).Save(restriction)
+			writer = crud.DB.Set("gorm:save_associations", false).Save(restriction)
+			if writer.RowsAffected == 0 {
+				tx.Rollback()
+				return nil, errors.New("Entity not found")
+			}
 			restriction.BeginLifespanVersion = currentTime
 			restriction.EndLifespanVersion = nil
-			crud.DB.Set("gorm:save_associations", false).Create(restriction)
+			writer = crud.DB.Set("gorm:save_associations", false).Create(restriction)
+			if writer.Error != nil{
+				tx.Rollback()
+				return nil, writer.Error
+			}
 			if mortgage := rrr.Restriction.Mortgage; mortgage != nil{
 				mortgage.EndLifespanVersion = &currentTime
-				crud.DB.Set("gorm:save_associations", false).Save(mortgage)
+				writer = crud.DB.Set("gorm:save_associations", false).Save(mortgage)
+				if writer.RowsAffected == 0 {
+					tx.Rollback()
+					return nil, errors.New("Entity not found")
+				}
 				mortgage.BeginLifespanVersion = currentTime
 				mortgage.EndLifespanVersion = nil
-				crud.DB.Set("gorm:save_associations", false).Create(mortgage)
+				writer = crud.DB.Set("gorm:save_associations", false).Create(mortgage)
+				if writer.Error != nil{
+					tx.Rollback()
+					return nil, writer.Error
+				}
 			}
 		}
 		if responsibility := rrr.Responsibility; responsibility != nil{
 			responsibility.EndLifespanVersion = &currentTime
-			crud.DB.Set("gorm:save_associations", false).Save(responsibility)
+			writer = crud.DB.Set("gorm:save_associations", false).Save(responsibility)
+			if writer.RowsAffected == 0 {
+				tx.Rollback()
+				return nil, errors.New("Entity not found")
+			}
 			responsibility.BeginLifespanVersion = currentTime
 			responsibility.EndLifespanVersion = nil
-			crud.DB.Set("gorm:save_associations", false).Create(responsibility)
+			writer = crud.DB.Set("gorm:save_associations", false).Create(responsibility)
+			if writer.Error != nil{
+				tx.Rollback()
+				return nil, writer.Error
+			}
 		}
 	}
 	commit := tx.Commit()
@@ -183,8 +242,11 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 		return errors.New("Entity not found")
 	}
 	oldParty.EndLifespanVersion = &currentTime
-	crud.DB.Set("gorm:save_associations", false).Save(&oldParty)
-
+	writer := crud.DB.Set("gorm:save_associations", false).Save(&oldParty)
+	if writer.RowsAffected == 0 {
+		tx.Rollback()
+		return errors.New("Entity not found")
+	}
 	reader = crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion = ?", party.PID, currentTime).
 		Preload("GroupParty","endlifespanversion IS NULL").
 		Preload("Groups", "endlifespanversion IS NULL").
@@ -200,32 +262,60 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 	}
 	if groupParty := oldParty.GroupParty; groupParty != nil{
 		groupParty.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&groupParty)
+		writer = crud.DB.Set("gorm:save_associations", false).Save(&groupParty)
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return errors.New("Entity not found")
+		}
 	}
 
 	for _, group := range oldParty.Groups {
 		group.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&group)
+		writer = crud.DB.Set("gorm:save_associations", false).Save(&group)
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return errors.New("Entity not found")
+		}
 	}
 
 	for _, rrr := range oldParty.RRR {
 		rrr.EndLifespanVersion = &currentTime
-		crud.DB.Set("gorm:save_associations", false).Save(&rrr)
+		writer = crud.DB.Set("gorm:save_associations", false).Save(&rrr)
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return errors.New("Entity not found")
+		}
 		if right := rrr.Right; right != nil{
 			right.EndLifespanVersion = &currentTime
-			crud.DB.Set("gorm:save_associations", false).Save(right)
+			writer = crud.DB.Set("gorm:save_associations", false).Save(right)
+			if writer.RowsAffected == 0 {
+				tx.Rollback()
+				return errors.New("Entity not found")
+			}
 		}
 		if restriction := rrr.Restriction; restriction != nil{
 			restriction.EndLifespanVersion = &currentTime
-			crud.DB.Set("gorm:save_associations", false).Save(restriction)
+			writer = crud.DB.Set("gorm:save_associations", false).Save(restriction)
+			if writer.RowsAffected == 0 {
+				tx.Rollback()
+				return errors.New("Entity not found")
+			}
 			if mortgage := rrr.Restriction.Mortgage; mortgage != nil{
 				mortgage.EndLifespanVersion = &currentTime
-				crud.DB.Set("gorm:save_associations", false).Save(mortgage)
+				writer = crud.DB.Set("gorm:save_associations", false).Save(mortgage)
+				if writer.RowsAffected == 0 {
+					tx.Rollback()
+					return errors.New("Entity not found")
+				}
 			}
 		}
 		if responsibility := rrr.Responsibility; responsibility != nil{
 			responsibility.EndLifespanVersion = &currentTime
-			crud.DB.Set("gorm:save_associations", false).Save(responsibility)
+			writer = crud.DB.Set("gorm:save_associations", false).Save(responsibility)
+			if writer.RowsAffected == 0 {
+				tx.Rollback()
+				return errors.New("Entity not found")
+			}
 		}
 	}
 	commit := tx.Commit()

@@ -1,9 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"github.com/cdrlis/cdrLIS/crud"
 	"github.com/rs/cors"
 	"net/http"
+	"os"
 
 	"github.com/cdrlis/cdrLIS/handler"
 	"github.com/jinzhu/gorm"
@@ -12,15 +14,16 @@ import (
 )
 
 func main() {
-	// PostgreSQL
-	db, err := gorm.Open("postgres", "host=localhost port=5432 user=postgres dbname=ladm password=123456vV sslmode=disable")
+	config := LoadConfiguration("config.json")
+	// config.json (PostgreSQL)
+	db, err := gorm.Open(config.DatabaseDialect, config.ConnectionString)
 	// YugabyteDB
 	// db, err := gorm.Open("postgres", "host=localhost port=5433 user=yugabyte dbname=yugabyte password=yugabyte sslmode=disable")
 	defer db.Close()
 	if err != nil {
 		panic(err)
 	}
-	db.LogMode(true)
+	db.LogMode(config.DatabaseLog)
 
 	partyCRUD := crud.LAPartyCRUD{DB: db}
 	groupPartyCRUD := crud.LAGroupPartyCRUD{DB: db}
@@ -104,4 +107,25 @@ func main() {
 	handler := cors.Default().Handler(router)
 	http.ListenAndServe(":3000", handler)
 
+}
+
+type Configuration struct {
+	ConnectionString string
+	DatabaseDialect  string
+	DatabaseLog      bool
+}
+
+func LoadConfiguration(configFilePath string) Configuration {
+	configFile, err := os.Open(configFilePath)
+	defer configFile.Close()
+	if err != nil {
+		panic(err)
+	}
+	decoder := json.NewDecoder(configFile)
+	var config Configuration
+	err = decoder.Decode(&config)
+	if err != nil {
+		panic(err)
+	}
+	return config
 }

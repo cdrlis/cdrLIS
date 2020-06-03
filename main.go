@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/cdrlis/cdrLIS/crud"
 	"github.com/rs/cors"
 	"net/http"
@@ -15,15 +16,16 @@ import (
 
 func main() {
 	config := LoadConfiguration("config.json")
+	fmt.Println(config.Database.ConnectionString())
 	// config.json (PostgreSQL)
-	db, err := gorm.Open(config.DatabaseDialect, config.ConnectionString)
+	db, err := gorm.Open(config.Database.Dialect, config.Database.ConnectionString())
 	// YugabyteDB
 	// db, err := gorm.Open("postgres", "host=localhost port=5433 user=yugabyte dbname=yugabyte password=yugabyte sslmode=disable")
 	defer db.Close()
 	if err != nil {
 		panic(err)
 	}
-	db.LogMode(config.DatabaseLog)
+	db.LogMode(config.Database.Log)
 
 	partyCRUD := crud.LAPartyCRUD{DB: db}
 	groupPartyCRUD := crud.LAGroupPartyCRUD{DB: db}
@@ -109,10 +111,24 @@ func main() {
 
 }
 
+type DatabaseSettings struct {
+	Host              string
+	Port              int
+	User              string
+	DbName            string
+	Password          string
+	AdditionalOptions string
+	Dialect           string
+	Log               bool
+}
+
+func (settings DatabaseSettings) ConnectionString() string {
+	return fmt.Sprintf("host=%s port=%d user=%s dbname=%s password=%s %s", settings.Host, settings.Port,
+		settings.User, settings.DbName, settings.Password, settings.AdditionalOptions)
+}
+
 type Configuration struct {
-	ConnectionString string
-	DatabaseDialect  string
-	DatabaseLog      bool
+	Database DatabaseSettings
 }
 
 func LoadConfiguration(configFilePath string) Configuration {

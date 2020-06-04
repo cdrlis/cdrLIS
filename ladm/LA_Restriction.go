@@ -12,8 +12,9 @@ import (
 
 type LARestriction struct {
 	common.VersionedObject
-	ID  string `gorm:"column:id;primary_key" json:"-"`
-	RRR *LARRR `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rrr,omitempty"`
+	ID  string     `gorm:"column:id;primary_key" json:"-"`
+	RID common.Oid `gorm:"column:rid" json:"rID"`
+	RRR *LARRR     `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rrr,omitempty"`
 
 	PartyRequired *bool             `gorm:"column:partyrequired" json:"partyRequired"`
 	Type          LARestrictionType `gorm:"column:type" json:"type"`

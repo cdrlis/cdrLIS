@@ -39,7 +39,7 @@ func (crud BfsSpatialUnitMinusCRUD) Create(bfsSpatialUnitIn interface{}) (interf
 	bfsSpatialUnit.SuBeginLifespanVersion = bfsSpatialUnit.Su.BeginLifespanVersion
 	bfsSpatialUnit.BfsID = bfsSpatialUnit.Bfs.BfsID.String()
 	bfsSpatialUnit.BfsBeginLifespanVersion = bfsSpatialUnit.Bfs.BeginLifespanVersion
-	writer := crud.DB.Set("gorm:save_associations", false).Create(&bfsSpatialUnit)
+	writer := tx.Set("gorm:save_associations", false).Create(&bfsSpatialUnit)
 	if writer.Error != nil{
 		tx.Rollback()
 		return nil, writer.Error
@@ -71,7 +71,7 @@ func (crud BfsSpatialUnitMinusCRUD) Delete(bfsSpatialUnitIn interface{}) error {
 	bfsSpatialUnit := bfsSpatialUnitIn.(ladm.BfsSpatialUnitMinus)
 	currentTime := time.Now()
 	var oldBfsSpatialUnit ladm.BfsSpatialUnitMinus
-	reader := crud.DB.Where("su = ? AND "+
+	reader := tx.Where("su = ? AND "+
 		"bfs = ? AND "+
 		"endlifespanversion IS NULL", bfsSpatialUnit.Su.SuID.String(), bfsSpatialUnit.Bfs.BfsID.String()).First(&oldBfsSpatialUnit)
 	if reader.RowsAffected == 0 {
@@ -79,7 +79,7 @@ func (crud BfsSpatialUnitMinusCRUD) Delete(bfsSpatialUnitIn interface{}) error {
 		return errors.New("Entity not found")
 	}
 	oldBfsSpatialUnit.EndLifespanVersion = &currentTime
-	crud.DB.Set("gorm:save_associations", false).Save(&oldBfsSpatialUnit)
+	tx.Set("gorm:save_associations", false).Save(&oldBfsSpatialUnit)
 	commit := tx.Commit()
 	if commit.Error != nil{
 		return commit.Error

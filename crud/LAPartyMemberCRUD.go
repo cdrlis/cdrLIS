@@ -43,7 +43,7 @@ func (crud LAPartyMemberCRUD) Create(partyMemberIn interface{}) (interface{}, er
 	partyMember.PartyBeginLifespanVersion = partyMember.Party.BeginLifespanVersion
 	partyMember.GroupID = partyMember.Group.PID.String()
 	partyMember.GroupBeginLifespanVersion = partyMember.Group.BeginLifespanVersion
-	writer := crud.DB.Set("gorm:save_associations", false).Create(&partyMember)
+	writer := tx.Set("gorm:save_associations", false).Create(&partyMember)
 	if writer.Error != nil{
 		tx.Rollback()
 		return nil, writer.Error
@@ -70,7 +70,7 @@ func (crud LAPartyMemberCRUD) Update(partyMemberIn interface{}) (interface{}, er
 	partyMember := partyMemberIn.(*ladm.LAPartyMember)
 	currentTime := time.Now()
 	var oldPartyMember ladm.LAPartyMember
-	reader := crud.DB.Where("parties = ? AND "+
+	reader := tx.Where("parties = ? AND "+
 		"groups = ? AND "+
 		"endlifespanversion IS NULL", partyMember.Party.PID.String(), partyMember.Group.PID.String()).
 		First(&oldPartyMember)
@@ -79,7 +79,7 @@ func (crud LAPartyMemberCRUD) Update(partyMemberIn interface{}) (interface{}, er
 		return nil, errors.New("Entity not found")
 	}
 	oldPartyMember.EndLifespanVersion = &currentTime
-	writer := crud.DB.Set("gorm:save_associations", false).Save(&oldPartyMember)
+	writer := tx.Set("gorm:save_associations", false).Save(&oldPartyMember)
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -90,7 +90,7 @@ func (crud LAPartyMemberCRUD) Update(partyMemberIn interface{}) (interface{}, er
 	partyMember.PartyBeginLifespanVersion = partyMember.Party.BeginLifespanVersion
 	partyMember.GroupID = partyMember.Group.PID.String()
 	partyMember.GroupBeginLifespanVersion = partyMember.Group.BeginLifespanVersion
-	writer = crud.DB.Set("gorm:save_associations", false).Create(&partyMember)
+	writer = tx.Set("gorm:save_associations", false).Create(&partyMember)
 	if writer.Error != nil{
 		tx.Rollback()
 		return nil, writer.Error
@@ -107,7 +107,7 @@ func (crud LAPartyMemberCRUD) Delete(partyMemberIn interface{}) error {
 	partyMember := partyMemberIn.(ladm.LAPartyMember)
 	currentTime := time.Now()
 	var oldPartyMember ladm.LAPartyMember
-	reader := crud.DB.Where("parties = ? AND "+
+	reader := tx.Where("parties = ? AND "+
 		"groups = ? AND "+
 		"endlifespanversion IS NULL", partyMember.PartyID, partyMember.GroupID).First(&oldPartyMember)
 	if reader.RowsAffected == 0 {
@@ -115,7 +115,7 @@ func (crud LAPartyMemberCRUD) Delete(partyMemberIn interface{}) error {
 		return errors.New("Entity not found")
 	}
 	oldPartyMember.EndLifespanVersion = &currentTime
-	writer := crud.DB.Set("gorm:save_associations", false).Save(&oldPartyMember)
+	writer := tx.Set("gorm:save_associations", false).Save(&oldPartyMember)
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")

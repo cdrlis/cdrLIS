@@ -36,6 +36,7 @@ func main() {
 	boundaryFaceStringCRUD := crud.LABoundaryFaceStringCRUD{DB: db}
 	bfsSpatialUnitPlusCRUD := crud.BfsSpatialUnitPlusCRUD{DB: db}
 	bfsSpatialUnitMinusCRUD := crud.BfsSpatialUnitMinusCRUD{DB: db}
+	rrrCRUD := crud.LARRRCRUD{DB: db}
 
 	partyHandler := handler.PartyHandler{PartyCRUD: partyCRUD}
 	groupPartyHandler := handler.GroupPartyHandler{GroupPartyCRUD: groupPartyCRUD}
@@ -46,7 +47,7 @@ func main() {
 	boundaryFaceStringHandler := handler.BoundaryFaceStringHandler{BoundaryFaceStringCRUD: boundaryFaceStringCRUD}
 	bfsSpatialUnitPlusHandler := handler.BoundaryFaceStringSpatialUnitPlusHandler{SpatialUnitCRUD: sunitCRUD, BoundaryFaceStringCRUD: boundaryFaceStringCRUD, BfsSpatialUnitCRUD: bfsSpatialUnitPlusCRUD}
 	bfsSpatialUnitMinusHandler := handler.BoundaryFaceStringSpatialUnitMinusHandler{SpatialUnitCRUD: sunitCRUD, BoundaryFaceStringCRUD: boundaryFaceStringCRUD, BfsSpatialUnitCRUD: bfsSpatialUnitMinusCRUD}
-
+	rrrHandler := handler.RrrHandler{RrrCRUD: rrrCRUD, PartyCRUD: partyCRUD, BAUnitCRUD: baunitCRUD}
 	router := httprouter.New()
 
 	router.GET("/party", partyHandler.GetParties)
@@ -66,6 +67,12 @@ func main() {
 	router.GET("/partymember/:partyNamespace/:partyLocalId/:groupNamespace/:groupLocalId", partyMemberHandler.GetPartyMember)
 	router.PUT("/partymember/:partyNamespace/:partyLocalId/:groupNamespace/:groupLocalId", partyMemberHandler.UpdatePartyMember)
 	router.DELETE("/partymember/:partyNamespace/:partyLocalId/:groupNamespace/:groupLocalId", partyMemberHandler.DeletePartyMember)
+
+	router.GET("/rrr", rrrHandler.GetRrrs)
+	router.POST("/rrr", rrrHandler.CreateRrr)
+	router.GET("/rrr/:namespace/:localId", rrrHandler.GetRrr)
+	router.PUT("/rrr/:namespace/:localId", rrrHandler.UpdateRrr)
+	router.DELETE("/rrr/:namespace/:localId", rrrHandler.DeleteRrr)
 
 	router.GET("/baunit", baunitHandler.GetBAUnits)
 	router.POST("/baunit", baunitHandler.CreateBAUnit)

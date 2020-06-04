@@ -41,7 +41,7 @@ func (handler *PartyMemberHandler) CreatePartyMember(w http.ResponseWriter, r *h
 		respondError(w, 400, err.Error())
 		return
 	}
-	partyInteface, err := handler.PartyCRUD.Read(partyMember.Party.PID)
+	partyInterface, err := handler.PartyCRUD.Read(partyMember.Party.PID)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
@@ -51,7 +51,7 @@ func (handler *PartyMemberHandler) CreatePartyMember(w http.ResponseWriter, r *h
 		respondError(w, 404, err.Error())
 		return
 	}
-	party := partyInteface.(ladm.LAParty)
+	party := partyInterface.(ladm.LAParty)
 	group := groupInterface.(ladm.LAParty).GroupParty
 	partyMember.Party = &party
 	partyMember.Group = group

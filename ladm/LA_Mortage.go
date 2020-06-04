@@ -14,6 +14,7 @@ import "github.com/cdrlis/cdrLIS/ladm/common"
 type LAMortgage struct {
 	common.VersionedObject
 	ID          string         `gorm:"column:id;primary_key" json:"-"`
+	RID         common.Oid     `gorm:"column:rid" json:"rID"`
 	Restriction *LARestriction `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"restriction,omitempty"`
 
 	Amount       *Currency       `gorm:"column:amount" json:"amount"`

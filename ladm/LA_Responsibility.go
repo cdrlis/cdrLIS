@@ -12,8 +12,9 @@ import (
 
 type LAResponsibility struct {
 	common.VersionedObject
-	ID  string `gorm:"column:id;primary_key" json:"-"`
-	RRR *LARRR `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rrr,omitempty"`
+	ID  string     `gorm:"column:id;primary_key" json:"-"`
+	RID common.Oid `gorm:"column:rid" json:"rID"`
+	RRR *LARRR     `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rrr,omitempty"`
 
 	Type LAResponsibilityType `gorm:"column:type" json:"type"`
 }

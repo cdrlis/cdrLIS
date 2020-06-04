@@ -12,8 +12,9 @@ import (
 // may also be specifically associated to the right which is the object of the mortgage); see Figure 10.
 type LARight struct {
 	common.VersionedObject
-	ID  string `gorm:"column:id;primary_key" json:"-"`
-	RRR *LARRR `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rrr,omitempty"`
+	ID  string     `gorm:"column:id;primary_key" json:"-"`
+	RID common.Oid `gorm:"column:rid" json:"rID"`
+	RRR *LARRR     `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rrr,omitempty"`
 
 	Type LARightType `gorm:"column:type" json:"type"`
 

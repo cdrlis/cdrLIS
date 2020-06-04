@@ -31,7 +31,7 @@ func (crud LALevelCRUD) Create(levelIn interface{}) (interface{}, error) {
 	level.ID = level.LID.String()
 	level.BeginLifespanVersion = currentTime
 	level.EndLifespanVersion = nil
-	writer := crud.DB.Set("gorm:save_associations", false).Create(&level)
+	writer := tx.Set("gorm:save_associations", false).Create(&level)
 	if writer.Error != nil{
 		tx.Rollback()
 		return nil, writer.Error
@@ -56,14 +56,14 @@ func (crud LALevelCRUD) Update(levelIn interface{}) (interface{}, error) {
 	level := levelIn.(*ladm.LALevel)
 	currentTime := time.Now()
 	var oldLevel ladm.LALevel
-	reader := crud.DB.Where("lid = ?::\"Oid\" AND endlifespanversion IS NULL", level.LID).
+	reader := tx.Where("lid = ?::\"Oid\" AND endlifespanversion IS NULL", level.LID).
 		First(&oldLevel)
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	oldLevel.EndLifespanVersion = &currentTime
-	writer := crud.DB.Set("gorm:save_associations", false).Save(&oldLevel)
+	writer := tx.Set("gorm:save_associations", false).Save(&oldLevel)
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -71,12 +71,12 @@ func (crud LALevelCRUD) Update(levelIn interface{}) (interface{}, error) {
 	level.ID = level.LID.String()
 	level.BeginLifespanVersion = currentTime
 	level.EndLifespanVersion = nil
-	writer = crud.DB.Set("gorm:save_associations", false).Create(&level)
+	writer = tx.Set("gorm:save_associations", false).Create(&level)
 	if writer.Error != nil{
 		tx.Rollback()
 		return nil, writer.Error
 	}
-	reader = crud.DB.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
+	reader = tx.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
 		Preload("Su", "endlifespanversion IS NULL").
 		First(&oldLevel)
 	if reader.RowsAffected == 0 {
@@ -85,7 +85,7 @@ func (crud LALevelCRUD) Update(levelIn interface{}) (interface{}, error) {
 	}
 	for _, su := range oldLevel.SU {
 		su.EndLifespanVersion = &currentTime
-		writer = crud.DB.Set("gorm:save_associations", false).Save(&su)
+		writer = tx.Set("gorm:save_associations", false).Save(&su)
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return nil, errors.New("Entity not found")
@@ -93,7 +93,7 @@ func (crud LALevelCRUD) Update(levelIn interface{}) (interface{}, error) {
 		su.BeginLifespanVersion = currentTime
 		su.EndLifespanVersion = nil
 		su.LevelBeginLifespanVersion = currentTime
-		writer = crud.DB.Set("gorm:save_associations", false).Create(&su)
+		writer = tx.Set("gorm:save_associations", false).Create(&su)
 		if writer.Error != nil{
 			tx.Rollback()
 			return nil, writer.Error
@@ -111,18 +111,18 @@ func (crud LALevelCRUD) Delete(levelIn interface{}) error {
 	level := levelIn.(ladm.LALevel)
 	currentTime := time.Now()
 	var oldLevel ladm.LALevel
-	reader := crud.DB.Where("lid = ?::\"Oid\" AND endlifespanversion IS NULL", level.LID).First(&oldLevel)
+	reader := tx.Where("lid = ?::\"Oid\" AND endlifespanversion IS NULL", level.LID).First(&oldLevel)
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	oldLevel.EndLifespanVersion = &currentTime
-	writer := crud.DB.Set("gorm:save_associations", false).Save(&oldLevel)
+	writer := tx.Set("gorm:save_associations", false).Save(&oldLevel)
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}
-	reader = crud.DB.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
+	reader = tx.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
 		Preload("Su", "endlifespanversion IS NULL").
 		First(&oldLevel)
 	if reader.RowsAffected == 0 {
@@ -131,7 +131,7 @@ func (crud LALevelCRUD) Delete(levelIn interface{}) error {
 	}
 	for _, su := range oldLevel.SU {
 		su.EndLifespanVersion = &currentTime
-		writer = crud.DB.Set("gorm:save_associations", false).Save(&su)
+		writer = tx.Set("gorm:save_associations", false).Save(&su)
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return errors.New("Entity not found")

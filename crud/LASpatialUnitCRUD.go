@@ -20,8 +20,12 @@ func (crud LASpatialUnitCRUD) Read(where ...interface{}) (interface{}, error) {
 			Preload("Baunit.BaUnit", "endlifespanversion IS NULL").
 			Preload("PlusBfs", "endlifespanversion IS NULL").
 			Preload("PlusBfs.Bfs", "endlifespanversion IS NULL").
+			Preload("PlusBfs.Bfs.Point", "endlifespanversion IS NULL").
+			Preload("PlusBfs.Bfs.Point.Point", "endlifespanversion IS NULL").
 			Preload("MinusBfs", "endlifespanversion IS NULL").
 			Preload("MinusBfs.Bfs", "endlifespanversion IS NULL").
+			Preload("MinusBfs.Bfs.Point", "endlifespanversion IS NULL").
+			Preload("MinusBfs.Bfs.Point.Point", "endlifespanversion IS NULL").
 			First(&spatialUnit)
 		if reader.RowsAffected == 0 {
 			return nil, errors.New("Entity not found")

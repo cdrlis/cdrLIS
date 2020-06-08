@@ -27,7 +27,6 @@ func main() {
 	db.LogMode(config.Database.Log)
 
 	partyCRUD := crud.LAPartyCRUD{DB: db}
-	groupPartyCRUD := crud.LAGroupPartyCRUD{DB: db}
 	partyMemberCRUD := crud.LAPartyMemberCRUD{DB: db}
 	levelCRUD := crud.LALevelCRUD{DB: db}
 	sunitCRUD := crud.LASpatialUnitCRUD{DB: db}
@@ -38,7 +37,6 @@ func main() {
 	rrrCRUD := crud.LARRRCRUD{DB: db}
 
 	partyHandler := handler.PartyHandler{PartyCRUD: partyCRUD}
-	groupPartyHandler := handler.GroupPartyHandler{GroupPartyCRUD: groupPartyCRUD}
 	partyMemberHandler := handler.PartyMemberHandler{PartyMemberCRUD: partyMemberCRUD, PartyCRUD: partyCRUD}
 	baunitHandler := handler.BAUnitHandler{BAUnitCRUD: baunitCRUD}
 	sunitHandler := handler.SpatialUnitHandler{SpatialUnitCRUD: sunitCRUD, LevelCRUD: levelCRUD}
@@ -54,12 +52,6 @@ func main() {
 	router.GET("/party/:namespace/:localId", partyHandler.GetParty)
 	router.PUT("/party/:namespace/:localId", partyHandler.UpdateParty)
 	router.DELETE("/party/:namespace/:localId", partyHandler.DeleteParty)
-
-	router.GET("/groupparty", groupPartyHandler.GetParties)
-	router.POST("/groupparty", groupPartyHandler.CreateParty)
-	router.GET("/groupparty/:namespace/:localId", groupPartyHandler.GetParty)
-	router.PUT("/groupparty/:namespace/:localId", groupPartyHandler.UpdateParty)
-	router.DELETE("/groupparty/:namespace/:localId", groupPartyHandler.DeleteParty)
 
 	router.GET("/partymember", partyMemberHandler.GetPartyMembers)
 	router.POST("/partymember", partyMemberHandler.CreatePartyMember)

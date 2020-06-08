@@ -77,7 +77,7 @@ func (crud LALevelCRUD) Update(levelIn interface{}) (interface{}, error) {
 		return nil, writer.Error
 	}
 	reader = tx.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
-		Preload("Su", "endlifespanversion IS NULL").
+		Preload("SU", "endlifespanversion IS NULL").
 		First(&oldLevel)
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
@@ -123,7 +123,7 @@ func (crud LALevelCRUD) Delete(levelIn interface{}) error {
 		return errors.New("Entity not found")
 	}
 	reader = tx.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
-		Preload("Su", "endlifespanversion IS NULL").
+		Preload("SU", "endlifespanversion IS NULL").
 		First(&oldLevel)
 	if reader.RowsAffected == 0 {
 		tx.Rollback()

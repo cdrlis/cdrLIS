@@ -17,7 +17,7 @@ import (
 //
 type LAPoint struct {
 	common.VersionedObject
-
+	ID                string               `gorm:"column:id;primary_key" json:"-"`
 	InterpolationRole LAInterpolationType  `gorm:"column:interpolationrole" json:"interpolationRole"`
 	Monumentation     *LAMonumentationType `gorm:"column:monumentation" json:"monumentation"`
 	OriginalLocation  *geometry.GMPoint    `gorm:"column:originallocation" json:"originalLocation"`

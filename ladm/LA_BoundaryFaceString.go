@@ -27,7 +27,7 @@ type LABoundaryFaceString struct {
 	Geometry       *geometry.GMMultiCurve `gorm:"column:geometry" json:"geometry"`
 	LocationByText *string                `gorm:"column:locationbytext" json:"locationByText"`
 
-	point   []LAPoint             // pointBfs
+	Point   []PointBfs            `gorm:"foreignkey:BfsID,BfsBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"point"`
 	MinusSu []BfsSpatialUnitMinus `gorm:"foreignkey:BfsID,BfsBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"suMinus"`
 	PlusSu  []BfsSpatialUnitPlus  `gorm:"foreignkey:BfsID,BfsBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"suPlus"`
 }

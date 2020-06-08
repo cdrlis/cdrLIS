@@ -637,7 +637,7 @@ CREATE TABLE "suBaunit" (
 
 CREATE TABLE "suHierarchy" (
                                child						VARCHAR NOT NULL,		-- childID.namespace || '-' || childID.localId
-                               parent						VARCHAR NOT NUL<L,		-- parentID.namespace || '->' || parentID.localId
+                               parent						VARCHAR NOT NULL,		-- parentID.namespace || '->' || parentID.localId
                                childBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                                parentBeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                                beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

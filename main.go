@@ -16,7 +16,6 @@ import (
 
 func main() {
 	config := LoadConfiguration("config.json")
-	fmt.Println(config.Database.ConnectionString())
 	// config.json (PostgreSQL)
 	db, err := gorm.Open(config.Database.Dialect, config.Database.ConnectionString())
 	// YugabyteDB

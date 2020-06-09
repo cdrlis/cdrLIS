@@ -30,12 +30,15 @@ func main() {
 	partyMemberCRUD := crud.LAPartyMemberCRUD{DB: db}
 	baunitCRUD := crud.LABAUnitCRUD{DB: db}
 	baUnitAsPartyCRUD := crud.BAUnitAsPartyCRUD{DB: db}
+	requiredRelationshipBAUnitCRUD := crud.LARequiredRelationshipBAUnitCRUD{DB: db}
 	rrrCRUD := crud.LARRRCRUD{DB: db}
+	mortgageRightCRUD := crud.MortgageRightCRUD{DB: db}
 	levelCRUD := crud.LALevelCRUD{DB: db}
 	sunitCRUD := crud.LASpatialUnitCRUD{DB: db}
 	suHierarchyCRUD := crud.SuHierarchyCRUD{DB: db}
 	suGroupCRUD := crud.LASpatialUnitGroupCRUD{DB: db}
 	suGroupHierarchyCRUD := crud.SuGroupHierarchyCRUD{DB: db}
+	requiredRelationshipSpatialUnitCRUD := crud.LARequiredRelationshipSpatialUnitCRUD{DB: db}
 	suSuGroupCRUD := crud.SuSuGroupCRUD{DB: db}
 	boundaryFaceStringCRUD := crud.LABoundaryFaceStringCRUD{DB: db}
 	bfsSpatialUnitPlusCRUD := crud.BfsSpatialUnitPlusCRUD{DB: db}
@@ -47,10 +50,13 @@ func main() {
 	partyMemberHandler := handler.PartyMemberHandler{PartyMemberCRUD: partyMemberCRUD, PartyCRUD: partyCRUD}
 	baunitHandler := handler.BAUnitHandler{BAUnitCRUD: baunitCRUD}
 	baUnitAsPartyHandler := handler.BAUnitAsPartyHandler{BAUnitAsPartyCRUD: baUnitAsPartyCRUD, BAUnitCRUD: baunitCRUD, PartyCRUD: partyCRUD}
+	requiredRelationshipBAUnitHandler := handler.RequiredRelationshipBAUnitHandler{RequiredRelationshipBAUnitCRUD: requiredRelationshipBAUnitCRUD, BAUnitCRUD: baunitCRUD}
 	rrrHandler := handler.RrrHandler{RrrCRUD: rrrCRUD, PartyCRUD: partyCRUD, BAUnitCRUD: baunitCRUD}
+	mortgageRightHandler := handler.MortgageRightHandler{MortgageRightCRUD: mortgageRightCRUD, RrrCRUD: rrrCRUD}
 	levelHandler := handler.LevelHandler{LevelCRUD: levelCRUD}
 	sunitHandler := handler.SpatialUnitHandler{SpatialUnitCRUD: sunitCRUD, LevelCRUD: levelCRUD}
 	suHierarchyHandler := handler.SuHierarchyHandler{SuHierarchyCRUD: suHierarchyCRUD, SpatialUnitCRUD: sunitCRUD}
+	requiredRelationshipSUHandler := handler.RequiredRelationshipSUHandler{RequiredRelationshipSUCRUD: requiredRelationshipSpatialUnitCRUD, SpatialUnitCRUD: sunitCRUD}
 	sunitGroupHandler := handler.SpatialUnitGroupHandler{SuGroupCRUD: suGroupCRUD}
 	suGroupHierarchyHandler := handler.SuGroupHierarchyHandler{SuGroupHierarchyCRUD: suGroupHierarchyCRUD, SpatialUnitGroupCRUD: suGroupCRUD}
 	suSuGroupHandler := handler.SuSuGroupHandler{SuSuGroupCRUD: suSuGroupCRUD, SuGroupCRUD: suGroupCRUD, SuCRUD: sunitCRUD}
@@ -86,11 +92,23 @@ func main() {
 	router.PUT("/baunitasparty/:baunitNamespace/:baunitLocalId/:partyNamespace/:partyLocalId", baUnitAsPartyHandler.UpdateBAUnitAsParty)
 	router.DELETE("/baunitasparty/:baunitNamespace/:baunitLocalId/:partyNamespace/:partyLocalId", baUnitAsPartyHandler.DeleteBAUnitAsParty)
 
+	router.GET("/relationshipbaunit", requiredRelationshipBAUnitHandler.GetRequiredRelationshipBAUnits)
+	router.POST("/relationshipbaunit", requiredRelationshipBAUnitHandler.CreateRequiredRelationshipBAUnit)
+	router.GET("/relationshipbaunit/:unit1Namespace/:unit1LocalId/:unit2Namespace/:unit2LocalId", requiredRelationshipBAUnitHandler.GetRequiredRelationshipBAUnit)
+	router.PUT("/relationshipbaunit/:unit1Namespace/:unit1LocalId/:unit2Namespace/:unit2LocalId", requiredRelationshipBAUnitHandler.UpdateRequiredRelationshipBAUnit)
+	router.DELETE("/relationshipbaunit/:unit1Namespace/:unit1LocalId/:unit2Namespace/:unit2LocalId", requiredRelationshipBAUnitHandler.DeleteRequiredRelationshipBAUnit)
+
 	router.GET("/rrr", rrrHandler.GetRrrs)
 	router.POST("/rrr", rrrHandler.CreateRrr)
 	router.GET("/rrr/:namespace/:localId", rrrHandler.GetRrr)
 	router.PUT("/rrr/:namespace/:localId", rrrHandler.UpdateRrr)
 	router.DELETE("/rrr/:namespace/:localId", rrrHandler.DeleteRrr)
+
+	router.GET("/mortgagerigt", mortgageRightHandler.GetMortgageRights)
+	router.POST("/mortgagerigt", mortgageRightHandler.CreateMortgageRight)
+	router.GET("/mortgagerigt/:mortgageNamespace/:mortgageLocalId/:rightNamespace/:rightLocalId", mortgageRightHandler.GetMortgageRight)
+	router.PUT("/mortgagerigt/:mortgageNamespace/:mortgageLocalId/:rightNamespace/:rightLocalId", mortgageRightHandler.UpdateMortgageRight)
+	router.DELETE("/mortgagerigt/:mortgageNamespace/:mortgageLocalId/:rightNamespace/:rightLocalId", mortgageRightHandler.DeleteMortgageRight)
 
 	router.GET("/level", levelHandler.GetLevels)
 	router.POST("/level", levelHandler.CreateLevel)
@@ -112,6 +130,12 @@ func main() {
 	router.GET("/suhierarchy/:parentNamespace/:parentLocalId/:childNamespace/:childLocalId", suHierarchyHandler.GetSuHierarchy)
 	router.PUT("/suhierarchy/:parentNamespace/:parentLocalId/:childNamespace/:childLocalId", suHierarchyHandler.UpdateSuHierarchy)
 	router.DELETE("/suhierarchy/:parentNamespace/:parentLocalId/:childNamespace/:childLocalId", suHierarchyHandler.DeleteSuHierarchy)
+
+	router.GET("/relationshipsu", requiredRelationshipSUHandler.GetRequiredRelationshipSUs)
+	router.POST("/relationshipsu", requiredRelationshipSUHandler.CreateRequiredRelationshipSU)
+	router.GET("/relationshipsu/:su1Namespace/:su1LocalId/:su2Namespace/:su2LocalId", requiredRelationshipSUHandler.GetRequiredRelationshipSU)
+	router.PUT("/relationshipsu/:su1Namespace/:su1LocalId/:su2Namespace/:su2LocalId", requiredRelationshipSUHandler.UpdateRequiredRelationshipSU)
+	router.DELETE("/relationshipsu/:su1Namespace/:su1LocalId/:su2Namespace/:su2LocalId", requiredRelationshipSUHandler.DeleteRequiredRelationshipSU)
 
 	router.GET("/spatialunitgroup", sunitGroupHandler.GetSuGroups)
 	router.POST("/spatialunitgroup", sunitGroupHandler.CreateSuGroup)

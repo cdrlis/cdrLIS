@@ -1,10 +1,15 @@
 package ladm
 
 import (
+	"database/sql/driver"
+	"errors"
+	"fmt"
 	"github.com/cdrlis/cdrLIS/ladm/common"
 	"github.com/cdrlis/cdrLIS/ladm/common/geometry"
 	"github.com/cdrlis/cdrLIS/ladm/external"
 	"github.com/paulsmith/gogeos/geos"
+	"regexp"
+	"strconv"
 	"time"
 )
 
@@ -44,7 +49,7 @@ type LASpatialUnit struct {
 
 	BuildingUnit LARequiredRelationshipSpatialUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"building,omitempty"`
 
-	Baunit       []SuBAUnit                        `gorm:"foreignkey:SUID,SUBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"baunit"`
+	Baunit []SuBAUnit `gorm:"foreignkey:SUID,SUBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"baunit"`
 
 	SuHierarchy       *SuHierarchy                        `gorm:"foreignkey:ChildID,ChildBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"hierarchy,omitempty"` // suHierarchy
 	RelationSu1       []LARequiredRelationshipSpatialUnit `gorm:"foreignkey:Su1ID,Su1BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"relation1,omitempty"`     // relationSu
@@ -159,10 +164,39 @@ type LAAreaType string
 
 const (
 	OfficialArea    LAAreaType = "officialArea"
-	NonOfficialArea            = "nonOfficialArea"
-	CalculatedArea             = "calculatedArea"
-	SurveyedArea               = "surveyedArea"
+	NonOfficialArea LAAreaType = "nonOfficialArea"
+	CalculatedArea  LAAreaType = "calculatedArea"
+	SurveyedArea    LAAreaType = "surveyedArea"
 )
+
+func (area LAAreaValue) Value() (driver.Value, error) {
+	return fmt.Sprintf("(%s,%f)",area.Type, area.AreaSize), nil
+}
+
+// Scan Reads Oid
+func (area *LAAreaValue) Scan(value interface{}) error {
+
+	if value == nil {
+		return nil
+	}
+
+	bytes, ok := value.([]byte)
+	if !ok {
+		return errors.New("cannot convert database value to area")
+	}
+
+	str := string(bytes)
+	re := regexp.MustCompile("\\((.*?),(.*?)\\)")
+	match := re.FindStringSubmatch(str)
+	areaSize, err := strconv.ParseFloat(match[1], 64)
+	if err != nil {
+		return err
+	}
+	areaValue := LAAreaValue{AreaSize: Area(areaSize), Type: LAAreaType(match[2])}
+	*area = areaValue
+
+	return nil
+}
 
 //
 // LA_DimensionType: the LA_DimensionType code list includes all the various dimension types, such as

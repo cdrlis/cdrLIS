@@ -177,7 +177,7 @@ func main() {
 	router.POST("/point", pointHandler.CreatePoint)
 	router.GET("/point/:namespace/:localId", pointHandler.GetPoint)
 	router.PUT("/point/:namespace/:localId", pointHandler.UpdatePoint)
-	router.DELETE("/level/:namespace/:localId", pointHandler.DeletePoint)
+	router.DELETE("/point/:namespace/:localId", pointHandler.DeletePoint)
 
 	router.GET("/pointbfs", pointBfsHandler.GetPointBfss)
 	router.POST("/pointbfs", pointBfsHandler.CreatePointBfs)

@@ -41,8 +41,7 @@ type LASpatialUnit struct {
 	ReferencePoint  *geometry.GMPoint      `gorm:"column:referencepoint" json:"referencePoint"`
 	SuID            common.Oid             `gorm:"column:suid" json:"suID"`
 	SurfaceRelation *LASurfaceRelationType `gorm:"column:surfacerelation" json:"surfaceRelation"`
-
-	// suLevel
+	
 	LevelID                   string    `gorm:"column:level" json:"-"`
 	LevelBeginLifespanVersion time.Time `gorm:"column:levelbeginlifespanversion" json:"-"`
 	Level                     *LALevel  `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:LevelID,LevelBeginLifespanVersion" json:"level"`
@@ -112,16 +111,16 @@ func (su LASpatialUnit) Boundary() (*geos.Geometry, error) {
 		} else {
 			continue
 		}
-		curve := geos.Must(geos.NewLineString())
+		resultCurve := geos.Must(geos.NewLineString())
 		nGeometry, err := geom.NGeometry()
 		if err != nil {
 			continue
 		}
 		for i := 0; i < nGeometry; i++ {
 			curve := geos.Must(geom.Geometry(i))
-			curve = geos.Must(curve.Union(geos.Must(geos.NewLineString(geos.MustCoords(curve.Coords())...))))
+			resultCurve = geos.Must(resultCurve.Union(geos.Must(geos.NewLineString(geos.MustCoords(curve.Coords())...))))
 		}
-		msBoundary = geos.Must(msBoundary.Union(curve))
+		msBoundary = geos.Must(msBoundary.Union(resultCurve))
 	}
 	for _, bfs := range su.MinusBfs {
 		var geom *geos.Geometry
@@ -130,16 +129,16 @@ func (su LASpatialUnit) Boundary() (*geos.Geometry, error) {
 		} else {
 			continue
 		}
-		curve := geos.Must(geos.NewLineString())
+		resultCurve := geos.Must(geos.NewLineString())
 		nGeometry, err := geom.NGeometry()
 		if err != nil {
 			continue
 		}
 		for i := 0; i < nGeometry; i++ {
-			lineString := geos.Must(geom.Geometry(i))
-			curve = geos.Must(curve.Union(geos.Must(geos.NewLineString(geos.MustCoords(lineString.Coords())...))))
+			curve := geos.Must(geom.Geometry(i))
+			resultCurve = geos.Must(resultCurve.Union(geos.Must(geos.NewLineString(geos.MustCoords(curve.Coords())...))))
 		}
-		msBoundary = geos.Must(msBoundary.Union(curve))
+		msBoundary = geos.Must(msBoundary.Union(resultCurve))
 	}
 	msBoundary = geos.Must(msBoundary.LineMerge())
 	return msBoundary, nil
@@ -169,11 +168,12 @@ const (
 	SurveyedArea    LAAreaType = "surveyedArea"
 )
 
+// Value Returns AreaValue
 func (area LAAreaValue) Value() (driver.Value, error) {
-	return fmt.Sprintf("(%s,%f)",area.Type, area.AreaSize), nil
+	return fmt.Sprintf("(%s,%f)", area.Type, area.AreaSize), nil
 }
 
-// Scan Reads Oid
+// Scan Reads AreaValue
 func (area *LAAreaValue) Scan(value interface{}) error {
 
 	if value == nil {
@@ -208,10 +208,10 @@ type LADimensionType string
 
 const (
 	D0      LADimensionType = "0D"
-	D1                      = "1D"
-	D2                      = "2D"
-	D3                      = "3D"
-	Liminal                 = "laminal"
+	D1      LADimensionType = "1D"
+	D2      LADimensionType = "2D"
+	D3      LADimensionType = "3D"
+	Liminal LADimensionType = "laminal"
 )
 
 //
@@ -224,7 +224,7 @@ type LASurfaceRelationType string
 
 const (
 	MixedSRT  LASurfaceRelationType = "mixed" // Due to conflict with LALevelContentType, Mixed can't be used.
-	Below                           = "below"
-	Above                           = "above"
-	OnSurface                       = "onSurface"
+	Below     LASurfaceRelationType = "below"
+	Above     LASurfaceRelationType = "above"
+	OnSurface LASurfaceRelationType = "onSurface"
 )

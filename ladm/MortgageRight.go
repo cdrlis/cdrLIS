@@ -10,10 +10,10 @@ type MortgageRight struct {
 
 	MortgageID                   string         `gorm:"column:mortgage" json:"-"`
 	MortgageBeginLifespanVersion time.Time      `gorm:"column:mortgagebeginlifespanversion" json:"-"`
-	Mortgage                     *LASpatialUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:MortgageID,MortgageBeginLifespanVersion" json:"mortgage"`
+	Mortgage                     *LAMortgage    `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:MortgageID,MortgageBeginLifespanVersion" json:"mortgage"`
 
-	RightID                      string         `gorm:"column:right" json:"-"`
-	RightBeginLifespanVersion    time.Time      `gorm:"column:rightbeginlifespanversion" json:"-"`
+	RightID                      string         `gorm:"column:right_" json:"-"`
+	RightBeginLifespanVersion    time.Time      `gorm:"column:right_beginlifespanversion" json:"-"`
 	Right                        *LARight       `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:RightID,RightBeginLifespanVersion" json:"right"`
 	
 	Index                        int            `gorm:"column:index" json:"index"`

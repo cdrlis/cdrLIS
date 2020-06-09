@@ -366,6 +366,7 @@ CREATE TABLE "mortgageRight" (
                                  beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                  endLifeSpanVersion		TIMESTAMP,
                                  PRIMARY KEY(mortgage, right_, beginLifeSpanVersion),
+                                 UNIQUE(mortgage, mortgageBeginLifeSpanVersion, right_, right_BeginLifeSpanVersion),
                                  FOREIGN KEY (mortgage, mortgageBeginLifeSpanVersion) REFERENCES "LA_Mortgage"(id, beginLifeSpanVersion),
                                  FOREIGN KEY (right_, right_BeginLifeSpanVersion) REFERENCES "LA_Right"(id, beginLifeSpanVersion)
 );
@@ -409,7 +410,6 @@ ALTER TABLE "LA_RRR"
 
 
 CREATE TABLE "LA_RequiredRelationshipBAUnit" (
-                                                 id							VARCHAR NOT NULL,
                                                  relationship				VARCHAR NOT NULL,
 --	quality						"DQ_Element",								-- Omitted for simplicity
 --	source 						"CI_ResponsibleParty",						-- Omitted for simplicity
@@ -419,7 +419,7 @@ CREATE TABLE "LA_RequiredRelationshipBAUnit" (
                                                  unit1BeginLifeSpanVersion 	TIMESTAMP NOT NULL,
                                                  unit2						VARCHAR NOT NULL,			-- LA_BAUnit.id
                                                  unit2BeginLifeSpanVersion	TIMESTAMP NOT NULL,
-                                                 PRIMARY KEY(id, beginLifeSpanVersion),
+                                                 PRIMARY KEY(unit1, unit2, beginLifeSpanVersion),
                                                  UNIQUE(unit1, unit1BeginLifeSpanVersion, unit2, unit2BeginLifeSpanVersion),
                                                  FOREIGN KEY (unit1, unit1BeginLifeSpanVersion) REFERENCES "LA_BAUnit" (id, beginLifeSpanVersion),
                                                  FOREIGN KEY (unit2, unit2BeginLifeSpanVersion) REFERENCES "LA_BAUnit" (id, beginLifeSpanVersion)
@@ -435,6 +435,7 @@ CREATE TABLE "baunitAsParty" (
                                  beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                  endLifeSpanVersion		TIMESTAMP,
                                  PRIMARY KEY (unit, party, beginLifeSpanVersion),
+                                 UNIQUE (unit, unitBeginLifeSpanVersion, party, partyBeginLifeSpanVersion),
                                  FOREIGN KEY (unit, unitBeginLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion),
                                  FOREIGN KEY (party, partyBeginLifeSpanVersion) REFERENCES "LA_Party"(id, beginLifeSpanVersion)
 );
@@ -569,7 +570,6 @@ CREATE TYPE "ISO19125_Type" AS ENUM (
     'ST_Equals', 'ST_Disjoint', 'ST_Intersects', 'ST_Touches', 'ST_Crosses', 'ST_Within', 'ST_Contains', 'ST_Overlaps'
     );
 CREATE TABLE "LA_RequiredRelationshipSpatialUnit" (
-                                                      id								VARCHAR NOT NULL,
 --	quality							"DQ_Element",								-- Omitted for simplicity
 --	source 							"CI_ResponsibleParty",						-- Omitted for simplicity
                                                       su1								VARCHAR NOT NULL,			-- LA_SpatialUnit.id
@@ -579,7 +579,7 @@ CREATE TABLE "LA_RequiredRelationshipSpatialUnit" (
                                                       relationship					"ISO19125_Type",
                                                       beginLifeSpanVersion 			TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                                       endLifeSpanVersion				TIMESTAMP,
-                                                      PRIMARY KEY (id, beginLifeSpanVersion),
+                                                      PRIMARY KEY (su1, su2, beginLifeSpanVersion),
                                                       UNIQUE(su1, su1BeginLifeSpanVersion, su2, su2BeginLifeSpanVersion),
                                                       FOREIGN KEY (su1, su1BeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
                                                       FOREIGN KEY (su2, su2BeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion)
@@ -619,6 +619,7 @@ CREATE TABLE "suSuGroup" (
                              beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                              endLifeSpanVersion		TIMESTAMP,
                              PRIMARY KEY (part, whole, beginLifeSpanVersion),
+                             UNIQUE (part, partBeginLifeSpanVersion, whole, wholeBeginLifeSpanVersion),
                              FOREIGN KEY (part, partBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
                              FOREIGN KEY (whole, wholeBeginLifeSpanVersion) REFERENCES "LA_SpatialUnitGroup"(id, beginLifeSpanVersion)
 );
@@ -631,6 +632,7 @@ CREATE TABLE "suBaunit" (
                             beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             endLifeSpanVersion		TIMESTAMP,
                             PRIMARY KEY (su, baunit, beginLifeSpanVersion),
+                            UNIQUE (su, suBeginLifeSpanVersion, baunit, baunitBeginLifeSpanVersion),
                             FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion),
                             FOREIGN KEY (baunit, baunitBeginLifeSpanVersion) REFERENCES "LA_BAUnit"(id, beginLifeSpanVersion)
 );
@@ -701,6 +703,7 @@ CREATE TABLE "minus" (
                          beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                          endLifeSpanVersion		TIMESTAMP,
                          PRIMARY KEY (bfs, su, beginLifeSpanVersion),
+                         UNIQUE (bfs, bfsBeginLifeSpanVersion, su, suBeginLifeSpanVersion),
                          FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion),
                          FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion)
 );
@@ -713,6 +716,7 @@ CREATE TABLE "plus" (
                         beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         endLifeSpanVersion		TIMESTAMP,
                         PRIMARY KEY (bfs, su, beginLifeSpanVersion),
+                        UNIQUE (bfs, bfsBeginLifeSpanVersion, su, suBeginLifeSpanVersion),
                         FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion),
                         FOREIGN KEY (su, suBeginLifeSpanVersion) REFERENCES "LA_SpatialUnit"(id, beginLifeSpanVersion)
 );
@@ -781,6 +785,7 @@ CREATE TABLE "pointBfs" (
                             beginLifeSpanVersion 	TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             endLifeSpanVersion		TIMESTAMP,
                             PRIMARY KEY (point, bfs, beginLifeSpanVersion),
+                            UNIQUE (point, pointBeginLifeSpanVersion, bfs, bfsBeginLifeSpanVersion),
                             FOREIGN KEY (point, pointBeginLifeSpanVersion) REFERENCES "LA_Point"(id, beginLifeSpanVersion),
                             FOREIGN KEY (bfs, bfsBeginLifeSpanVersion) REFERENCES "LA_BoundaryFaceString"(id, beginLifeSpanVersion)
 );

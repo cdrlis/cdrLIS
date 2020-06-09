@@ -8,11 +8,11 @@ import (
 	"time"
 )
 
-type LAPointBfsCRUD struct {
+type PointBfsCRUD struct {
 	DB *gorm.DB
 }
 
-func (crud LAPointBfsCRUD) Read(where ...interface{}) (interface{}, error) {
+func (crud PointBfsCRUD) Read(where ...interface{}) (interface{}, error) {
 	var pointBfs ladm.PointBfs
 	if where != nil {
 		reader := crud.DB.Where("point = ? AND "+
@@ -29,7 +29,7 @@ func (crud LAPointBfsCRUD) Read(where ...interface{}) (interface{}, error) {
 	return nil, nil
 }
 
-func (crud LAPointBfsCRUD) Create(pointBfsIn interface{}) (interface{}, error) {
+func (crud PointBfsCRUD) Create(pointBfsIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	pointBfs := pointBfsIn.(ladm.PointBfs)
 	currentTime := time.Now()
@@ -51,7 +51,7 @@ func (crud LAPointBfsCRUD) Create(pointBfsIn interface{}) (interface{}, error) {
 	return &pointBfs, nil
 }
 
-func (crud LAPointBfsCRUD) ReadAll(where ...interface{}) (interface{}, error) {
+func (crud PointBfsCRUD) ReadAll(where ...interface{}) (interface{}, error) {
 	var pointBfss []ladm.PointBfs
 	if crud.DB.Where("endlifespanversion IS NULL").
 		Preload("Point", "endlifespanversion IS NULL").
@@ -61,7 +61,7 @@ func (crud LAPointBfsCRUD) ReadAll(where ...interface{}) (interface{}, error) {
 	return &pointBfss, nil
 }
 
-func (crud LAPointBfsCRUD) Update(pointBfsIn interface{}) (interface{}, error) {
+func (crud PointBfsCRUD) Update(pointBfsIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	pointBfs := pointBfsIn.(*ladm.PointBfs)
 	currentTime := time.Now()
@@ -98,7 +98,7 @@ func (crud LAPointBfsCRUD) Update(pointBfsIn interface{}) (interface{}, error) {
 	return pointBfs, nil
 }
 
-func (crud LAPointBfsCRUD) Delete(pointBfsIn interface{}) error {
+func (crud PointBfsCRUD) Delete(pointBfsIn interface{}) error {
 	tx := crud.DB.Begin()
 	pointBfs := pointBfsIn.(ladm.PointBfs)
 	currentTime := time.Now()

@@ -41,7 +41,7 @@ type LASpatialUnit struct {
 	ReferencePoint  *geometry.GMPoint      `gorm:"column:referencepoint" json:"referencePoint"`
 	SuID            common.Oid             `gorm:"column:suid" json:"suID"`
 	SurfaceRelation *LASurfaceRelationType `gorm:"column:surfacerelation" json:"surfaceRelation"`
-	
+
 	LevelID                   string    `gorm:"column:level" json:"-"`
 	LevelBeginLifespanVersion time.Time `gorm:"column:levelbeginlifespanversion" json:"-"`
 	Level                     *LALevel  `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:LevelID,LevelBeginLifespanVersion" json:"level"`
@@ -211,7 +211,7 @@ const (
 	D1      LADimensionType = "1D"
 	D2      LADimensionType = "2D"
 	D3      LADimensionType = "3D"
-	Liminal LADimensionType = "laminal"
+	Liminal LADimensionType = "liminal"
 )
 
 //

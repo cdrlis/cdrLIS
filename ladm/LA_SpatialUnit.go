@@ -191,7 +191,7 @@ const (
 
 // Value Returns AreaValue
 func (area LAAreaValue) Value() (driver.Value, error) {
-	return fmt.Sprintf("(%s,%f)", area.Type, area.AreaSize), nil
+	return fmt.Sprintf("(%f,%s)", area.AreaSize, area.Type), nil
 }
 
 // Scan Reads AreaValue

@@ -78,7 +78,7 @@ func (handler *RrrHandler) UpdateRrr(w http.ResponseWriter, r *http.Request, p h
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.RrrCRUD.Update(&newRrr)
+	handler.RrrCRUD.Update(newRrr)
 	respondJSON(w, 200, newRrr)
 }
 

@@ -9,6 +9,7 @@ import (
 	"github.com/cdrlis/cdrLIS/ladm/external"
 	"github.com/paulsmith/gogeos/geos"
 	"regexp"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -109,8 +110,12 @@ func (su LASpatialUnit) Boundary() (*geos.Geometry, error) {
 		if bfs.Bfs.Geometry != nil {
 			geom = &(bfs.Bfs.Geometry.GMObject.Geometry)
 		} else if len(bfs.Bfs.Point) >= 2 {
+			points := bfs.Bfs.Point
+			sort.Slice(points, func(i, j int) bool {
+				return points[i].Index < points[j].Index
+			})
 			var resultCords []geos.Coord
-			for _, point := range bfs.Bfs.Point{
+			for _, point := range points{
 				resultCords = append(resultCords, geos.MustCoords(point.Point.OriginalLocation.Coords())...)
 			}
 			geom = geos.Must(geos.NewLineString(resultCords...))
@@ -133,8 +138,12 @@ func (su LASpatialUnit) Boundary() (*geos.Geometry, error) {
 		if bfs.Bfs.Geometry != nil {
 			geom = &(bfs.Bfs.Geometry.GMObject.Geometry)
 		} else if len(bfs.Bfs.Point) >= 2 {
+			points := bfs.Bfs.Point
+			sort.Slice(points, func(i, j int) bool {
+				return points[i].Index < points[j].Index
+			})
 			var resultCords []geos.Coord
-			for _, point := range bfs.Bfs.Point{
+			for _, point := range points{
 				resultCords = append(resultCords, geos.MustCoords(point.Point.OriginalLocation.Coords())...)
 			}
 			geom = geos.Must(geos.NewLineString(resultCords...))

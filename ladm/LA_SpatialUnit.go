@@ -108,6 +108,13 @@ func (su LASpatialUnit) Boundary() (*geos.Geometry, error) {
 		var geom *geos.Geometry
 		if bfs.Bfs.Geometry != nil {
 			geom = &(bfs.Bfs.Geometry.GMObject.Geometry)
+		}
+		if len(bfs.Bfs.Point) >= 2 {
+			var resultCords []geos.Coord
+			for _, point := range bfs.Bfs.Point{
+				resultCords = append(resultCords, geos.MustCoords(point.Point.OriginalLocation.Coords())...)
+			}
+			geom = geos.Must(geos.NewLineString(resultCords...))
 		} else {
 			continue
 		}

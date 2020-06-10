@@ -1,4 +1,4 @@
-## ***cdrLIS*** -- generic and extensible core of a consistent, distributed and resilient land information system (LIS).
+## ***cdrLIS*** -- a generic and extensible core of a consistent, distributed and resilient land information system (LIS).
 
 **cdrLIS** is a generic and extensible LADM-compliant core framework implemented in [Go](https://golang.org) programming language.
 

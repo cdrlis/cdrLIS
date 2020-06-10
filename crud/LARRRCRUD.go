@@ -126,7 +126,7 @@ func (crud LARRRCRUD) ReadAll(where ...interface{}) (interface{}, error) {
 }
 
 func (crud LARRRCRUD) Update(rrrIn interface{}) (interface{}, error) {
-	rrr := rrrIn.(ladm.LARRR)
+	rrr := rrrIn.(*ladm.LARRR)
 	tx := crud.DB.Begin()
 	rCount := 0
 	if rrr.Right != nil {

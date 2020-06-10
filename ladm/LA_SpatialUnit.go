@@ -46,7 +46,7 @@ type LASpatialUnit struct {
 	LevelBeginLifespanVersion time.Time `gorm:"column:levelbeginlifespanversion" json:"-"`
 	Level                     *LALevel  `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:LevelID,LevelBeginLifespanVersion" json:"level"`
 
-	BuildingUnit LARequiredRelationshipSpatialUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"building,omitempty"`
+	BuildingUnit *LALegalSpaceBuildingUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"building,omitempty"`
 
 	Baunit []SuBAUnit `gorm:"foreignkey:SUID,SUBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"baunit"`
 

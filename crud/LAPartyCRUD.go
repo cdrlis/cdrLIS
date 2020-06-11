@@ -36,8 +36,14 @@ func (crud LAPartyCRUD) Read(where ...interface{}) (interface{}, error) {
 func (crud LAPartyCRUD) Create(partyIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	party := partyIn.(ladm.LAParty)
-	reader := tx.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).First(&party)
-	if reader.RowsAffected != 0 {
+	existing := 0
+	reader := tx.Model(&ladm.LAParty{}).Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity already exists")
 	}

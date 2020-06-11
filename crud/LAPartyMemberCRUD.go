@@ -36,6 +36,21 @@ func (crud LAPartyMemberCRUD) Create(partyMemberIn interface{}) (interface{}, er
 		tx.Rollback()
 		return nil, errors.New("Group not found")
 	}
+	existing := 0
+	reader := tx.Model(&ladm.LAPartyMember{}).Where("parties = ? AND "+
+		"groups = ? AND "+
+		"endlifespanversion IS NULL",
+		partyMember.Party.PID.String(),
+		partyMember.Group.PID.String()).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	partyMember.BeginLifespanVersion = currentTime
 	partyMember.EndLifespanVersion = nil

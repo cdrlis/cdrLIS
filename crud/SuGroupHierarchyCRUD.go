@@ -32,6 +32,21 @@ func (crud SuGroupHierarchyCRUD) Read(where ...interface{}) (interface{}, error)
 func (crud SuGroupHierarchyCRUD) Create(suGroupHierarchyIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	suGroupHierarchy := suGroupHierarchyIn.(ladm.SuGroupHierarchy)
+	existing := 0
+	reader := tx.Model(&ladm.SuGroupHierarchy{}).Where("set = ? AND "+
+		"element = ? AND "+
+		"endlifespanversion IS NULL",
+		suGroupHierarchy.Set.SugID.String(),
+		suGroupHierarchy.Element.SugID.String()).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	suGroupHierarchy.BeginLifespanVersion = currentTime
 	suGroupHierarchy.EndLifespanVersion = nil
@@ -40,12 +55,12 @@ func (crud SuGroupHierarchyCRUD) Create(suGroupHierarchyIn interface{}) (interfa
 	suGroupHierarchy.ElementID = suGroupHierarchy.Element.SugID.String()
 	suGroupHierarchy.ElementBeginLifespanVersion = suGroupHierarchy.Element.BeginLifespanVersion
 	writer := tx.Set("gorm:save_associations", false).Create(&suGroupHierarchy)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return &suGroupHierarchy, nil
@@ -87,12 +102,12 @@ func (crud SuGroupHierarchyCRUD) Update(suGroupHierarchyIn interface{}) (interfa
 	suGroupHierarchy.ElementID = suGroupHierarchy.Element.SugID.String()
 	suGroupHierarchy.ElementBeginLifespanVersion = suGroupHierarchy.Element.BeginLifespanVersion
 	writer = tx.Set("gorm:save_associations", false).Create(&suGroupHierarchy)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return suGroupHierarchy, nil
@@ -117,7 +132,7 @@ func (crud SuGroupHierarchyCRUD) Delete(suGroupHierarchyIn interface{}) error {
 		return errors.New("Entity not found")
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return commit.Error
 	}
 	return nil

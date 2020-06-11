@@ -32,6 +32,21 @@ func (crud LARequiredRelationshipBAUnitCRUD) Read(where ...interface{}) (interfa
 func (crud LARequiredRelationshipBAUnitCRUD) Create(relationshipBAUnitIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	relationshipBAUnit := relationshipBAUnitIn.(ladm.LARequiredRelationshipBAUnit)
+	existing := 0
+	reader := tx.Model(&ladm.LARequiredRelationshipBAUnit{}).Where("unit1 = ? AND "+
+		"unit2 = ? AND "+
+		"endlifespanversion IS NULL",
+		relationshipBAUnit.Unit1.SuID.String(),
+		relationshipBAUnit.Unit2.SuID.String()).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	relationshipBAUnit.BeginLifespanVersion = currentTime
 	relationshipBAUnit.EndLifespanVersion = nil
@@ -40,12 +55,12 @@ func (crud LARequiredRelationshipBAUnitCRUD) Create(relationshipBAUnitIn interfa
 	relationshipBAUnit.Unit2ID = relationshipBAUnit.Unit2.SuID.String()
 	relationshipBAUnit.Unit2BeginLifespanVersion = relationshipBAUnit.Unit2.BeginLifespanVersion
 	writer := tx.Set("gorm:save_associations", false).Create(&relationshipBAUnit)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return &relationshipBAUnit, nil
@@ -87,12 +102,12 @@ func (crud LARequiredRelationshipBAUnitCRUD) Update(relationshipBAUnitIn interfa
 	relationshipBAUnit.Unit2ID = relationshipBAUnit.Unit2.SuID.String()
 	relationshipBAUnit.Unit2BeginLifespanVersion = relationshipBAUnit.Unit2.BeginLifespanVersion
 	writer = tx.Set("gorm:save_associations", false).Create(&relationshipBAUnit)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return relationshipBAUnit, nil
@@ -117,7 +132,7 @@ func (crud LARequiredRelationshipBAUnitCRUD) Delete(relationshipBAUnitIn interfa
 		return errors.New("Entity not found")
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return commit.Error
 	}
 	return nil

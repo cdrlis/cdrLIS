@@ -27,6 +27,17 @@ func (crud LAPointCRUD) Read(where ...interface{}) (interface{}, error) {
 func (crud LAPointCRUD) Create(pointIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	point := pointIn.(ladm.LAPoint)
+	existing := 0
+	reader := tx.Model(&ladm.LAPoint{}).Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", point.PID).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	point.ID = point.PID.String()
 	point.BeginLifespanVersion = currentTime

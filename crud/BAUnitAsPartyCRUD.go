@@ -32,6 +32,21 @@ func (crud BAUnitAsPartyCRUD) Read(where ...interface{}) (interface{}, error) {
 func (crud BAUnitAsPartyCRUD) Create(baunitAsPartyIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	baunitAsParty := baunitAsPartyIn.(ladm.BAUnitAsParty)
+	existing := 0
+	reader := tx.Model(&ladm.BAUnitAsParty{}).Where("unit = ? AND "+
+		"party = ? AND "+
+		"endlifespanversion IS NULL",
+		baunitAsParty.Unit.UID.String(),
+		baunitAsParty.Party.PID.String()).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	baunitAsParty.BeginLifespanVersion = currentTime
 	baunitAsParty.EndLifespanVersion = nil
@@ -40,12 +55,12 @@ func (crud BAUnitAsPartyCRUD) Create(baunitAsPartyIn interface{}) (interface{}, 
 	baunitAsParty.PartyID = baunitAsParty.Party.PID.String()
 	baunitAsParty.PartyBeginLifespanVersion = baunitAsParty.Party.BeginLifespanVersion
 	writer := tx.Set("gorm:save_associations", false).Create(&baunitAsParty)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return &baunitAsParty, nil
@@ -87,12 +102,12 @@ func (crud BAUnitAsPartyCRUD) Update(baunitAsPartyIn interface{}) (interface{}, 
 	baunitAsParty.PartyID = baunitAsParty.Party.PID.String()
 	baunitAsParty.PartyBeginLifespanVersion = baunitAsParty.Party.BeginLifespanVersion
 	writer = tx.Set("gorm:save_associations", false).Create(&baunitAsParty)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return baunitAsParty, nil
@@ -117,7 +132,7 @@ func (crud BAUnitAsPartyCRUD) Delete(baunitAsPartyIn interface{}) error {
 		return errors.New("Entity not found")
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return commit.Error
 	}
 	return nil

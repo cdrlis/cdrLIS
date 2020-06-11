@@ -39,6 +39,17 @@ func (crud LASpatialUnitCRUD) Read(where ...interface{}) (interface{}, error) {
 func (crud LASpatialUnitCRUD) Create(spatialUnitIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	spatialUnit := spatialUnitIn.(ladm.LASpatialUnit)
+	existing := 0
+	reader := tx.Model(&ladm.LASpatialUnit{}).Where("suid = ?::\"Oid\" AND endlifespanversion IS NULL", spatialUnit.SuID).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	spatialUnit.ID = spatialUnit.SuID.String()
 	spatialUnit.BeginLifespanVersion = currentTime

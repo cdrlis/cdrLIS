@@ -29,6 +29,17 @@ func (crud LABoundaryFaceStringCRUD) Read(where ...interface{}) (interface{}, er
 func (crud LABoundaryFaceStringCRUD) Create(boundaryFaceStringIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	boundaryFaceString := boundaryFaceStringIn.(ladm.LABoundaryFaceString)
+	existing := 0
+	reader := tx.Model(&ladm.LABoundaryFaceString{}).Where("bfsid = ?::\"Oid\" AND endlifespanversion IS NULL", boundaryFaceString.BfsID).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	boundaryFaceString.ID = boundaryFaceString.BfsID.String()
 	boundaryFaceString.BeginLifespanVersion = currentTime

@@ -32,6 +32,21 @@ func (crud BfsSpatialUnitMinusCRUD) Read(where ...interface{}) (interface{}, err
 func (crud BfsSpatialUnitMinusCRUD) Create(bfsSpatialUnitIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	bfsSpatialUnit := bfsSpatialUnitIn.(ladm.BfsSpatialUnitMinus)
+	existing := 0
+	reader := tx.Model(&ladm.BfsSpatialUnitMinus{}).Where("su = ? AND "+
+		"bfs = ? AND "+
+		"endlifespanversion IS NULL",
+		bfsSpatialUnit.Su.SuID.String(),
+		bfsSpatialUnit.Bfs.BfsID.String()).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	bfsSpatialUnit.BeginLifespanVersion = currentTime
 	bfsSpatialUnit.EndLifespanVersion = nil

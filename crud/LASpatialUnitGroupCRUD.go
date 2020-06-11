@@ -27,6 +27,17 @@ func (crud LASpatialUnitGroupCRUD) Read(where ...interface{}) (interface{}, erro
 func (crud LASpatialUnitGroupCRUD) Create(suGroupIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	suGroup := suGroupIn.(ladm.LASpatialUnitGroup)
+	existing := 0
+	reader := tx.Model(&ladm.LASpatialUnitGroup{}).Where("sugid = ?::\"Oid\" AND endlifespanversion IS NULL", suGroup.SugID).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	suGroup.ID = suGroup.SugID.String()
 	suGroup.BeginLifespanVersion = currentTime

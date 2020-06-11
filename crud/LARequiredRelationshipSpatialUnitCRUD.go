@@ -32,6 +32,21 @@ func (crud LARequiredRelationshipSpatialUnitCRUD) Read(where ...interface{}) (in
 func (crud LARequiredRelationshipSpatialUnitCRUD) Create(relationshipSuIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	relationshipSu := relationshipSuIn.(ladm.LARequiredRelationshipSpatialUnit)
+	existing := 0
+	reader := tx.Model(&ladm.LARequiredRelationshipSpatialUnit{}).Where("su1 = ? AND "+
+		"su2 = ? AND "+
+		"endlifespanversion IS NULL",
+		relationshipSu.Su1.SuID.String(),
+		relationshipSu.Su2.SuID.String()).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	relationshipSu.BeginLifespanVersion = currentTime
 	relationshipSu.EndLifespanVersion = nil
@@ -40,12 +55,12 @@ func (crud LARequiredRelationshipSpatialUnitCRUD) Create(relationshipSuIn interf
 	relationshipSu.Su2ID = relationshipSu.Su2.SuID.String()
 	relationshipSu.Su2BeginLifespanVersion = relationshipSu.Su2.BeginLifespanVersion
 	writer := tx.Set("gorm:save_associations", false).Create(&relationshipSu)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return &relationshipSu, nil
@@ -87,12 +102,12 @@ func (crud LARequiredRelationshipSpatialUnitCRUD) Update(relationshipSuIn interf
 	relationshipSu.Su2ID = relationshipSu.Su2.SuID.String()
 	relationshipSu.Su2BeginLifespanVersion = relationshipSu.Su2.BeginLifespanVersion
 	writer = tx.Set("gorm:save_associations", false).Create(&relationshipSu)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return relationshipSu, nil
@@ -117,7 +132,7 @@ func (crud LARequiredRelationshipSpatialUnitCRUD) Delete(relationshipSuIn interf
 		return errors.New("Entity not found")
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return commit.Error
 	}
 	return nil

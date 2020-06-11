@@ -32,6 +32,21 @@ func (crud PointBfsCRUD) Read(where ...interface{}) (interface{}, error) {
 func (crud PointBfsCRUD) Create(pointBfsIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	pointBfs := pointBfsIn.(ladm.PointBfs)
+	existing := 0
+	reader := tx.Model(&ladm.PointBfs{}).Where("point = ? AND "+
+		"bfs = ? AND "+
+		"endlifespanversion IS NULL",
+		pointBfs.Point.PID.String(),
+		pointBfs.Bfs.BfsID.String()).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	pointBfs.BeginLifespanVersion = currentTime
 	pointBfs.EndLifespanVersion = nil
@@ -40,12 +55,12 @@ func (crud PointBfsCRUD) Create(pointBfsIn interface{}) (interface{}, error) {
 	pointBfs.BfsID = pointBfs.Bfs.BfsID.String()
 	pointBfs.BfsBeginLifespanVersion = pointBfs.Bfs.BeginLifespanVersion
 	writer := tx.Set("gorm:save_associations", false).Create(&pointBfs)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return &pointBfs, nil
@@ -87,12 +102,12 @@ func (crud PointBfsCRUD) Update(pointBfsIn interface{}) (interface{}, error) {
 	pointBfs.BfsID = pointBfs.Bfs.BfsID.String()
 	pointBfs.BfsBeginLifespanVersion = pointBfs.Bfs.BeginLifespanVersion
 	writer = tx.Set("gorm:save_associations", false).Create(&pointBfs)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return pointBfs, nil
@@ -117,7 +132,7 @@ func (crud PointBfsCRUD) Delete(pointBfsIn interface{}) error {
 		return errors.New("Entity not found")
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return commit.Error
 	}
 	return nil

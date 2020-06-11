@@ -31,8 +31,19 @@ func (crud LARRRCRUD) Read(where ...interface{}) (interface{}, error) {
 }
 
 func (crud LARRRCRUD) Create(rrrIn interface{}) (interface{}, error) {
-	rrr := rrrIn.(ladm.LARRR)
 	tx := crud.DB.Begin()
+	rrr := rrrIn.(ladm.LARRR)
+	existing := 0
+	reader := tx.Model(&ladm.LARRR{}).Where("rid = ?::\"Oid\" AND endlifespanversion IS NULL", rrr.RID.String()).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	rCount := 0
 	if rrr.Right != nil {
 		rCount += 1

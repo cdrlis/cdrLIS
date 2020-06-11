@@ -35,6 +35,17 @@ func (crud LABAUnitCRUD) Read(where ...interface{}) (interface{}, error) {
 func (crud LABAUnitCRUD) Create(baUnitIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	baUnit := baUnitIn.(ladm.LABAUnit)
+	existing := 0
+	reader := tx.Model(&ladm.LABAUnit{}).Where("uid = ?::\"Oid\" AND endlifespanversion IS NULL", baUnit.UID).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	baUnit.ID = baUnit.UID.String()
 	baUnit.BeginLifespanVersion = currentTime

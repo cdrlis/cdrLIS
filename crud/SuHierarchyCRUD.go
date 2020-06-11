@@ -32,6 +32,21 @@ func (crud SuHierarchyCRUD) Read(where ...interface{}) (interface{}, error) {
 func (crud SuHierarchyCRUD) Create(suHierarchyIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	suHierarchy := suHierarchyIn.(ladm.SuHierarchy)
+	existing := 0
+	reader := tx.Model(&ladm.SuHierarchy{}).Where("parent = ? AND "+
+		"child = ? AND "+
+		"endlifespanversion IS NULL",
+		suHierarchy.Parent.SuID.String(),
+		suHierarchy.Child.SuID.String()).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	suHierarchy.BeginLifespanVersion = currentTime
 	suHierarchy.EndLifespanVersion = nil
@@ -40,12 +55,12 @@ func (crud SuHierarchyCRUD) Create(suHierarchyIn interface{}) (interface{}, erro
 	suHierarchy.ChildID = suHierarchy.Child.SuID.String()
 	suHierarchy.ChildBeginLifespanVersion = suHierarchy.Child.BeginLifespanVersion
 	writer := tx.Set("gorm:save_associations", false).Create(&suHierarchy)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return &suHierarchy, nil
@@ -87,12 +102,12 @@ func (crud SuHierarchyCRUD) Update(suHierarchyIn interface{}) (interface{}, erro
 	suHierarchy.ChildID = suHierarchy.Child.SuID.String()
 	suHierarchy.ChildBeginLifespanVersion = suHierarchy.Child.BeginLifespanVersion
 	writer = tx.Set("gorm:save_associations", false).Create(&suHierarchy)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return suHierarchy, nil
@@ -117,7 +132,7 @@ func (crud SuHierarchyCRUD) Delete(suHierarchyIn interface{}) error {
 		return errors.New("Entity not found")
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return commit.Error
 	}
 	return nil

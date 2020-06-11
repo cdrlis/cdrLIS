@@ -32,6 +32,21 @@ func (crud SuSuGroupCRUD) Read(where ...interface{}) (interface{}, error) {
 func (crud SuSuGroupCRUD) Create(suSuGroupIn interface{}) (interface{}, error) {
 	tx := crud.DB.Begin()
 	suSuGroup := suSuGroupIn.(ladm.SuSuGroup)
+	existing := 0
+	reader := tx.Model(&ladm.SuSuGroup{}).Where("whole = ? AND "+
+		"part = ? AND "+
+		"endlifespanversion IS NULL",
+		suSuGroup.Whole.SugID.String(),
+		suSuGroup.Part.SuID.String()).
+		Count(&existing)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
+	if existing != 0 {
+		tx.Rollback()
+		return nil, errors.New("Entity already exists")
+	}
 	currentTime := time.Now()
 	suSuGroup.BeginLifespanVersion = currentTime
 	suSuGroup.EndLifespanVersion = nil
@@ -40,12 +55,12 @@ func (crud SuSuGroupCRUD) Create(suSuGroupIn interface{}) (interface{}, error) {
 	suSuGroup.PartID = suSuGroup.Part.SuID.String()
 	suSuGroup.PartBeginLifespanVersion = suSuGroup.Part.BeginLifespanVersion
 	writer := tx.Set("gorm:save_associations", false).Create(&suSuGroup)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return &suSuGroup, nil
@@ -87,12 +102,12 @@ func (crud SuSuGroupCRUD) Update(suSuGroupIn interface{}) (interface{}, error) {
 	suSuGroup.PartID = suSuGroup.Part.SuID.String()
 	suSuGroup.PartBeginLifespanVersion = suSuGroup.Part.BeginLifespanVersion
 	writer = tx.Set("gorm:save_associations", false).Create(&suSuGroup)
-	if writer.Error != nil{
+	if writer.Error != nil {
 		tx.Rollback()
 		return nil, writer.Error
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return nil, commit.Error
 	}
 	return suSuGroup, nil
@@ -117,7 +132,7 @@ func (crud SuSuGroupCRUD) Delete(suSuGroupIn interface{}) error {
 		return errors.New("Entity not found")
 	}
 	commit := tx.Commit()
-	if commit.Error != nil{
+	if commit.Error != nil {
 		return commit.Error
 	}
 	return nil

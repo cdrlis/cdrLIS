@@ -181,9 +181,9 @@ func main() {
 
 	router.GET("/pointbfs", pointBfsHandler.GetPointBfss)
 	router.POST("/pointbfs", pointBfsHandler.CreatePointBfs)
-	router.GET("/pointbfs/:sugNamespace/:sugLocalId/:suNamespace/:suLocalId", pointBfsHandler.GetPointBfs)
-	router.PUT("/pointbfs/:sugNamespace/:sugLocalId/:suNamespace/:suLocalId", pointBfsHandler.UpdatePointBfs)
-	router.DELETE("/pointbfs/:sugNamespace/:sugLocalId/:suNamespace/:suLocalId", pointBfsHandler.DeletePointBfs)
+	router.GET("/pointbfs/:pointNamespace/:pointLocalId/:bfsNamespace/:bfsLocalId", pointBfsHandler.GetPointBfs)
+	router.PUT("/pointbfs/:pointNamespace/:pointLocalId/:bfsNamespace/:bfsLocalId", pointBfsHandler.UpdatePointBfs)
+	router.DELETE("/pointbfs/:pointNamespace/:pointLocalId/:bfsNamespace/:bfsLocalId", pointBfsHandler.DeletePointBfs)
 
 	handler := cors.Default().Handler(router)
 	http.ListenAndServe(":3000", handler)

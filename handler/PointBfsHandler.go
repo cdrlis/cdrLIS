@@ -52,7 +52,7 @@ func (handler *PointBfsHandler) CreatePointBfs(w http.ResponseWriter, r *http.Re
 		respondError(w, 404, err.Error())
 		return
 	}
-	pointBfs.Point.BeginLifespanVersion = point.(ladm.LASpatialUnit).BeginLifespanVersion
+	pointBfs.Point.BeginLifespanVersion = point.(ladm.LAPoint).BeginLifespanVersion
 	pointBfs.Bfs.BeginLifespanVersion = bfs.(ladm.LABoundaryFaceString).BeginLifespanVersion
 	createdPointBfs, err := handler.PointBfsCRUD.Create(pointBfs)
 	if err != nil {

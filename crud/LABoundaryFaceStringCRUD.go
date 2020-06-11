@@ -15,6 +15,8 @@ func (crud LABoundaryFaceStringCRUD) Read(where ...interface{}) (interface{}, er
 	var boundaryFaceString ladm.LABoundaryFaceString
 	if where != nil {
 		reader := crud.DB.Where("bfsid = ?::\"Oid\" AND endlifespanversion IS NULL", where).
+			Preload("Point", "endlifespanversion IS NULL").
+			Preload("Point.Point", "endlifespanversion IS NULL").
 			First(&boundaryFaceString)
 		if reader.RowsAffected == 0 {
 			return nil, errors.New("Entity not found")

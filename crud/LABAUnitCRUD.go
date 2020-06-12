@@ -101,7 +101,7 @@ func (crud LABAUnitCRUD) Update(baUnitIn interface{}) (interface{}, error) {
 		return nil, writer.Error
 	}
 	reader = tx.Where("uid = ?::\"Oid\" AND endlifespanversion = ?", baUnit.UID, currentTime).
-		Preload("Su", "endlifespanversion IS NULL").
+		Preload("SU", "endlifespanversion IS NULL").
 		Preload("RRR", "endlifespanversion IS NULL").
 		Preload("RRR.Right", "endlifespanversion IS NULL").
 		Preload("RRR.Responsibility", "endlifespanversion IS NULL").
@@ -266,7 +266,7 @@ func (crud LABAUnitCRUD) Delete(baUnitIn interface{}) error {
 	}
 
 	reader = tx.Where("uid = ?::\"Oid\" AND endlifespanversion = ?", baUnit.UID, currentTime).
-		Preload("Su", "endlifespanversion IS NULL").
+		Preload("SU", "endlifespanversion IS NULL").
 		Preload("RRR", "endlifespanversion IS NULL").
 		Preload("RRR.Right", "endlifespanversion IS NULL").
 		Preload("RRR.Responsibility", "endlifespanversion IS NULL").

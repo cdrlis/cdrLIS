@@ -36,8 +36,8 @@ func (crud LARequiredRelationshipBAUnitCRUD) Create(relationshipBAUnitIn interfa
 	reader := tx.Model(&ladm.LARequiredRelationshipBAUnit{}).Where("unit1 = ? AND "+
 		"unit2 = ? AND "+
 		"endlifespanversion IS NULL",
-		relationshipBAUnit.Unit1.SuID.String(),
-		relationshipBAUnit.Unit2.SuID.String()).
+		relationshipBAUnit.Unit1.UID.String(),
+		relationshipBAUnit.Unit2.UID.String()).
 		Count(&existing)
 	if reader.Error != nil{
 		tx.Rollback()
@@ -50,9 +50,9 @@ func (crud LARequiredRelationshipBAUnitCRUD) Create(relationshipBAUnitIn interfa
 	currentTime := time.Now()
 	relationshipBAUnit.BeginLifespanVersion = currentTime
 	relationshipBAUnit.EndLifespanVersion = nil
-	relationshipBAUnit.Unit1ID = relationshipBAUnit.Unit1.SuID.String()
+	relationshipBAUnit.Unit1ID = relationshipBAUnit.Unit1.UID.String()
 	relationshipBAUnit.Unit1BeginLifespanVersion = relationshipBAUnit.Unit1.BeginLifespanVersion
-	relationshipBAUnit.Unit2ID = relationshipBAUnit.Unit2.SuID.String()
+	relationshipBAUnit.Unit2ID = relationshipBAUnit.Unit2.UID.String()
 	relationshipBAUnit.Unit2BeginLifespanVersion = relationshipBAUnit.Unit2.BeginLifespanVersion
 	writer := tx.Set("gorm:save_associations", false).Create(&relationshipBAUnit)
 	if writer.Error != nil {
@@ -83,7 +83,7 @@ func (crud LARequiredRelationshipBAUnitCRUD) Update(relationshipBAUnitIn interfa
 	var oldRelationshipBAUnit ladm.LARequiredRelationshipBAUnit
 	reader := tx.Where("unit1 = ? AND "+
 		"unit2 = ? AND "+
-		"endlifespanversion IS NULL", relationshipBAUnit.Unit1.SuID.String(), relationshipBAUnit.Unit2.SuID.String()).
+		"endlifespanversion IS NULL", relationshipBAUnit.Unit1.UID.String(), relationshipBAUnit.Unit2.UID.String()).
 		First(&oldRelationshipBAUnit)
 	if reader.Error != nil{
 		tx.Rollback()
@@ -105,9 +105,9 @@ func (crud LARequiredRelationshipBAUnitCRUD) Update(relationshipBAUnitIn interfa
 	}
 	relationshipBAUnit.BeginLifespanVersion = currentTime
 	relationshipBAUnit.EndLifespanVersion = nil
-	relationshipBAUnit.Unit1ID = relationshipBAUnit.Unit1.SuID.String()
+	relationshipBAUnit.Unit1ID = relationshipBAUnit.Unit1.UID.String()
 	relationshipBAUnit.Unit1BeginLifespanVersion = relationshipBAUnit.Unit1.BeginLifespanVersion
-	relationshipBAUnit.Unit2ID = relationshipBAUnit.Unit2.SuID.String()
+	relationshipBAUnit.Unit2ID = relationshipBAUnit.Unit2.UID.String()
 	relationshipBAUnit.Unit2BeginLifespanVersion = relationshipBAUnit.Unit2.BeginLifespanVersion
 	writer = tx.Set("gorm:save_associations", false).Create(&relationshipBAUnit)
 	if writer.Error != nil {

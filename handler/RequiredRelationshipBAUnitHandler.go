@@ -41,12 +41,12 @@ func (handler *RequiredRelationshipBAUnitHandler) CreateRequiredRelationshipBAUn
 		respondError(w, 400, err.Error())
 		return
 	}
-	unit1, err := handler.BAUnitCRUD.Read(relationshipBAUnit.Unit1.SuID)
+	unit1, err := handler.BAUnitCRUD.Read(relationshipBAUnit.Unit1.UID)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
 	}
-	unit2, err := handler.BAUnitCRUD.Read(relationshipBAUnit.Unit2.SuID)
+	unit2, err := handler.BAUnitCRUD.Read(relationshipBAUnit.Unit2.UID)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return

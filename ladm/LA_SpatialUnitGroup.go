@@ -24,9 +24,10 @@ type LASpatialUnitGroup struct {
 	ReferencePoint *geometry.GMPoint `gorm:"column:referencepoint" json:"referencePoint"`
 	SugID          common.Oid        `gorm:"column:sugid" json:"sugID"`
 
-	SuGroupHierarchy *SuGroupHierarchy `gorm:"foreignkey:ElementID,ElementBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"hierarchy,omitempty"`
+	SuGroupHierarchySet      *SuGroupHierarchy  `gorm:"foreignkey:ElementID,ElementBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"hierarchySet,omitempty"`
+	SuGroupHierarchyElements []SuGroupHierarchy `gorm:"foreignkey:SetID,SetBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"hierarchyElements,omitempty"`
 
-	SpatialUnits     []SuSuGroup       `gorm:"foreignkey:WholeID,WholeBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"units,omitempty"`
+	SpatialUnits             []SuSuGroup        `gorm:"foreignkey:WholeID,WholeBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"units,omitempty"`
 }
 
 func (LASpatialUnitGroup) TableName() string {

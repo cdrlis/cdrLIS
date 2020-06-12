@@ -29,11 +29,14 @@ type LABAUnit struct {
 	Type LABAUnitType `gorm:"column:type" json:"type"`
 	UID  common.Oid   `gorm:"column:uid" json:"uID"`
 
-	Unit       []BAUnitAsParty `gorm:"foreignkey:UnitID,UnitBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"baunitAsParty"`
+	Unit          []BAUnitAsParty                `gorm:"foreignkey:UnitID,UnitBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"baunitAsParty,omitempty"`
 
-	RRR        []LARRR         `gorm:"foreignkey:UnitID,UnitBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rrr"`
+	RRR           []LARRR                        `gorm:"foreignkey:UnitID,UnitBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"rrr"`
 
-	SU []SuBAUnit `gorm:"foreignkey:BaUnitID,BaUnitBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"su"`
+	RelationUnit1 []LARequiredRelationshipBAUnit `gorm:"foreignkey:Unit2ID,Unit2BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"relation1,omitempty"`
+	RelationUnit2 []LARequiredRelationshipBAUnit `gorm:"foreignkey:Unit1ID,Unit1BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"relation2,omitempty"`
+
+	SU            []SuBAUnit                     `gorm:"foreignkey:BaUnitID,BaUnitBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"su,omitempty"`
 }
 
 func (LABAUnit) TableName() string {

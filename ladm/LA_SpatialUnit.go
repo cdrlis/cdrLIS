@@ -51,12 +51,16 @@ type LASpatialUnit struct {
 
 	Baunit []SuBAUnit `gorm:"foreignkey:SUID,SUBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"baunit"`
 
-	SuHierarchy       *SuHierarchy                        `gorm:"foreignkey:ChildID,ChildBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"hierarchy,omitempty"` // suHierarchy
-	RelationSu1       []LARequiredRelationshipSpatialUnit `gorm:"foreignkey:Su1ID,Su1BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"relation1,omitempty"`     // relationSu
-	RelationSu2       []LARequiredRelationshipSpatialUnit `gorm:"foreignkey:Su2ID,Su2BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"relation2,omitempty"`     // relationSu
-	SpatialUnitGroups []SuSuGroup                         `gorm:"foreignkey:PartID,PartBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"groups,omitempty"`      // suSuGroup
-	MinusBfs          []BfsSpatialUnitMinus               `gorm:"foreignkey:SuID,SuBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"bfsMinus"`                 // minus
-	PlusBfs           []BfsSpatialUnitPlus                `gorm:"foreignkey:SuID,SuBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"bfsPlus"`                  // plus
+	SuHierarchyParent   *SuHierarchy                        `gorm:"foreignkey:ChildID,ChildBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"hierarchyParent,omitempty"`
+	SuHierarchyChildren []SuHierarchy                       `gorm:"foreignkey:ParentID,ParentBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"hierarchyChildren,omitempty"`
+
+	RelationSu1         []LARequiredRelationshipSpatialUnit `gorm:"foreignkey:Su2ID,Su2BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"relation1,omitempty"`
+	RelationSu2         []LARequiredRelationshipSpatialUnit `gorm:"foreignkey:Su1ID,Su1BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"relation2,omitempty"`
+
+	SpatialUnitGroups   []SuSuGroup                         `gorm:"foreignkey:PartID,PartBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"groups,omitempty"`
+
+	MinusBfs            []BfsSpatialUnitMinus               `gorm:"foreignkey:SuID,SuBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"bfsMinus"`
+	PlusBfs             []BfsSpatialUnitPlus                `gorm:"foreignkey:SuID,SuBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"bfsPlus"`
 }
 
 func (LASpatialUnit) TableName() string {
@@ -115,7 +119,7 @@ func (su LASpatialUnit) Boundary() (*geos.Geometry, error) {
 				return points[i].Index < points[j].Index
 			})
 			var resultCords []geos.Coord
-			for _, point := range points{
+			for _, point := range points {
 				resultCords = append(resultCords, geos.MustCoords(point.Point.OriginalLocation.Coords())...)
 			}
 			geom = geos.Must(geos.NewLineString(resultCords...))
@@ -143,7 +147,7 @@ func (su LASpatialUnit) Boundary() (*geos.Geometry, error) {
 				return points[i].Index < points[j].Index
 			})
 			var resultCords []geos.Coord
-			for _, point := range points{
+			for _, point := range points {
 				resultCords = append(resultCords, geos.MustCoords(point.Point.OriginalLocation.Coords())...)
 			}
 			geom = geos.Must(geos.NewLineString(resultCords...))

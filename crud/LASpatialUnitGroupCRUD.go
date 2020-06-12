@@ -15,6 +15,12 @@ func (crud LASpatialUnitGroupCRUD) Read(where ...interface{}) (interface{}, erro
 	var suGroup ladm.LASpatialUnitGroup
 	if where != nil {
 		reader := crud.DB.Where("sugid = ?::\"Oid\" AND endlifespanversion IS NULL", where).
+			Preload("SpatialUnits","endlifespanversion IS NULL").
+			Preload("SpatialUnits.Part","endlifespanversion IS NULL").
+			Preload("SuGroupHierarchySet","endlifespanversion IS NULL").
+			Preload("SuGroupHierarchySet.Set","endlifespanversion IS NULL").
+			Preload("SuGroupHierarchyElements","endlifespanversion IS NULL").
+			Preload("SuGroupHierarchyElements.Element","endlifespanversion IS NULL").
 			First(&suGroup)
 		if reader.RowsAffected == 0 {
 			return nil, errors.New("Entity not found")
@@ -69,6 +75,8 @@ func (crud LASpatialUnitGroupCRUD) Update(suGroupIn interface{}) (interface{}, e
 	var oldSuGroup ladm.LASpatialUnitGroup
 	reader := tx.Where("sugid = ?::\"Oid\" AND endlifespanversion IS NULL", suGroup.SugID).
 		Preload("SpatialUnits","endlifespanversion IS NULL").
+		Preload("SuGroupHierarchySet","endlifespanversion IS NULL").
+		Preload("SuGroupHierarchyElements","endlifespanversion IS NULL").
 		First(&oldSuGroup)
 	if reader.Error != nil{
 		tx.Rollback()
@@ -116,6 +124,46 @@ func (crud LASpatialUnitGroupCRUD) Update(suGroupIn interface{}) (interface{}, e
 			return nil, writer.Error
 		}
 	}
+	if hierarchySet := oldSuGroup.SuGroupHierarchySet; hierarchySet != nil {
+		hierarchySet.EndLifespanVersion = &currentTime
+		writer = tx.Set("gorm:save_associations", false).Save(hierarchySet)
+		if writer.Error != nil {
+			tx.Rollback()
+			return nil, writer.Error
+		}
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return nil, errors.New("Entity not found")
+		}
+		hierarchySet.BeginLifespanVersion = currentTime
+		hierarchySet.EndLifespanVersion = nil
+		hierarchySet.ElementBeginLifespanVersion = currentTime
+		writer = tx.Set("gorm:save_associations", false).Create(hierarchySet)
+		if writer.Error != nil {
+			tx.Rollback()
+			return nil, writer.Error
+		}
+	}
+	for _, element := range oldSuGroup.SuGroupHierarchyElements {
+		element.EndLifespanVersion = &currentTime
+		writer = tx.Set("gorm:save_associations", false).Save(&element)
+		if writer.Error != nil {
+			tx.Rollback()
+			return nil, writer.Error
+		}
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return nil, errors.New("Entity not found")
+		}
+		element.BeginLifespanVersion = currentTime
+		element.EndLifespanVersion = nil
+		element.SetBeginLifespanVersion = currentTime
+		writer = tx.Set("gorm:save_associations", false).Create(&element)
+		if writer.Error != nil {
+			tx.Rollback()
+			return nil, writer.Error
+		}
+	}
 	commit := tx.Commit()
 	if commit.Error != nil{
 		return nil, commit.Error
@@ -130,6 +178,8 @@ func (crud LASpatialUnitGroupCRUD) Delete(suGroupIn interface{}) error {
 	var oldSuGroup ladm.LASpatialUnitGroup
 	reader := tx.Where("sugid = ?::\"Oid\" AND endlifespanversion IS NULL", suGroup.SugID).
 		Preload("SpatialUnits","endlifespanversion IS NULL").
+		Preload("SuGroupHierarchySet","endlifespanversion IS NULL").
+		Preload("SuGroupHierarchyElements","endlifespanversion IS NULL").
 		First(&oldSuGroup)
 	if reader.Error != nil{
 		tx.Rollback()
@@ -152,6 +202,30 @@ func (crud LASpatialUnitGroupCRUD) Delete(suGroupIn interface{}) error {
 	for _, spatilUnit := range oldSuGroup.SpatialUnits {
 		spatilUnit.EndLifespanVersion = &currentTime
 		writer := tx.Set("gorm:save_associations", false).Save(&spatilUnit)
+		if writer.Error != nil {
+			tx.Rollback()
+			return writer.Error
+		}
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return errors.New("Entity not found")
+		}
+	}
+	if hierarchySet := oldSuGroup.SuGroupHierarchySet; hierarchySet != nil {
+		hierarchySet.EndLifespanVersion = &currentTime
+		writer = tx.Set("gorm:save_associations", false).Save(hierarchySet)
+		if writer.Error != nil {
+			tx.Rollback()
+			return writer.Error
+		}
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return errors.New("Entity not found")
+		}
+	}
+	for _, element := range oldSuGroup.SuGroupHierarchyElements {
+		element.EndLifespanVersion = &currentTime
+		writer = tx.Set("gorm:save_associations", false).Save(&element)
 		if writer.Error != nil {
 			tx.Rollback()
 			return writer.Error

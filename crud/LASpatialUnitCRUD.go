@@ -27,6 +27,8 @@ func (crud LASpatialUnitCRUD) Read(where ...interface{}) (interface{}, error) {
 			Preload("MinusBfs.Bfs", "endlifespanversion IS NULL").
 			Preload("MinusBfs.Bfs.Point", "endlifespanversion IS NULL").
 			Preload("MinusBfs.Bfs.Point.Point", "endlifespanversion IS NULL").
+			Preload("SpatialUnitGroups", "endlifespanversion IS NULL").
+			Preload("SpatialUnitGroups.Whole", "endlifespanversion IS NULL").
 			First(&spatialUnit)
 		if reader.RowsAffected == 0 {
 			return nil, errors.New("Entity not found")
@@ -90,6 +92,10 @@ func (crud LASpatialUnitCRUD) Update(spatialUnitIn interface{}) (interface{}, er
 	var oldSUnit ladm.LASpatialUnit
 	reader := tx.Where("suid = ?::\"Oid\" AND endlifespanversion IS NULL", spatialUnit.SuID).
 		Preload("BuildingUnit", "endlifespanversion IS NULL").
+		Preload("Baunit", "endlifespanversion IS NULL").
+		Preload("PlusBfs", "endlifespanversion IS NULL").
+		Preload("MinusBfs", "endlifespanversion IS NULL").
+		Preload("SpatialUnitGroups", "endlifespanversion IS NULL").
 		First(&oldSUnit)
 	if reader.Error != nil{
 		tx.Rollback()
@@ -141,19 +147,7 @@ func (crud LASpatialUnitCRUD) Update(spatialUnitIn interface{}) (interface{}, er
 			}
 		}
 	}
-	reader = tx.Where("suid = ?::\"Oid\" AND endlifespanversion = ?", spatialUnit.SuID, currentTime).
-		Preload("Baunit", "endlifespanversion IS NULL").
-		Preload("PlusBfs", "endlifespanversion IS NULL").
-		Preload("MinusBfs", "endlifespanversion IS NULL").
-		First(&oldSUnit)
-	if reader.Error != nil{
-		tx.Rollback()
-		return nil, reader.Error
-	}
-	if reader.RowsAffected == 0 {
-		tx.Rollback()
-		return nil, errors.New("Entity not found")
-	}
+
 	for _, baUnit := range oldSUnit.Baunit {
 		baUnit.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&baUnit)
@@ -210,6 +204,26 @@ func (crud LASpatialUnitCRUD) Update(spatialUnitIn interface{}) (interface{}, er
 			return nil, writer.Error
 		}
 	}
+	for _, group := range oldSUnit.SpatialUnitGroups {
+		group.EndLifespanVersion = &currentTime
+		writer = tx.Set("gorm:save_associations", false).Save(&group)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return nil, errors.New("Entity not found")
+		}
+		group.BeginLifespanVersion = currentTime
+		group.EndLifespanVersion = nil
+		group.PartBeginLifespanVersion = currentTime
+		writer = tx.Set("gorm:save_associations", false).Create(&group)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
+	}
 	commit := tx.Commit()
 	if commit.Error != nil{
 		return nil, commit.Error
@@ -224,6 +238,10 @@ func (crud LASpatialUnitCRUD) Delete(spatialUnitIn interface{}) error {
 	var oldSpatialUnit ladm.LASpatialUnit
 	reader := tx.Where("suid = ?::\"Oid\" AND endlifespanversion IS NULL", spatialUnit.SuID).
 		Preload("BuildingUnit", "endlifespanversion IS NULL").
+		Preload("Baunit", "endlifespanversion IS NULL").
+		Preload("PlusBfs", "endlifespanversion IS NULL").
+		Preload("MinusBfs", "endlifespanversion IS NULL").
+		Preload("SpatialUnitGroups", "endlifespanversion IS NULL").
 		First(&oldSpatialUnit)
 	if reader.Error != nil{
 		tx.Rollback()
@@ -255,18 +273,6 @@ func (crud LASpatialUnitCRUD) Delete(spatialUnitIn interface{}) error {
 			return errors.New("Entity not found")
 		}
 	}
-	reader = tx.Where("suid = ?::\"Oid\" AND endlifespanversion = ?", spatialUnit.SuID, currentTime).
-		Preload("Baunit", "endlifespanversion IS NULL").
-		Preload("PlusBfs", "endlifespanversion IS NULL").
-		First(&oldSpatialUnit)
-	if reader.Error != nil{
-		tx.Rollback()
-		return reader.Error
-	}
-	if reader.RowsAffected == 0 {
-		tx.Rollback()
-		return errors.New("Entity not found")
-	}
 	for _, baUnit := range oldSpatialUnit.Baunit {
 		baUnit.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&baUnit)
@@ -294,6 +300,18 @@ func (crud LASpatialUnitCRUD) Delete(spatialUnitIn interface{}) error {
 	for _, minusBfs := range oldSpatialUnit.MinusBfs {
 		minusBfs.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&minusBfs)
+		if writer.Error != nil{
+			tx.Rollback()
+			return writer.Error
+		}
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return errors.New("Entity not found")
+		}
+	}
+	for _, group := range oldSpatialUnit.SpatialUnitGroups {
+		group.EndLifespanVersion = &currentTime
+		writer = tx.Set("gorm:save_associations", false).Save(&group)
 		if writer.Error != nil{
 			tx.Rollback()
 			return writer.Error

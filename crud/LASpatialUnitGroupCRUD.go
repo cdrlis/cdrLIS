@@ -68,6 +68,7 @@ func (crud LASpatialUnitGroupCRUD) Update(suGroupIn interface{}) (interface{}, e
 	currentTime := time.Now()
 	var oldSuGroup ladm.LASpatialUnitGroup
 	reader := tx.Where("sugid = ?::\"Oid\" AND endlifespanversion IS NULL", suGroup.SugID).
+		Preload("SpatialUnits","endlifespanversion IS NULL").
 		First(&oldSuGroup)
 	if reader.Error != nil{
 		tx.Rollback()
@@ -95,15 +96,25 @@ func (crud LASpatialUnitGroupCRUD) Update(suGroupIn interface{}) (interface{}, e
 		tx.Rollback()
 		return nil, writer.Error
 	}
-	reader = tx.Where("sugid = ?::\"Oid\" AND endlifespanversion = ?", suGroup.SugID, currentTime).
-		First(&oldSuGroup)
-	if reader.Error != nil{
-		tx.Rollback()
-		return nil, reader.Error
-	}
-	if reader.RowsAffected == 0 {
-		tx.Rollback()
-		return nil, errors.New("Entity not found")
+	for _, spatilUnit := range oldSuGroup.SpatialUnits{
+		spatilUnit.EndLifespanVersion = &currentTime
+		writer := tx.Set("gorm:save_associations", false).Save(&spatilUnit)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return nil, errors.New("Entity not found")
+		}
+		spatilUnit.BeginLifespanVersion = currentTime
+		spatilUnit.EndLifespanVersion = nil
+		spatilUnit.WholeBeginLifespanVersion = suGroup.BeginLifespanVersion
+		writer = tx.Set("gorm:save_associations", false).Create(&spatilUnit)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
 	}
 	commit := tx.Commit()
 	if commit.Error != nil{
@@ -117,7 +128,9 @@ func (crud LASpatialUnitGroupCRUD) Delete(suGroupIn interface{}) error {
 	suGroup := suGroupIn.(ladm.LASpatialUnitGroup)
 	currentTime := time.Now()
 	var oldSuGroup ladm.LASpatialUnitGroup
-	reader := tx.Where("sugid = ?::\"Oid\" AND endlifespanversion IS NULL", suGroup.SugID).First(&oldSuGroup)
+	reader := tx.Where("sugid = ?::\"Oid\" AND endlifespanversion IS NULL", suGroup.SugID).
+		Preload("SpatialUnits","endlifespanversion IS NULL").
+		First(&oldSuGroup)
 	if reader.Error != nil{
 		tx.Rollback()
 		return reader.Error
@@ -136,16 +149,17 @@ func (crud LASpatialUnitGroupCRUD) Delete(suGroupIn interface{}) error {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}
-	reader = tx.Where("sugid = ?::\"Oid\" AND endlifespanversion = ?", suGroup.SugID, currentTime).
-		Preload("Su", "endlifespanversion IS NULL").
-		First(&oldSuGroup)
-	if reader.Error != nil{
-		tx.Rollback()
-		return reader.Error
-	}
-	if reader.RowsAffected == 0 {
-		tx.Rollback()
-		return errors.New("Entity not found")
+	for _, spatilUnit := range oldSuGroup.SpatialUnits {
+		spatilUnit.EndLifespanVersion = &currentTime
+		writer := tx.Set("gorm:save_associations", false).Save(&spatilUnit)
+		if writer.Error != nil {
+			tx.Rollback()
+			return writer.Error
+		}
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return errors.New("Entity not found")
+		}
 	}
 	commit := tx.Commit()
 	if commit.Error != nil{

@@ -88,6 +88,13 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 	currentTime := time.Now()
 	var oldParty ladm.LAParty
 	reader := tx.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).
+		Preload("GroupParty","endlifespanversion IS NULL").
+		Preload("Groups", "endlifespanversion IS NULL").
+		Preload("RRR", "endlifespanversion IS NULL").
+		Preload("RRR.Right", "endlifespanversion IS NULL").
+		Preload("RRR.Responsibility", "endlifespanversion IS NULL").
+		Preload("RRR.Restriction", "endlifespanversion IS NULL").
+		Preload("RRR.Restriction.Mortgage", "endlifespanversion IS NULL").
 		First(&oldParty)
 	if reader.Error != nil{
 		tx.Rollback()
@@ -115,24 +122,6 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 		tx.Rollback()
 		return nil, writer.Error
 	}
-	reader = tx.Where("pid = ?::\"Oid\" AND endlifespanversion = ?", party.PID, currentTime).
-		Preload("GroupParty","endlifespanversion IS NULL").
-		Preload("Groups", "endlifespanversion IS NULL").
-		Preload("RRR", "endlifespanversion IS NULL").
-		Preload("RRR.Right", "endlifespanversion IS NULL").
-		Preload("RRR.Responsibility", "endlifespanversion IS NULL").
-		Preload("RRR.Restriction", "endlifespanversion IS NULL").
-		Preload("RRR.Restriction.Mortgage", "endlifespanversion IS NULL").
-		First(&oldParty)
-	if reader.Error != nil{
-		tx.Rollback()
-		return nil, reader.Error
-	}
-	if reader.RowsAffected == 0 {
-		tx.Rollback()
-		return nil, errors.New("Entity not found")
-	}
-
 	if groupParty := oldParty.GroupParty; groupParty != nil{
 		groupParty.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&groupParty)
@@ -286,7 +275,15 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 	tx := crud.DB.Begin()
 	currentTime := time.Now()
 	var oldParty ladm.LAParty
-	reader := tx.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).First(&oldParty)
+	reader := tx.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).
+		Preload("GroupParty","endlifespanversion IS NULL").
+		Preload("Groups", "endlifespanversion IS NULL").
+		Preload("RRR", "endlifespanversion IS NULL").
+		Preload("RRR.Right", "endlifespanversion IS NULL").
+		Preload("RRR.Responsibility", "endlifespanversion IS NULL").
+		Preload("RRR.Restriction", "endlifespanversion IS NULL").
+		Preload("RRR.Restriction.Mortgage", "endlifespanversion IS NULL").
+		First(&oldParty)
 	if reader.Error != nil{
 		tx.Rollback()
 		return reader.Error
@@ -302,23 +299,6 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 		return writer.Error
 	}
 	if writer.RowsAffected == 0 {
-		tx.Rollback()
-		return errors.New("Entity not found")
-	}
-	reader = tx.Where("pid = ?::\"Oid\" AND endlifespanversion = ?", party.PID, currentTime).
-		Preload("GroupParty","endlifespanversion IS NULL").
-		Preload("Groups", "endlifespanversion IS NULL").
-		Preload("RRR", "endlifespanversion IS NULL").
-		Preload("RRR.Right", "endlifespanversion IS NULL").
-		Preload("RRR.Responsibility", "endlifespanversion IS NULL").
-		Preload("RRR.Restriction", "endlifespanversion IS NULL").
-		Preload("RRR.Restriction.Mortgage", "endlifespanversion IS NULL").
-		First(&oldParty)
-	if reader.Error != nil{
-		tx.Rollback()
-		return reader.Error
-	}
-	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}

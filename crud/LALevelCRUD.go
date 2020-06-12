@@ -68,6 +68,7 @@ func (crud LALevelCRUD) Update(levelIn interface{}) (interface{}, error) {
 	currentTime := time.Now()
 	var oldLevel ladm.LALevel
 	reader := tx.Where("lid = ?::\"Oid\" AND endlifespanversion IS NULL", level.LID).
+		Preload("SU", "endlifespanversion IS NULL").
 		First(&oldLevel)
 	if reader.Error != nil{
 		tx.Rollback()
@@ -94,17 +95,6 @@ func (crud LALevelCRUD) Update(levelIn interface{}) (interface{}, error) {
 	if writer.Error != nil{
 		tx.Rollback()
 		return nil, writer.Error
-	}
-	reader = tx.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
-		Preload("SU", "endlifespanversion IS NULL").
-		First(&oldLevel)
-	if reader.Error != nil{
-		tx.Rollback()
-		return nil, reader.Error
-	}
-	if reader.RowsAffected == 0 {
-		tx.Rollback()
-		return nil, errors.New("Entity not found")
 	}
 	for _, su := range oldLevel.SU {
 		su.EndLifespanVersion = &currentTime
@@ -138,7 +128,9 @@ func (crud LALevelCRUD) Delete(levelIn interface{}) error {
 	level := levelIn.(ladm.LALevel)
 	currentTime := time.Now()
 	var oldLevel ladm.LALevel
-	reader := tx.Where("lid = ?::\"Oid\" AND endlifespanversion IS NULL", level.LID).First(&oldLevel)
+	reader := tx.Where("lid = ?::\"Oid\" AND endlifespanversion IS NULL", level.LID).
+		Preload("SU", "endlifespanversion IS NULL").
+		First(&oldLevel)
 	if reader.Error != nil{
 		tx.Rollback()
 		return reader.Error
@@ -154,17 +146,6 @@ func (crud LALevelCRUD) Delete(levelIn interface{}) error {
 		return writer.Error
 	}
 	if writer.RowsAffected == 0 {
-		tx.Rollback()
-		return errors.New("Entity not found")
-	}
-	reader = tx.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
-		Preload("SU", "endlifespanversion IS NULL").
-		First(&oldLevel)
-	if reader.Error != nil{
-		tx.Rollback()
-		return reader.Error
-	}
-	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}

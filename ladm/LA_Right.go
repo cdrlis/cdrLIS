@@ -18,7 +18,7 @@ type LARight struct {
 
 	Type LARightType `gorm:"column:type" json:"type"`
 
-	Mortgage []LAMortgage `json:"-"` // mortgageRight
+	Mortgage []MortgageRight `gorm:"foreignkey:RightID,RightBeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion;" json:"mortgages,omitempty"`
 }
 
 func (LARight) TableName() string {

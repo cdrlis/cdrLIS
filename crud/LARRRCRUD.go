@@ -193,9 +193,11 @@ func (crud LARRRCRUD) Update(rrrIn interface{}) (interface{}, error) {
 	}
 	reader = tx.Where("rid = ?::\"Oid\" AND endlifespanversion = ?", rrr.RID, currentTime).
 		Preload("Right", "endlifespanversion IS NULL").
+		Preload("Right.Mortgage", "endlifespanversion IS NULL").
 		Preload("Responsibility", "endlifespanversion IS NULL").
 		Preload("Restriction", "endlifespanversion IS NULL").
 		Preload("Restriction.Mortgage", "endlifespanversion IS NULL").
+		Preload("Restriction.Mortgage.Rights", "endlifespanversion IS NULL").
 		First(&oldRrr)
 	if reader.Error != nil{
 		tx.Rollback()
@@ -216,6 +218,18 @@ func (crud LARRRCRUD) Update(rrrIn interface{}) (interface{}, error) {
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return nil, errors.New("Entity not found")
+		}
+		for _, mortgage := range right.Mortgage{
+			mortgage.EndLifespanVersion = &currentTime
+			writer = tx.Set("gorm:save_associations", false).Save(&mortgage)
+			if writer.Error != nil{
+				tx.Rollback()
+				return nil, reader.Error
+			}
+			if writer.RowsAffected == 0 {
+				tx.Rollback()
+				return nil, errors.New("Entity not found")
+			}
 		}
 	}
 	if responsibility := oldRrr.Responsibility; responsibility != nil {
@@ -252,6 +266,18 @@ func (crud LARRRCRUD) Update(rrrIn interface{}) (interface{}, error) {
 				tx.Rollback()
 				return nil, errors.New("Entity not found")
 			}
+			for _, right := range mortgage.Rights{
+				right.EndLifespanVersion = &currentTime
+				writer = tx.Set("gorm:save_associations", false).Save(&right)
+				if writer.Error != nil{
+					tx.Rollback()
+					return nil, reader.Error
+				}
+				if writer.RowsAffected == 0 {
+					tx.Rollback()
+					return nil, errors.New("Entity not found")
+				}
+			}
 		}
 	}
 
@@ -264,6 +290,21 @@ func (crud LARRRCRUD) Update(rrrIn interface{}) (interface{}, error) {
 		if writer.Error != nil {
 			tx.Rollback()
 			return nil, writer.Error
+		}
+		for _, mortgage := range oldRrr.Right.Mortgage{
+			mortgage.BeginLifespanVersion = currentTime
+			mortgage.EndLifespanVersion = nil
+			mortgage.RightID = right.ID
+			mortgage.RightBeginLifespanVersion = right.BeginLifespanVersion
+			writer = tx.Set("gorm:save_associations", false).Create(&mortgage)
+			if writer.Error != nil{
+				tx.Rollback()
+				return nil, reader.Error
+			}
+			if writer.RowsAffected == 0 {
+				tx.Rollback()
+				return nil, errors.New("Entity not found")
+			}
 		}
 	}
 	if responsibility := rrr.Responsibility; responsibility != nil {
@@ -297,6 +338,21 @@ func (crud LARRRCRUD) Update(rrrIn interface{}) (interface{}, error) {
 				tx.Rollback()
 				return nil, writer.Error
 			}
+			for _, right := range oldRrr.Restriction.Mortgage.Rights{
+				right.BeginLifespanVersion = currentTime
+				right.EndLifespanVersion = nil
+				right.MortgageID = mortgage.ID
+				right.MortgageBeginLifespanVersion = mortgage.BeginLifespanVersion
+				writer = tx.Set("gorm:save_associations", false).Create(&right)
+				if writer.Error != nil{
+					tx.Rollback()
+					return nil, reader.Error
+				}
+				if writer.RowsAffected == 0 {
+					tx.Rollback()
+					return nil, errors.New("Entity not found")
+				}
+			}
 		}
 	}
 	commit := tx.Commit()
@@ -313,9 +369,11 @@ func (crud LARRRCRUD) Delete(rrrIn interface{}) error {
 	var oldRrr ladm.LARRR
 	reader := tx.Where("rid = ?::\"Oid\" AND endlifespanversion IS NULL", rrr.RID).
 		Preload("Right", "endlifespanversion IS NULL").
+		Preload("Right.Mortgage", "endlifespanversion IS NULL").
 		Preload("Responsibility", "endlifespanversion IS NULL").
 		Preload("Restriction", "endlifespanversion IS NULL").
 		Preload("Restriction.Mortgage", "endlifespanversion IS NULL").
+		Preload("Restriction.Mortgage.Rights", "endlifespanversion IS NULL").
 		First(&oldRrr)
 	if reader.Error != nil{
 		tx.Rollback()
@@ -346,6 +404,18 @@ func (crud LARRRCRUD) Delete(rrrIn interface{}) error {
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return errors.New("Entity not found")
+		}
+		for _, mortgage := range right.Mortgage{
+			mortgage.EndLifespanVersion = &currentTime
+			writer = tx.Set("gorm:save_associations", false).Save(&mortgage)
+			if writer.Error != nil{
+				tx.Rollback()
+				return reader.Error
+			}
+			if writer.RowsAffected == 0 {
+				tx.Rollback()
+				return errors.New("Entity not found")
+			}
 		}
 	}
 	if responsibility := oldRrr.Responsibility; responsibility != nil {
@@ -381,6 +451,18 @@ func (crud LARRRCRUD) Delete(rrrIn interface{}) error {
 			if writer.RowsAffected == 0 {
 				tx.Rollback()
 				return errors.New("Entity not found")
+			}
+			for _, right := range mortgage.Rights{
+				right.EndLifespanVersion = &currentTime
+				writer = tx.Set("gorm:save_associations", false).Save(&right)
+				if writer.Error != nil{
+					tx.Rollback()
+					return reader.Error
+				}
+				if writer.RowsAffected == 0 {
+					tx.Rollback()
+					return errors.New("Entity not found")
+				}
 			}
 		}
 	}

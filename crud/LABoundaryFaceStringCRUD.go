@@ -70,6 +70,8 @@ func (crud LABoundaryFaceStringCRUD) Update(boundaryFaceStringIn interface{}) (i
 	currentTime := time.Now()
 	var oldBoundaryFaceString ladm.LABoundaryFaceString
 	reader := tx.Where("bfsid = ?::\"Oid\" AND endlifespanversion IS NULL", boundaryFaceString.BfsID).
+		Preload("PlusSu", "endlifespanversion IS NULL").
+		Preload("MinusSu", "endlifespanversion IS NULL").
 		First(&oldBoundaryFaceString)
 	if reader.Error != nil{
 		tx.Rollback()
@@ -97,17 +99,6 @@ func (crud LABoundaryFaceStringCRUD) Update(boundaryFaceStringIn interface{}) (i
 		tx.Rollback()
 		return nil, writer.Error
 	}
-	reader = tx.Where("bfsid = ?::\"Oid\" AND endlifespanversion = ?", boundaryFaceString.BfsID, currentTime).
-		Preload("PlusSu", "endlifespanversion IS NULL").
-		First(&oldBoundaryFaceString)
-	if reader.Error != nil{
-		tx.Rollback()
-		return nil, reader.Error
-	}
-	if reader.RowsAffected == 0 {
-		tx.Rollback()
-		return nil, errors.New("Entity not found")
-	}
 	for _, plusSu := range oldBoundaryFaceString.PlusSu {
 		plusSu.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&plusSu)
@@ -128,6 +119,46 @@ func (crud LABoundaryFaceStringCRUD) Update(boundaryFaceStringIn interface{}) (i
 			return nil, writer.Error
 		}
 	}
+	for _, minusSu := range oldBoundaryFaceString.MinusSu {
+		minusSu.EndLifespanVersion = &currentTime
+		writer = tx.Set("gorm:save_associations", false).Save(&minusSu)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return nil, errors.New("Entity not found")
+		}
+		minusSu.BeginLifespanVersion = currentTime
+		minusSu.EndLifespanVersion = nil
+		minusSu.BfsBeginLifespanVersion = currentTime
+		writer = tx.Set("gorm:save_associations", false).Create(&minusSu)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
+	}
+	for _, point := range oldBoundaryFaceString.Point {
+		point.EndLifespanVersion = &currentTime
+		writer = tx.Set("gorm:save_associations", false).Save(&point)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return nil, errors.New("Entity not found")
+		}
+		point.BeginLifespanVersion = currentTime
+		point.EndLifespanVersion = nil
+		point.BfsBeginLifespanVersion = currentTime
+		writer = tx.Set("gorm:save_associations", false).Create(&point)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
+	}
 	commit := tx.Commit()
 	if commit.Error != nil{
 		return nil, commit.Error
@@ -140,7 +171,11 @@ func (crud LABoundaryFaceStringCRUD) Delete(boundaryFaceStringIn interface{}) er
 	boundaryFaceString := boundaryFaceStringIn.(ladm.LABoundaryFaceString)
 	currentTime := time.Now()
 	var oldBoundaryFaceString ladm.LABoundaryFaceString
-	reader := tx.Where("bfsid = ?::\"Oid\" AND endlifespanversion IS NULL", boundaryFaceString.BfsID).First(&oldBoundaryFaceString)
+	reader := tx.Where("bfsid = ?::\"Oid\" AND endlifespanversion IS NULL", boundaryFaceString.BfsID).
+		Preload("PlusSu", "endlifespanversion IS NULL").
+		Preload("MinusSu", "endlifespanversion IS NULL").
+		Preload("Point", "endlifespanversion IS NULL").
+		First(&oldBoundaryFaceString)
 	if reader.Error != nil{
 		tx.Rollback()
 		return reader.Error
@@ -161,6 +196,8 @@ func (crud LABoundaryFaceStringCRUD) Delete(boundaryFaceStringIn interface{}) er
 	}
 	reader = tx.Where("bfsid = ?::\"Oid\" AND endlifespanversion = ?", boundaryFaceString.BfsID, currentTime).
 		Preload("PlusSu", "endlifespanversion IS NULL").
+		Preload("MinusSu", "endlifespanversion IS NULL").
+		Preload("Point", "endlifespanversion IS NULL").
 		First(&oldBoundaryFaceString)
 	if reader.Error != nil{
 		tx.Rollback()
@@ -173,6 +210,30 @@ func (crud LABoundaryFaceStringCRUD) Delete(boundaryFaceStringIn interface{}) er
 	for _, plusSu := range oldBoundaryFaceString.PlusSu {
 		plusSu.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&plusSu)
+		if writer.Error != nil{
+			tx.Rollback()
+			return writer.Error
+		}
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return errors.New("Entity not found")
+		}
+	}
+	for _, minusSu := range oldBoundaryFaceString.MinusSu {
+		minusSu.EndLifespanVersion = &currentTime
+		writer = tx.Set("gorm:save_associations", false).Save(&minusSu)
+		if writer.Error != nil{
+			tx.Rollback()
+			return writer.Error
+		}
+		if writer.RowsAffected == 0 {
+			tx.Rollback()
+			return errors.New("Entity not found")
+		}
+	}
+	for _, point := range oldBoundaryFaceString.Point {
+		point.EndLifespanVersion = &currentTime
+		writer = tx.Set("gorm:save_associations", false).Save(&point)
 		if writer.Error != nil{
 			tx.Rollback()
 			return writer.Error

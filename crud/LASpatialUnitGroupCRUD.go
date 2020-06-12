@@ -69,12 +69,20 @@ func (crud LASpatialUnitGroupCRUD) Update(suGroupIn interface{}) (interface{}, e
 	var oldSuGroup ladm.LASpatialUnitGroup
 	reader := tx.Where("sugid = ?::\"Oid\" AND endlifespanversion IS NULL", suGroup.SugID).
 		First(&oldSuGroup)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	oldSuGroup.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldSuGroup)
+	if writer.Error != nil{
+		tx.Rollback()
+		return nil, writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -89,6 +97,10 @@ func (crud LASpatialUnitGroupCRUD) Update(suGroupIn interface{}) (interface{}, e
 	}
 	reader = tx.Where("sugid = ?::\"Oid\" AND endlifespanversion = ?", suGroup.SugID, currentTime).
 		First(&oldSuGroup)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -106,12 +118,20 @@ func (crud LASpatialUnitGroupCRUD) Delete(suGroupIn interface{}) error {
 	currentTime := time.Now()
 	var oldSuGroup ladm.LASpatialUnitGroup
 	reader := tx.Where("sugid = ?::\"Oid\" AND endlifespanversion IS NULL", suGroup.SugID).First(&oldSuGroup)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	oldSuGroup.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldSuGroup)
+	if writer.Error != nil{
+		tx.Rollback()
+		return writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
@@ -119,6 +139,10 @@ func (crud LASpatialUnitGroupCRUD) Delete(suGroupIn interface{}) error {
 	reader = tx.Where("sugid = ?::\"Oid\" AND endlifespanversion = ?", suGroup.SugID, currentTime).
 		Preload("Su", "endlifespanversion IS NULL").
 		First(&oldSuGroup)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")

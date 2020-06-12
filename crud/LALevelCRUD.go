@@ -69,12 +69,20 @@ func (crud LALevelCRUD) Update(levelIn interface{}) (interface{}, error) {
 	var oldLevel ladm.LALevel
 	reader := tx.Where("lid = ?::\"Oid\" AND endlifespanversion IS NULL", level.LID).
 		First(&oldLevel)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	oldLevel.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldLevel)
+	if writer.Error != nil{
+		tx.Rollback()
+		return nil, writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -90,6 +98,10 @@ func (crud LALevelCRUD) Update(levelIn interface{}) (interface{}, error) {
 	reader = tx.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
 		Preload("SU", "endlifespanversion IS NULL").
 		First(&oldLevel)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -97,6 +109,10 @@ func (crud LALevelCRUD) Update(levelIn interface{}) (interface{}, error) {
 	for _, su := range oldLevel.SU {
 		su.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&su)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return nil, errors.New("Entity not found")
@@ -123,12 +139,20 @@ func (crud LALevelCRUD) Delete(levelIn interface{}) error {
 	currentTime := time.Now()
 	var oldLevel ladm.LALevel
 	reader := tx.Where("lid = ?::\"Oid\" AND endlifespanversion IS NULL", level.LID).First(&oldLevel)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	oldLevel.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldLevel)
+	if writer.Error != nil{
+		tx.Rollback()
+		return writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
@@ -136,6 +160,10 @@ func (crud LALevelCRUD) Delete(levelIn interface{}) error {
 	reader = tx.Where("lid = ?::\"Oid\" AND endlifespanversion = ?", level.LID, currentTime).
 		Preload("SU", "endlifespanversion IS NULL").
 		First(&oldLevel)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
@@ -143,6 +171,10 @@ func (crud LALevelCRUD) Delete(levelIn interface{}) error {
 	for _, su := range oldLevel.SU {
 		su.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&su)
+		if writer.Error != nil{
+			tx.Rollback()
+			return writer.Error
+		}
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return errors.New("Entity not found")

@@ -85,12 +85,20 @@ func (crud SuGroupHierarchyCRUD) Update(suGroupHierarchyIn interface{}) (interfa
 		"element = ? AND "+
 		"endlifespanversion IS NULL", suGroupHierarchy.Set.SugID.String(), suGroupHierarchy.Element.SugID.String()).
 		First(&oldSuGroupHierarchy)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	oldSuGroupHierarchy.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldSuGroupHierarchy)
+	if writer.Error != nil{
+		tx.Rollback()
+		return nil, writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -121,12 +129,20 @@ func (crud SuGroupHierarchyCRUD) Delete(suGroupHierarchyIn interface{}) error {
 	reader := tx.Where("set = ? AND "+
 		"element = ? AND "+
 		"endlifespanversion IS NULL", suGroupHierarchy.SetID, suGroupHierarchy.ElementID).First(&oldSuGroupHierarchy)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	oldSuGroupHierarchy.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldSuGroupHierarchy)
+	if writer.Error != nil{
+		tx.Rollback()
+		return writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")

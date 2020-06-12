@@ -85,12 +85,20 @@ func (crud SuSuGroupCRUD) Update(suSuGroupIn interface{}) (interface{}, error) {
 		"part = ? AND "+
 		"endlifespanversion IS NULL", suSuGroup.Whole.SugID.String(), suSuGroup.Part.SuID.String()).
 		First(&oldSuSuGroup)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	oldSuSuGroup.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldSuSuGroup)
+	if writer.Error != nil{
+		tx.Rollback()
+		return nil, writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -121,12 +129,20 @@ func (crud SuSuGroupCRUD) Delete(suSuGroupIn interface{}) error {
 	reader := tx.Where("whole = ? AND "+
 		"part = ? AND "+
 		"endlifespanversion IS NULL", suSuGroup.WholeID, suSuGroup.PartID).First(&oldSuSuGroup)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	oldSuSuGroup.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldSuSuGroup)
+	if writer.Error != nil{
+		tx.Rollback()
+		return writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")

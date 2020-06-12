@@ -69,12 +69,20 @@ func (crud LAPointCRUD) Update(pointIn interface{}) (interface{}, error) {
 	var oldPoint ladm.LAPoint
 	reader := tx.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", point.PID).
 		First(&oldPoint)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	oldPoint.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldPoint)
+	if writer.Error != nil{
+		tx.Rollback()
+		return nil, writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -90,6 +98,10 @@ func (crud LAPointCRUD) Update(pointIn interface{}) (interface{}, error) {
 	reader = tx.Where("pid = ?::\"Oid\" AND endlifespanversion = ?", point.PID, currentTime).
 		Preload("SU", "endlifespanversion IS NULL").
 		First(&oldPoint)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -97,6 +109,10 @@ func (crud LAPointCRUD) Update(pointIn interface{}) (interface{}, error) {
 	for _, bfs := range oldPoint.Bfs {
 		bfs.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&bfs)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return nil, errors.New("Entity not found")
@@ -123,12 +139,20 @@ func (crud LAPointCRUD) Delete(pointIn interface{}) error {
 	currentTime := time.Now()
 	var oldPoint ladm.LAPoint
 	reader := tx.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", point.PID).First(&oldPoint)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	oldPoint.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldPoint)
+	if writer.Error != nil{
+		tx.Rollback()
+		return writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
@@ -136,6 +160,10 @@ func (crud LAPointCRUD) Delete(pointIn interface{}) error {
 	reader = tx.Where("pid = ?::\"Oid\" AND endlifespanversion = ?", point.PID, currentTime).
 		Preload("SU", "endlifespanversion IS NULL").
 		First(&oldPoint)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
@@ -143,6 +171,10 @@ func (crud LAPointCRUD) Delete(pointIn interface{}) error {
 	for _, bfs := range oldPoint.Bfs {
 		bfs.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&bfs)
+		if writer.Error != nil{
+			tx.Rollback()
+			return writer.Error
+		}
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return errors.New("Entity not found")

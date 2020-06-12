@@ -89,6 +89,10 @@ func (crud BfsSpatialUnitPlusCRUD) Delete(bfsSpatialUnitIn interface{}) error {
 	reader := tx.Where("su = ? AND "+
 		"bfs = ? AND "+
 		"endlifespanversion IS NULL", bfsSpatialUnit.Su.SuID.String(), bfsSpatialUnit.Bfs.BfsID.String()).First(&oldBfsSpatialUnit)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")

@@ -89,12 +89,20 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 	var oldParty ladm.LAParty
 	reader := tx.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).
 		First(&oldParty)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	oldParty.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldParty)
+	if writer.Error != nil{
+		tx.Rollback()
+		return nil, writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -116,6 +124,10 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 		Preload("RRR.Restriction", "endlifespanversion IS NULL").
 		Preload("RRR.Restriction.Mortgage", "endlifespanversion IS NULL").
 		First(&oldParty)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -124,6 +136,10 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 	if groupParty := oldParty.GroupParty; groupParty != nil{
 		groupParty.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&groupParty)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return nil, errors.New("Entity not found")
@@ -140,6 +156,14 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 	for _, group := range oldParty.Groups {
 		group.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&group)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return nil, errors.New("Entity not found")
@@ -157,6 +181,10 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 	for _, rrr := range oldParty.RRR {
 		rrr.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&rrr)
+		if writer.Error != nil{
+			tx.Rollback()
+			return nil, writer.Error
+		}
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return nil, errors.New("Entity not found")
@@ -172,6 +200,10 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 		if right := rrr.Right; right != nil{
 			right.EndLifespanVersion = &currentTime
 			writer = tx.Set("gorm:save_associations", false).Save(right)
+			if writer.Error != nil{
+				tx.Rollback()
+				return nil, writer.Error
+			}
 			if writer.RowsAffected == 0 {
 				tx.Rollback()
 				return nil, errors.New("Entity not found")
@@ -187,6 +219,10 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 		if restriction := rrr.Restriction; restriction != nil{
 			restriction.EndLifespanVersion = &currentTime
 			writer = tx.Set("gorm:save_associations", false).Save(restriction)
+			if writer.Error != nil{
+				tx.Rollback()
+				return nil, writer.Error
+			}
 			if writer.RowsAffected == 0 {
 				tx.Rollback()
 				return nil, errors.New("Entity not found")
@@ -201,6 +237,10 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 			if mortgage := rrr.Restriction.Mortgage; mortgage != nil{
 				mortgage.EndLifespanVersion = &currentTime
 				writer = tx.Set("gorm:save_associations", false).Save(mortgage)
+				if writer.Error != nil{
+					tx.Rollback()
+					return nil, writer.Error
+				}
 				if writer.RowsAffected == 0 {
 					tx.Rollback()
 					return nil, errors.New("Entity not found")
@@ -217,6 +257,10 @@ func (crud LAPartyCRUD) Update(partyIn interface{}) (interface{}, error) {
 		if responsibility := rrr.Responsibility; responsibility != nil{
 			responsibility.EndLifespanVersion = &currentTime
 			writer = tx.Set("gorm:save_associations", false).Save(responsibility)
+			if writer.Error != nil{
+				tx.Rollback()
+				return nil, writer.Error
+			}
 			if writer.RowsAffected == 0 {
 				tx.Rollback()
 				return nil, errors.New("Entity not found")
@@ -243,12 +287,20 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 	currentTime := time.Now()
 	var oldParty ladm.LAParty
 	reader := tx.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", party.PID).First(&oldParty)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	oldParty.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldParty)
+	if writer.Error != nil{
+		tx.Rollback()
+		return writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
@@ -262,6 +314,10 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 		Preload("RRR.Restriction", "endlifespanversion IS NULL").
 		Preload("RRR.Restriction.Mortgage", "endlifespanversion IS NULL").
 		First(&oldParty)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
@@ -269,6 +325,10 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 	if groupParty := oldParty.GroupParty; groupParty != nil{
 		groupParty.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&groupParty)
+		if writer.Error != nil{
+			tx.Rollback()
+			return writer.Error
+		}
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return errors.New("Entity not found")
@@ -278,6 +338,10 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 	for _, group := range oldParty.Groups {
 		group.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&group)
+		if writer.Error != nil{
+			tx.Rollback()
+			return writer.Error
+		}
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return errors.New("Entity not found")
@@ -287,6 +351,10 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 	for _, rrr := range oldParty.RRR {
 		rrr.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&rrr)
+		if writer.Error != nil{
+			tx.Rollback()
+			return writer.Error
+		}
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return errors.New("Entity not found")
@@ -294,6 +362,10 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 		if right := rrr.Right; right != nil{
 			right.EndLifespanVersion = &currentTime
 			writer = tx.Set("gorm:save_associations", false).Save(right)
+			if writer.Error != nil{
+				tx.Rollback()
+				return writer.Error
+			}
 			if writer.RowsAffected == 0 {
 				tx.Rollback()
 				return errors.New("Entity not found")
@@ -302,6 +374,10 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 		if restriction := rrr.Restriction; restriction != nil{
 			restriction.EndLifespanVersion = &currentTime
 			writer = tx.Set("gorm:save_associations", false).Save(restriction)
+			if writer.Error != nil{
+				tx.Rollback()
+				return writer.Error
+			}
 			if writer.RowsAffected == 0 {
 				tx.Rollback()
 				return errors.New("Entity not found")
@@ -309,6 +385,10 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 			if mortgage := rrr.Restriction.Mortgage; mortgage != nil{
 				mortgage.EndLifespanVersion = &currentTime
 				writer = tx.Set("gorm:save_associations", false).Save(mortgage)
+				if writer.Error != nil{
+					tx.Rollback()
+					return writer.Error
+				}
 				if writer.RowsAffected == 0 {
 					tx.Rollback()
 					return errors.New("Entity not found")
@@ -318,6 +398,10 @@ func (crud LAPartyCRUD) Delete(partyIn interface{}) error {
 		if responsibility := rrr.Responsibility; responsibility != nil{
 			responsibility.EndLifespanVersion = &currentTime
 			writer = tx.Set("gorm:save_associations", false).Save(responsibility)
+			if writer.Error != nil{
+				tx.Rollback()
+				return writer.Error
+			}
 			if writer.RowsAffected == 0 {
 				tx.Rollback()
 				return errors.New("Entity not found")

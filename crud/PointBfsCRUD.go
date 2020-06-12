@@ -85,12 +85,20 @@ func (crud PointBfsCRUD) Update(pointBfsIn interface{}) (interface{}, error) {
 		"bfs = ? AND "+
 		"endlifespanversion IS NULL", pointBfs.Point.PID.String(), pointBfs.Bfs.BfsID.String()).
 		First(&oldRelationshipBAUnit)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	oldRelationshipBAUnit.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldRelationshipBAUnit)
+	if writer.Error != nil{
+		tx.Rollback()
+		return nil, writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -121,12 +129,20 @@ func (crud PointBfsCRUD) Delete(pointBfsIn interface{}) error {
 	reader := tx.Where("point = ? AND "+
 		"bfs = ? AND "+
 		"endlifespanversion IS NULL", pointBfs.PointID, pointBfs.BfsID).First(&oldRelationshipBAUnit)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	oldRelationshipBAUnit.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldRelationshipBAUnit)
+	if writer.Error != nil{
+		tx.Rollback()
+		return writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")

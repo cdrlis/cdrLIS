@@ -85,12 +85,20 @@ func (crud BAUnitAsPartyCRUD) Update(baunitAsPartyIn interface{}) (interface{}, 
 		"party = ? AND "+
 		"endlifespanversion IS NULL", baunitAsParty.Unit.UID.String(), baunitAsParty.Party.PID.String()).
 		First(&oldBaunitAsParty)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	oldBaunitAsParty.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldBaunitAsParty)
+	if writer.Error != nil{
+		tx.Rollback()
+		return nil, writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -121,12 +129,20 @@ func (crud BAUnitAsPartyCRUD) Delete(baunitAsPartyIn interface{}) error {
 	reader := tx.Where("unit = ? AND "+
 		"party = ? AND "+
 		"endlifespanversion IS NULL", baunitAsParty.UnitID, baunitAsParty.PartyID).First(&oldBaunitAsParty)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	oldBaunitAsParty.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldBaunitAsParty)
+	if writer.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")

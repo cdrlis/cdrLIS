@@ -85,12 +85,20 @@ func (crud LARequiredRelationshipBAUnitCRUD) Update(relationshipBAUnitIn interfa
 		"unit2 = ? AND "+
 		"endlifespanversion IS NULL", relationshipBAUnit.Unit1.SuID.String(), relationshipBAUnit.Unit2.SuID.String()).
 		First(&oldRelationshipBAUnit)
+	if reader.Error != nil{
+		tx.Rollback()
+		return nil, reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
 	}
 	oldRelationshipBAUnit.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldRelationshipBAUnit)
+	if writer.Error != nil{
+		tx.Rollback()
+		return nil, writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return nil, errors.New("Entity not found")
@@ -121,12 +129,20 @@ func (crud LARequiredRelationshipBAUnitCRUD) Delete(relationshipBAUnitIn interfa
 	reader := tx.Where("unit1 = ? AND "+
 		"unit2 = ? AND "+
 		"endlifespanversion IS NULL", relationshipBAUnit.Unit1ID, relationshipBAUnit.Unit2ID).First(&oldRelationshipBAUnit)
+	if reader.Error != nil{
+		tx.Rollback()
+		return reader.Error
+	}
 	if reader.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")
 	}
 	oldRelationshipBAUnit.EndLifespanVersion = &currentTime
 	writer := tx.Set("gorm:save_associations", false).Save(&oldRelationshipBAUnit)
+	if writer.Error != nil{
+		tx.Rollback()
+		return writer.Error
+	}
 	if writer.RowsAffected == 0 {
 		tx.Rollback()
 		return errors.New("Entity not found")

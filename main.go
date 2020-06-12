@@ -104,11 +104,11 @@ func main() {
 	router.PUT("/rrr/:namespace/:localId", rrrHandler.UpdateRrr)
 	router.DELETE("/rrr/:namespace/:localId", rrrHandler.DeleteRrr)
 
-	router.GET("/mortgagerigt", mortgageRightHandler.GetMortgageRights)
-	router.POST("/mortgagerigt", mortgageRightHandler.CreateMortgageRight)
-	router.GET("/mortgagerigt/:mortgageNamespace/:mortgageLocalId/:rightNamespace/:rightLocalId", mortgageRightHandler.GetMortgageRight)
-	router.PUT("/mortgagerigt/:mortgageNamespace/:mortgageLocalId/:rightNamespace/:rightLocalId", mortgageRightHandler.UpdateMortgageRight)
-	router.DELETE("/mortgagerigt/:mortgageNamespace/:mortgageLocalId/:rightNamespace/:rightLocalId", mortgageRightHandler.DeleteMortgageRight)
+	router.GET("/mortgageright", mortgageRightHandler.GetMortgageRights)
+	router.POST("/mortgageright", mortgageRightHandler.CreateMortgageRight)
+	router.GET("/mortgageright/:mortgageNamespace/:mortgageLocalId/:rightNamespace/:rightLocalId", mortgageRightHandler.GetMortgageRight)
+	router.PUT("/mortgageright/:mortgageNamespace/:mortgageLocalId/:rightNamespace/:rightLocalId", mortgageRightHandler.UpdateMortgageRight)
+	router.DELETE("/mortgageright/:mortgageNamespace/:mortgageLocalId/:rightNamespace/:rightLocalId", mortgageRightHandler.DeleteMortgageRight)
 
 	router.GET("/level", levelHandler.GetLevels)
 	router.POST("/level", levelHandler.CreateLevel)

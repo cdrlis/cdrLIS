@@ -17,8 +17,8 @@ type LAMortgage struct {
 	RID         common.Oid     `gorm:"column:rid" json:"rID"`
 	Restriction *LARestriction `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"restriction,omitempty"`
 
-	Amount       *Currency       `gorm:"column:amount" json:"amount"`
-	InterestRate *float32        `gorm:"column:interestRate" json:"interestrate"`
+	Amount       *float32        `gorm:"column:amount" json:"amount"`
+	InterestRate *float32        `gorm:"column:interestrate" json:"interestRate"`
 	Ranking      *int            `gorm:"column:ranking" json:"ranking"`
 	Type         *LAMortgageType `gorm:"column:type" json:"type"`
 

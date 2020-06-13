@@ -183,6 +183,10 @@ func (crud LASpatialUnitCRUD) Update(spatialUnitIn interface{}) (interface{}, er
 	for _, plusBfs := range oldSUnit.PlusBfs {
 		plusBfs.EndLifespanVersion = &currentTime
 		writer = tx.Set("gorm:save_associations", false).Save(&plusBfs)
+		if writer.Error != nil {
+			tx.Rollback()
+			return nil, writer.Error
+		}
 		if writer.RowsAffected == 0 {
 			tx.Rollback()
 			return nil, errors.New("Entity not found")

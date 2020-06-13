@@ -16,6 +16,8 @@ func (crud LAPartyCRUD) Read(where ...interface{}) (interface{}, error) {
 	if where != nil {
 		reader := crud.DB.Where("pid = ?::\"Oid\" AND endlifespanversion IS NULL", where).
 			Preload("GroupParty","endlifespanversion IS NULL").
+			Preload("GroupParty.Parties","endlifespanversion IS NULL").
+			Preload("GroupParty.Parties.Party","endlifespanversion IS NULL").
 			Preload("Groups", "endlifespanversion IS NULL").
 			Preload("Groups.Group", "endlifespanversion IS NULL").
 			Preload("RRR", "endlifespanversion IS NULL").

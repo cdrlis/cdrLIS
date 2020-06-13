@@ -72,6 +72,7 @@ func (crud LABoundaryFaceStringCRUD) Update(boundaryFaceStringIn interface{}) (i
 	reader := tx.Where("bfsid = ?::\"Oid\" AND endlifespanversion IS NULL", boundaryFaceString.BfsID).
 		Preload("PlusSu", "endlifespanversion IS NULL").
 		Preload("MinusSu", "endlifespanversion IS NULL").
+		Preload("Point","endlifespanversion IS NULL").
 		First(&oldBoundaryFaceString)
 	if reader.Error != nil{
 		tx.Rollback()

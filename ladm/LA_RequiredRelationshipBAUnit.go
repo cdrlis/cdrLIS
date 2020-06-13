@@ -15,11 +15,11 @@ import (
 type LARequiredRelationshipBAUnit struct {
 	common.VersionedObject
 
-	Unit1ID                   string    `gorm:"column:unit1" json:"-"`
+	Unit1ID                   string    `gorm:"column:unit1;primary_key" json:"-"`
 	Unit1BeginLifespanVersion time.Time `gorm:"column:unit1beginlifespanversion" json:"-"`
 	Unit1                     *LABAUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:Unit1ID,Unit1BeginLifespanVersion" json:"unit1"`
 
-	Unit2ID                   string    `gorm:"column:unit2" json:"-"`
+	Unit2ID                   string    `gorm:"column:unit2;primary_key" json:"-"`
 	Unit2BeginLifespanVersion time.Time `gorm:"column:unit2beginlifespanversion" json:"-"`
 	Unit2                     *LABAUnit `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:Unit2ID,Unit2BeginLifespanVersion" json:"unit2"`
 

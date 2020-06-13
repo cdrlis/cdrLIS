@@ -8,11 +8,11 @@ import (
 type SuGroupHierarchy struct {
 	common.VersionedObject
 
-	ElementID                   string              `gorm:"column:element" json:"-"`
+	ElementID                   string              `gorm:"column:element;primary_key" json:"-"`
 	ElementBeginLifespanVersion time.Time           `gorm:"column:elementbeginlifespanversion" json:"-"`
 	Element                     *LASpatialUnitGroup `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ElementID,ElementBeginLifespanVersion" json:"element"`
 
-	SetID                       string              `gorm:"column:set" json:"-"`
+	SetID                       string              `gorm:"column:set;primary_key" json:"-"`
 	SetBeginLifespanVersion     time.Time           `gorm:"column:setbeginlifespanversion" json:"-"`
 	Set                         *LASpatialUnitGroup `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:SetID,SetBeginLifespanVersion" json:"set"`
 }

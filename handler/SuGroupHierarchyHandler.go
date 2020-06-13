@@ -78,8 +78,12 @@ func (handler *SuGroupHierarchyHandler) UpdateSuGroupHierarchy(w http.ResponseWr
 	}
 	newSuGroupHierarchy.Set = suGroupHierarchy.(ladm.SuGroupHierarchy).Set
 	newSuGroupHierarchy.Element = suGroupHierarchy.(ladm.SuGroupHierarchy).Element
-	handler.SuGroupHierarchyCRUD.Update(&newSuGroupHierarchy)
-	respondJSON(w, 200, newSuGroupHierarchy)
+	updatedSuGroupHierarchy, err := handler.SuGroupHierarchyCRUD.Update(&newSuGroupHierarchy)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedSuGroupHierarchy)
 }
 
 func (handler *SuGroupHierarchyHandler) DeleteSuGroupHierarchy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -90,6 +94,10 @@ func (handler *SuGroupHierarchyHandler) DeleteSuGroupHierarchy(w http.ResponseWr
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.SuGroupHierarchyCRUD.Delete(suGroupHierarchy)
+	err = handler.SuGroupHierarchyCRUD.Delete(suGroupHierarchy)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

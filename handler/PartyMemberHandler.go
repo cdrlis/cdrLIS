@@ -80,8 +80,12 @@ func (handler *PartyMemberHandler) UpdatePartyMember(w http.ResponseWriter, r *h
 	}
 	newPartyMember.Party = partyMember.(ladm.LAPartyMember).Party
 	newPartyMember.Group = partyMember.(ladm.LAPartyMember).Group
-	handler.PartyMemberCRUD.Update(&newPartyMember)
-	respondJSON(w, 200, newPartyMember)
+	updatedPartyMember, err := handler.PartyMemberCRUD.Update(&newPartyMember)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedPartyMember)
 }
 
 func (handler *PartyMemberHandler) DeletePartyMember(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -92,6 +96,10 @@ func (handler *PartyMemberHandler) DeletePartyMember(w http.ResponseWriter, r *h
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.PartyMemberCRUD.Delete(partyMember)
+	err = handler.PartyMemberCRUD.Delete(partyMember)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

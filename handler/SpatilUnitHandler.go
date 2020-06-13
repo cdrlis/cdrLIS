@@ -69,8 +69,13 @@ func (handler *SpatialUnitHandler) UpdateSpatialUnit(w http.ResponseWriter, r *h
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.SpatialUnitCRUD.Update(&newSpatialUnit)
-	respondJSON(w, 200, newSpatialUnit)
+	newSpatialUnit.SuID = suid
+	updatedSpatialUnit, err := handler.SpatialUnitCRUD.Update(&newSpatialUnit)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedSpatialUnit)
 }
 
 func (handler *SpatialUnitHandler) DeleteSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -80,7 +85,11 @@ func (handler *SpatialUnitHandler) DeleteSpatialUnit(w http.ResponseWriter, r *h
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.SpatialUnitCRUD.Delete(spatialUnit)
+	err = handler.SpatialUnitCRUD.Delete(spatialUnit)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }
 

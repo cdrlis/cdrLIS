@@ -78,8 +78,12 @@ func (handler *RequiredRelationshipSUHandler) UpdateRequiredRelationshipSU(w htt
 	}
 	newRequiredRelationshipSU.Su1 = relationshioSU.(ladm.LARequiredRelationshipSpatialUnit).Su1
 	newRequiredRelationshipSU.Su2 = relationshioSU.(ladm.LARequiredRelationshipSpatialUnit).Su2
-	handler.RequiredRelationshipSUCRUD.Update(&newRequiredRelationshipSU)
-	respondJSON(w, 200, newRequiredRelationshipSU)
+	updatedRequiredRelationshipSU, err := handler.RequiredRelationshipSUCRUD.Update(&newRequiredRelationshipSU)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedRequiredRelationshipSU)
 }
 
 func (handler *RequiredRelationshipSUHandler) DeleteRequiredRelationshipSU(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -90,6 +94,10 @@ func (handler *RequiredRelationshipSUHandler) DeleteRequiredRelationshipSU(w htt
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.RequiredRelationshipSUCRUD.Delete(su1Bfs)
+	err = handler.RequiredRelationshipSUCRUD.Delete(su1Bfs)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

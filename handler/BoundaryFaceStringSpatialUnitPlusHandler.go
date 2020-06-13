@@ -79,8 +79,12 @@ func (handler *BoundaryFaceStringSpatialUnitPlusHandler) UpdateBfsSpatialUnit(w 
 	}
 	newBfsSpatialUnit.Su = bfsSpatialUnit.(ladm.BfsSpatialUnitPlus).Su
 	newBfsSpatialUnit.Bfs = bfsSpatialUnit.(ladm.BfsSpatialUnitPlus).Bfs
-	handler.BfsSpatialUnitCRUD.Update(&newBfsSpatialUnit)
-	respondJSON(w, 200, newBfsSpatialUnit)
+	updatedBfsSpatialUnit, err := handler.BfsSpatialUnitCRUD.Update(&newBfsSpatialUnit)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedBfsSpatialUnit)
 }
 
 func (handler *BoundaryFaceStringSpatialUnitPlusHandler) DeleteBfsSpatialUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -91,6 +95,10 @@ func (handler *BoundaryFaceStringSpatialUnitPlusHandler) DeleteBfsSpatialUnit(w 
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.BfsSpatialUnitCRUD.Delete(bfsSpatialUnit)
+	err = handler.BfsSpatialUnitCRUD.Delete(bfsSpatialUnit)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

@@ -61,8 +61,13 @@ func (handler *LevelHandler) UpdateLevel(w http.ResponseWriter, r *http.Request,
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.LevelCRUD.Update(&newLevel)
-	respondJSON(w, 200, newLevel)
+	newLevel.LID = lid
+	updatedLevel, err := handler.LevelCRUD.Update(&newLevel)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedLevel)
 }
 
 func (handler *LevelHandler) DeleteLevel(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -72,6 +77,10 @@ func (handler *LevelHandler) DeleteLevel(w http.ResponseWriter, r *http.Request,
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.LevelCRUD.Delete(level)
+	err = handler.LevelCRUD.Delete(level)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

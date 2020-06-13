@@ -79,8 +79,12 @@ func (handler *PointBfsHandler) UpdatePointBfs(w http.ResponseWriter, r *http.Re
 	}
 	newPointBfs.Point = pointBfs.(ladm.PointBfs).Point
 	newPointBfs.Bfs = pointBfs.(ladm.PointBfs).Bfs
-	handler.PointBfsCRUD.Update(&newPointBfs)
-	respondJSON(w, 200, newPointBfs)
+	updatedPointBfs, err := handler.PointBfsCRUD.Update(&newPointBfs)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedPointBfs)
 }
 
 func (handler *PointBfsHandler) DeletePointBfs(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -91,6 +95,10 @@ func (handler *PointBfsHandler) DeletePointBfs(w http.ResponseWriter, r *http.Re
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.PointBfsCRUD.Delete(pointBfs)
+	err = handler.PointBfsCRUD.Delete(pointBfs)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

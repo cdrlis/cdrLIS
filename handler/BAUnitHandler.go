@@ -61,8 +61,13 @@ func (handler *BAUnitHandler) UpdateBAUnit(w http.ResponseWriter, r *http.Reques
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.BAUnitCRUD.Update(&newBaUnit)
-	respondJSON(w, 200, newBaUnit)
+	newBaUnit.UID = uid
+	updatedBaUnit, err := handler.BAUnitCRUD.Update(&newBaUnit)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedBaUnit)
 }
 
 func (handler *BAUnitHandler) DeleteBAUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -72,6 +77,10 @@ func (handler *BAUnitHandler) DeleteBAUnit(w http.ResponseWriter, r *http.Reques
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.BAUnitCRUD.Delete(baUnit)
+	err = handler.BAUnitCRUD.Delete(baUnit)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

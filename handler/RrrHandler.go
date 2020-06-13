@@ -78,8 +78,13 @@ func (handler *RrrHandler) UpdateRrr(w http.ResponseWriter, r *http.Request, p h
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.RrrCRUD.Update(&newRrr)
-	respondJSON(w, 200, newRrr)
+	newRrr.RID = rid
+	updatedRrr, err := handler.RrrCRUD.Update(&newRrr)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedRrr)
 }
 
 func (handler *RrrHandler) DeleteRrr(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -89,6 +94,10 @@ func (handler *RrrHandler) DeleteRrr(w http.ResponseWriter, r *http.Request, p h
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.RrrCRUD.Delete(rrr)
+	err = handler.RrrCRUD.Delete(rrr)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

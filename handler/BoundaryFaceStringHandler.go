@@ -65,8 +65,13 @@ func (handler *BoundaryFaceStringHandler) UpdateBoundaryFaceString(w http.Respon
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.BoundaryFaceStringCRUD.Update(&newBoundaryFaceString)
-	respondJSON(w, 200, newBoundaryFaceString)
+	newBoundaryFaceString.BfsID = bfsid
+	updatedBoundaryFaceString, err := handler.BoundaryFaceStringCRUD.Update(&newBoundaryFaceString)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedBoundaryFaceString)
 }
 
 func (handler *BoundaryFaceStringHandler) DeleteBoundaryFaceString(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -76,6 +81,10 @@ func (handler *BoundaryFaceStringHandler) DeleteBoundaryFaceString(w http.Respon
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.BoundaryFaceStringCRUD.Delete(boundaryFaceString)
+	err = handler.BoundaryFaceStringCRUD.Delete(boundaryFaceString)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

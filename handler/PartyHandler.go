@@ -61,8 +61,13 @@ func (handler *PartyHandler) UpdateParty(w http.ResponseWriter, r *http.Request,
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.PartyCRUD.Update(&newParty)
-	respondJSON(w, 200, newParty)
+	newParty.PID = pid
+	updatedParty, err := handler.PartyCRUD.Update(&newParty)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedParty)
 }
 
 func (handler *PartyHandler) DeleteParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -72,6 +77,10 @@ func (handler *PartyHandler) DeleteParty(w http.ResponseWriter, r *http.Request,
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.PartyCRUD.Delete(party)
+	err = handler.PartyCRUD.Delete(party)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

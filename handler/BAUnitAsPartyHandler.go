@@ -79,8 +79,12 @@ func (handler *BAUnitAsPartyHandler) UpdateBAUnitAsParty(w http.ResponseWriter, 
 	}
 	newBAUnitAsParty.Unit = baUnitAsParty.(ladm.BAUnitAsParty).Unit
 	newBAUnitAsParty.Party = baUnitAsParty.(ladm.BAUnitAsParty).Party
-	handler.BAUnitAsPartyCRUD.Update(&newBAUnitAsParty)
-	respondJSON(w, 200, newBAUnitAsParty)
+	updatedBAUnitAsParty, err := handler.BAUnitAsPartyCRUD.Update(&newBAUnitAsParty)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedBAUnitAsParty)
 }
 
 func (handler *BAUnitAsPartyHandler) DeleteBAUnitAsParty(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -91,6 +95,10 @@ func (handler *BAUnitAsPartyHandler) DeleteBAUnitAsParty(w http.ResponseWriter, 
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.BAUnitAsPartyCRUD.Delete(baUnitAsParty)
+	err = handler.BAUnitAsPartyCRUD.Delete(baUnitAsParty)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

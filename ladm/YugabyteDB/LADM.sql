@@ -63,6 +63,7 @@ DROP TYPE IF EXISTS "LA_PartyRoleType";
 
 
 DROP TYPE IF EXISTS "Fraction";
+DROP TYPE IF EXISTS "Currency";
 
 DROP TABLE IF EXISTS "PolygonBoundary";
 DROP TABLE IF EXISTS "PolygonSpatialUnit";
@@ -82,6 +83,12 @@ CREATE TYPE "Oid" AS (
                          localId		VARCHAR,
                          namespace  VARCHAR
                      );
+
+CREATE TYPE "Currency" AS (
+                         amount		REAL,
+                         code  VARCHAR
+                     );
+
 
 --
 -- "DQ_Element" -- Omitted for simplicity
@@ -343,7 +350,7 @@ CREATE TYPE "LA_MortgageType" AS ENUM (
 CREATE TABLE "LA_Mortgage" (
                                id						VARCHAR NOT NULL,				-- rID.namespace || '-' || rID.localId
                                rID						"Oid" NOT NULL, 				-- PRIMARY KEY containing column of type 'user_defined_type' not yet supported in YigabyteDB
-                               amount					REAL,
+                               amount					"Currency",
                                interestRate			    REAL,
                                ranking					SMALLINT,
                                type					"LA_MortgageType",

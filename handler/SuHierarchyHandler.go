@@ -78,8 +78,12 @@ func (handler *SuHierarchyHandler) UpdateSuHierarchy(w http.ResponseWriter, r *h
 	}
 	newSuHierarchy.Parent = suHierarchy.(ladm.SuHierarchy).Parent
 	newSuHierarchy.Child = suHierarchy.(ladm.SuHierarchy).Child
-	handler.SuHierarchyCRUD.Update(&newSuHierarchy)
-	respondJSON(w, 200, newSuHierarchy)
+	updatedSuHierarchy, err := handler.SuHierarchyCRUD.Update(&newSuHierarchy)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedSuHierarchy)
 }
 
 func (handler *SuHierarchyHandler) DeleteSuHierarchy(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -90,6 +94,10 @@ func (handler *SuHierarchyHandler) DeleteSuHierarchy(w http.ResponseWriter, r *h
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.SuHierarchyCRUD.Delete(parentBfs)
+	err = handler.SuHierarchyCRUD.Delete(parentBfs)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

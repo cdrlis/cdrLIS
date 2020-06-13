@@ -84,8 +84,12 @@ func (handler *MortgageRightHandler) UpdateMortgageRight(w http.ResponseWriter, 
 	}
 	newMortgageRight.Mortgage = mortgageRight.(ladm.MortgageRight).Mortgage
 	newMortgageRight.Right = mortgageRight.(ladm.MortgageRight).Right
-	handler.MortgageRightCRUD.Update(&newMortgageRight)
-	respondJSON(w, 200, newMortgageRight)
+	updatedMortgageRight, err := handler.MortgageRightCRUD.Update(&newMortgageRight)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedMortgageRight)
 }
 
 func (handler *MortgageRightHandler) DeleteMortgageRight(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -96,6 +100,10 @@ func (handler *MortgageRightHandler) DeleteMortgageRight(w http.ResponseWriter, 
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.MortgageRightCRUD.Delete(mortgageRight)
+	err = handler.MortgageRightCRUD.Delete(mortgageRight)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

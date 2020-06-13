@@ -1,6 +1,13 @@
 package ladm
 
-import "github.com/cdrlis/cdrLIS/ladm/common"
+import (
+	"database/sql/driver"
+	"errors"
+	"fmt"
+	"github.com/cdrlis/cdrLIS/ladm/common"
+	"regexp"
+	"strconv"
+)
 
 //
 // Administrative::LA_Mortgage
@@ -17,7 +24,7 @@ type LAMortgage struct {
 	RID         common.Oid     `gorm:"column:rid" json:"rID"`
 	Restriction *LARestriction `gorm:"foreignkey:ID,BeginLifespanVersion;association_foreignkey:ID,BeginLifespanVersion" json:"restriction,omitempty"`
 
-	Amount       *float32        `gorm:"column:amount" json:"amount"`
+	Amount       *Currency       `gorm:"column:amount" json:"amount"`
 	InterestRate *float32        `gorm:"column:interestrate" json:"interestRate"`
 	Ranking      *int            `gorm:"column:ranking" json:"ranking"`
 	Type         *LAMortgageType `gorm:"column:type" json:"type"`
@@ -30,8 +37,8 @@ func (LAMortgage) TableName() string {
 }
 
 type Currency struct {
-	Amount float32
-	Code   ISO4217Type
+	Amount float64     `json:"amount"`
+	Code   ISO4217Type `json:"code"`
 }
 
 // Currency based on ISO 4217
@@ -46,6 +53,36 @@ const (
 	// ...
 	ZWL ISO4217Type = "ZWL"
 )
+
+// Value Returns Currency
+func (currency Currency) Value() (driver.Value, error) {
+	return fmt.Sprintf("(%f,%s)", currency.Amount, currency.Code), nil
+}
+
+// Scan Reads Currency
+func (currency *Currency) Scan(value interface{}) error {
+
+	if value == nil {
+		return nil
+	}
+
+	bytes, ok := value.([]byte)
+	if !ok {
+		return errors.New("cannot convert database value to currency")
+	}
+
+	str := string(bytes)
+	re := regexp.MustCompile("\\((.*?),(.*?)\\)")
+	match := re.FindStringSubmatch(str)
+	amount, err := strconv.ParseFloat(match[1], 64)
+	if err != nil {
+		return err
+	}
+	areaValue := Currency{Amount: amount, Code: ISO4217Type(match[2])}
+	*currency = areaValue
+
+	return nil
+}
 
 // LAMortageType Mortage type
 type LAMortgageType string

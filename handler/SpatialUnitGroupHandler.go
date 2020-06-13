@@ -48,9 +48,9 @@ func (handler *SpatialUnitGroupHandler) CreateSuGroup(w http.ResponseWriter, r *
 }
 
 func (handler *SpatialUnitGroupHandler) UpdateSuGroup(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	lid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
+	sugid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
 	decoder := json.NewDecoder(r.Body)
-	_, err := handler.SuGroupCRUD.Read(lid)
+	_, err := handler.SuGroupCRUD.Read(sugid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
@@ -61,8 +61,13 @@ func (handler *SpatialUnitGroupHandler) UpdateSuGroup(w http.ResponseWriter, r *
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.SuGroupCRUD.Update(&newSuGroup)
-	respondJSON(w, 200, newSuGroup)
+	newSuGroup.SugID = sugid
+	updatedSuGroup, err := handler.SuGroupCRUD.Update(&newSuGroup)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedSuGroup)
 }
 
 func (handler *SpatialUnitGroupHandler) DeleteSuGroup(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -72,6 +77,10 @@ func (handler *SpatialUnitGroupHandler) DeleteSuGroup(w http.ResponseWriter, r *
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.SuGroupCRUD.Delete(suGroup)
+	err = handler.SuGroupCRUD.Delete(suGroup)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

@@ -78,8 +78,12 @@ func (handler *RequiredRelationshipBAUnitHandler) UpdateRequiredRelationshipBAUn
 	}
 	newRelationshipBAUnit.Unit1 = relationshipBAUnit.(ladm.LARequiredRelationshipBAUnit).Unit1
 	newRelationshipBAUnit.Unit2 = relationshipBAUnit.(ladm.LARequiredRelationshipBAUnit).Unit2
-	handler.RequiredRelationshipBAUnitCRUD.Update(&newRelationshipBAUnit)
-	respondJSON(w, 200, newRelationshipBAUnit)
+	updatedRelationshipBAUnit, err := handler.RequiredRelationshipBAUnitCRUD.Update(&newRelationshipBAUnit)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedRelationshipBAUnit)
 }
 
 func (handler *RequiredRelationshipBAUnitHandler) DeleteRequiredRelationshipBAUnit(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -90,6 +94,10 @@ func (handler *RequiredRelationshipBAUnitHandler) DeleteRequiredRelationshipBAUn
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.RequiredRelationshipBAUnitCRUD.Delete(relationshipBAUnit)
+	err = handler.RequiredRelationshipBAUnitCRUD.Delete(relationshipBAUnit)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

@@ -48,9 +48,9 @@ func (handler *PointHandler) CreatePoint(w http.ResponseWriter, r *http.Request,
 }
 
 func (handler *PointHandler) UpdatePoint(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	lid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
+	pid := common.Oid{ Namespace: p.ByName("namespace"), LocalID:p.ByName("localId")}
 	decoder := json.NewDecoder(r.Body)
-	_, err := handler.PointCRUD.Read(lid)
+	_, err := handler.PointCRUD.Read(pid)
 	if err != nil {
 		respondError(w, 404, err.Error())
 		return
@@ -61,8 +61,13 @@ func (handler *PointHandler) UpdatePoint(w http.ResponseWriter, r *http.Request,
 		respondError(w, 400, err.Error())
 		return
 	}
-	handler.PointCRUD.Update(&newPoint)
-	respondJSON(w, 200, newPoint)
+	newPoint.PID = pid
+	updatedPoint ,err := handler.PointCRUD.Update(&newPoint)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedPoint)
 }
 
 func (handler *PointHandler) DeletePoint(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -72,6 +77,10 @@ func (handler *PointHandler) DeletePoint(w http.ResponseWriter, r *http.Request,
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.PointCRUD.Delete(point)
+	err = handler.PointCRUD.Delete(point)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

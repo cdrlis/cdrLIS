@@ -79,8 +79,12 @@ func (handler *SuSuGroupHandler) UpdateSuSuGroup(w http.ResponseWriter, r *http.
 	}
 	newSuSuGroup.Whole = suSuGroup.(ladm.SuSuGroup).Whole
 	newSuSuGroup.Part = suSuGroup.(ladm.SuSuGroup).Part
-	handler.SuSuGroupCRUD.Update(&newSuSuGroup)
-	respondJSON(w, 200, newSuSuGroup)
+	updatedSuSuGroup, err := handler.SuSuGroupCRUD.Update(&newSuSuGroup)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
+	respondJSON(w, 200, updatedSuSuGroup)
 }
 
 func (handler *SuSuGroupHandler) DeleteSuSuGroup(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -91,6 +95,10 @@ func (handler *SuSuGroupHandler) DeleteSuSuGroup(w http.ResponseWriter, r *http.
 		respondError(w, 404, err.Error())
 		return
 	}
-	handler.SuSuGroupCRUD.Delete(suSuGroup)
+	err = handler.SuSuGroupCRUD.Delete(suSuGroup)
+	if err != nil {
+		respondError(w, 400, err.Error())
+		return
+	}
 	respondEmpty(w, 204)
 }

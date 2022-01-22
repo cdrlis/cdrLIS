@@ -15,11 +15,14 @@ import (
 )
 
 func main() {
-	config := LoadConfiguration("config.json")
 	// config.json (PostgreSQL)
+	//config := LoadConfiguration("config.json")
+
+	// config.cockroachdb.json (YugabyteDB)
+	config := LoadConfiguration("config.cockroachdb.json")
 	db, err := gorm.Open(config.Database.Dialect, config.Database.ConnectionString())
-	// YugabyteDB
 	// db, err := gorm.Open("postgres", "host=localhost port=5433 user=yugabyte dbname=yugabyte password=yugabyte sslmode=disable")
+
 	defer db.Close()
 	if err != nil {
 		panic(err)

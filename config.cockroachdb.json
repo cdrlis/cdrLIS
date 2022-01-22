@@ -1,0 +1,12 @@
+{
+  "database": {
+    "host": "localhost",
+    "port": 26257,
+    "user": "root",
+    "dbname": "ladm",
+    "password": "root",
+    "additionalOptions": "sslmode=disable",
+    "dialect": "postgres",
+    "log": true
+  }
+}
